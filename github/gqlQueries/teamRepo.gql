@@ -1,0 +1,20 @@
+query($org_name: String! ,$team: String!,$first: Int!,$after: String){
+  organization(login: $org_name){ 
+    team(slug: $team) {
+      repositories(first:$first,after:$after){
+        pageInfo { 
+            endCursor
+       	    hasNextPage
+      	}
+        edges{
+            node {
+                id
+                name 
+                isArchived
+            }
+            permission
+        }
+      }
+    }
+  }
+}
