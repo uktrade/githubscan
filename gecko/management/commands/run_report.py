@@ -1,5 +1,6 @@
 from gecko.helper.push import GeckoDataSet
 from django.core.management.base import BaseCommand
+import traceback
 
 
 class Command(BaseCommand):
@@ -10,5 +11,6 @@ class Command(BaseCommand):
             report.push()
             report.push_overview()
             self.stdout.write(self.style.SUCCESS("OK"))
-        except Exception as err:
-            print(err)
+        except Exception as e:
+            print("Report Error:{}".format(e))
+            traceback.print_exc()

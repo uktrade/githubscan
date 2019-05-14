@@ -15,8 +15,14 @@ class DBReport:
                                 ).values_list('repository', flat=True))
             alerts = list()
             for repository in teamrepo_set:
-                alerts_set = self.dbData.getVulnerabilities(
-                    repository=repository).values('repository', 'critical', 'high', 'moderate', 'low')[0]
+                try:
+                    alerts_set = self.dbData.getVulnerabilities(
+                        repository=repository).values('repository', 'critical', 'high', 'moderate', 'low')[0]
+
+                except IndexError:
+                    alerts_set = {'repository': repository, 'critical': -1,
+                                  'high': -1, 'moderate': -1, 'low': -1}
+
                 alerts.append(alerts_set)
 
             report[team] = alerts
@@ -25,18 +31,24 @@ class DBReport:
 
     def getOverviewReport(self):
         report = dict()
-
         repository_set = set(
-            (self.dbData.getRepos()).value_list('name', flat=True))
+            (self.dbData.getRepos()).values_list('name', flat=True))
 
         for repository in repository_set:
             repoteams_set = set(self.dbData.getRepoteams(
-                repository=repository).value_list('team', flat=True))
+                repository=repository).values_list('team', flat=True))
             repoteams = ' '.join(list(repoteams_set))
-            alerts_set = self.dbData.getVulnerabilities(
-                repository=repository).values('repository', 'critical', 'high', 'moderate', 'low')[0]
-            alerts_set.insert(0, repoteams)
 
-            report[repoteams] = alerts_set
+            try:
+                alerts_set = self.dbData.getVulnerabilities(
+                    repository=repository).values('repository', 'critical', 'high', 'moderate', 'low')[0]
+
+            except IndexError:
+                alerts_set = {'repository': repository, 'critical': -
+                              1, 'high': -1, 'moderate': -1, 'low': -1}
+
+            alerts_set.update({'teams': repoteams[:100]})
+
+            report[repository] = alerts_set
 
         return report

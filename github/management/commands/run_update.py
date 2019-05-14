@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from github.helper.DB import Update
+import traceback
 
 
 class Command(BaseCommand):
@@ -8,5 +9,6 @@ class Command(BaseCommand):
         try:
             Update().all()
             self.stdout.write(self.style.SUCCESS("OK"))
-        except Exception as err:
-            print(err)
+        except Exception as e:
+            print("Update Error:{}".format(e))
+            traceback.print_exc()

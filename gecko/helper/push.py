@@ -17,7 +17,7 @@ class GeckoDataSet:
 
     def __find_or_create_teams_dataset(self):
 
-        for team, alters in self.report.items():
+        for team, alerts in self.report.items():
 
             dataset = self.gbClient.datasets.find_or_create(
                 team + 'github.vulnerability.alerts.by_name',
@@ -32,41 +32,30 @@ class GeckoDataSet:
             )
 
             dataset.put([])
+            dataset.put(alerts)
 
-            formated_data = []
+    def __find_or_create_overview_dataset(self):
 
-            for alert in alters:
-                formated_data.append(alert)
+        dataset = self.gbClient.datasets.find_or_create('overview.github.vulnerability.alerts.by_name',
+                                                        {
+                                                            'teams': {'type': 'string', 'name': 'Teams'},
+                                                            'repository': {'type': 'string', 'name': 'Repository'},
+                                                            'critical': {'type': 'number', 'name': 'C'},
+                                                            'high': {'type': 'number', 'name': 'H'},
+                                                            'moderate': {'type': 'number', 'name': 'M'},
+                                                            'low': {'type': 'number', 'name': 'L'}
+                                                        },
+                                                        ['repository']
+                                                        )
+        dataset.put([])
+        formated_data = []
+        for repository, alerts in self.overview_report.items():
+            formated_data.append(alerts)
 
-            dataset.put(formated_data)
-
-    def __overview(self):
-
-        for repository, alters in self.overview_report.items():
-
-            dataset = self.gbClient.datasets.find_or_create('overview.github.vulnerability.alerts.by_name',
-                                                            {
-                                                                'teams': {'type': 'string', 'name': 'Teams'},
-                                                                'repository': {'type': 'string', 'name': 'Repository'},
-                                                                'critical': {'type': 'number', 'name': 'C'},
-                                                                'high': {'type': 'number', 'name': 'H'},
-                                                                'moderate': {'type': 'number', 'name': 'M'},
-                                                                'low': {'type': 'number', 'name': 'L'}
-                                                            },
-                                                            ['repository']
-                                                            )
-
-            dataset.put([])
-
-            formated_data = []
-
-            for alert in alters:
-                formated_data.append(alert)
-
-            dataset.put(formated_data)
+        dataset.put(formated_data)
 
     def push(self):
         self.__find_or_create_teams_dataset()
 
     def push_overview(self):
-        self.__overview()
+        self.__find_or_create_overview_dataset()

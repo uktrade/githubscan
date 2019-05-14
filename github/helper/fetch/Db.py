@@ -21,5 +21,5 @@ class Data:
         return teamrepos
 
     def getRepoteams(self, repository):
-        repoteams = GitHubTeamRepo.objects.filter(repoistory=repository)
+        repoteams = GitHubTeamRepo.objects.filter(repository=repository)
         return repoteams

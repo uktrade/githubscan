@@ -14,33 +14,40 @@ class Update:
         teamsInGitHub = self.githubInfo.getTeams()
         teamsInDb = self.dbData.getTeams()
 
-        gitHubTeamSet = set(teamsInGitHub.keys())
-        dbTeamSet = set(teamsInDb.values_list('id', flat=True))
+        gitHubTeamSet = set(teamsInGitHub.items())
+
+        dbTeamSet = set(teamsInDb.values_list('id', 'name'))
 
         add_records = gitHubTeamSet.difference(dbTeamSet)
         remove_rcords = dbTeamSet.difference(gitHubTeamSet)
 
-        for id in add_records:
-            GitHubTeam(id=id, name=teamsInGitHub[id]).save()
-
-        for id in remove_rcords:
+        for record in remove_rcords:
+            id = record[0]
             GitHubTeam.objects.filter(id=id).delete()
+
+        for record in add_records:
+            id = record[0]
+            name = record[1]
+            GitHubTeam(id=id, name=name).save()
 
     def repostorties(self):
         repostortiesInGitHub = self.githubInfo.getRepos()
         repostortiesInDb = self.dbData.getRepos()
 
-        gitHubRepositoriesSet = set(repostortiesInGitHub.keys())
-        dbRepositoriesSet = set(repostortiesInDb.values_list('id', flat=True))
+        gitHubRepositoriesSet = set(repostortiesInGitHub.items())
+        dbRepositoriesSet = set(repostortiesInDb.values_list('id', 'name'))
 
-        add_record = gitHubRepositoriesSet.difference(dbRepositoriesSet)
-        remove_record = dbRepositoriesSet.difference(gitHubRepositoriesSet)
+        add_records = gitHubRepositoriesSet.difference(dbRepositoriesSet)
+        remove_records = dbRepositoriesSet.difference(gitHubRepositoriesSet)
 
-        for id in add_record:
-            GitHubRepo(id=id, name=repostortiesInGitHub[id]).save()
-
-        for id in remove_record:
+        for record in remove_records:
+            id = record[0]
             GitHubRepo.objects.filter(id=id).delete()
+
+        for record in add_records:
+            id = record[0]
+            name = record[1]
+            GitHubRepo(id=id, name=name).save()
 
     def vulnerabilities(self):
         repostorties = set(
@@ -103,7 +110,7 @@ class Update:
                     team=team, repository=repository).delete()
 
     def all(self):
-        self.teams()
+        # self.teams()
         self.repostorties()
-        self.vulnerabilities()
-        self.teamRepositories()
+        # self.vulnerabilities()
+        # self.teamRepositories()
