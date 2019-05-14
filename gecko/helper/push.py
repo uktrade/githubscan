@@ -1,6 +1,7 @@
 import geckoboard as gb
 from django.conf import settings
 from gecko.helper.fetch import DBReport
+from time import sleep
 
 
 class GeckoDataSet:
@@ -15,10 +16,18 @@ class GeckoDataSet:
         except Exception as e:
             raise RuntimeError(e)
 
+        self.count = 0
+
+    def __wait(self):
+        # Ensure we are not sending more than 60 updates per minute , this is limit set by Geckoboard
+        if self.count >= 50:
+            sleep(65)
+            self.count = 0
+
     def __find_or_create_teams_dataset(self):
 
         for team, alerts in self.report.items():
-
+            self.__wait()
             dataset = self.gbClient.datasets.find_or_create(
                 team + 'github.vulnerability.alerts.by_name',
                 {
@@ -33,8 +42,11 @@ class GeckoDataSet:
 
             dataset.put([])
             dataset.put(alerts)
+            self.count += 3
 
     def __find_or_create_overview_dataset(self):
+
+        self.__wait()
 
         dataset = self.gbClient.datasets.find_or_create('overview.github.vulnerability.alerts.by_name',
                                                         {
