@@ -73,8 +73,15 @@ class Update:
             moderate = alertsInGithub[repository]['moderate']
             low = alertsInGithub[repository]['moderate']
 
-            GitHubVulnerabilityAlters.objects.update_or_create(
-                repository=repository, critical=critical, high=high, moderate=moderate, low=low)
+            repo_exixts = GitHubVulnerabilityAlters.objects.filter(
+                repository=repository).exists()
+
+            if repo_exixts:
+                GitHubVulnerabilityAlters.objects.filter(repository=repository).update(
+                    critical=critical, high=high, moderate=moderate, low=low)
+            else:
+                GitHubVulnerabilityAlters(
+                    repository=repository, critical=critical, high=high, moderate=moderate, low=low).save()
 
     def teamRepositories(self):
         teams = set(self.dbData.getTeams().values_list('name', flat=True))
@@ -110,7 +117,7 @@ class Update:
                     team=team, repository=repository).delete()
 
     def all(self):
-        # self.teams()
+        self.teams()
         self.repostorties()
-        # self.vulnerabilities()
-        # self.teamRepositories()
+        self.vulnerabilities()
+        self.teamRepositories()

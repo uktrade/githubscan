@@ -20,8 +20,7 @@ class GitHubRepo(models.Model):
 
 
 class GitHubVulnerabilityAlters(models.Model):
-    id = models.AutoField(primary_key=True)
-    repository = models.CharField(max_length=100)
+    repository = models.CharField(primary_key=True, max_length=100)
     critical = models.IntegerField()
     high = models.IntegerField()
     moderate = models.IntegerField()

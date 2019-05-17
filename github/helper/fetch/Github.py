@@ -96,7 +96,7 @@ class Info:
         while True:
             for node in response['data']['organization']['repository']['vulnerabilityAlerts']['nodes']:
                 severity = (node['securityVulnerability']['severity']).lower()
-                SERVERITY_COUNT[severity] = +1
+                SERVERITY_COUNT[severity] += 1
             if response['data']['organization']['repository']['vulnerabilityAlerts']['pageInfo']['hasNextPage'] is False:
                 break
             else:
