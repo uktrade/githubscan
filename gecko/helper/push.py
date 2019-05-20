@@ -2,12 +2,15 @@ import geckoboard as gb
 from django.conf import settings
 from gecko.helper.fetch import DBReport
 from time import sleep
+import requests
+import json
 
 
 class GeckoDataSet:
 
     def __init__(self):
         self.GECKO_API_TOKEN = settings.GECKO_TOKEN
+        self.GECKO_OVERVIEW_BOARD = settings.GECKO_OVERVIEW_BOARD
         self.report = DBReport().getReport()
         self.overview_report = DBReport().getOverviewReport()
         try:
@@ -44,30 +47,44 @@ class GeckoDataSet:
             dataset.put(alerts)
             self.count += 3
 
-    def __find_or_create_overview_dataset(self):
+    # def __find_or_create_overview_dataset(self):
 
-        self.__wait()
+    #     self.__wait()
 
-        dataset = self.gbClient.datasets.find_or_create('overview.github.vulnerability.alerts.by_name',
-                                                        {
-                                                            'teams': {'type': 'string', 'name': 'Teams'},
-                                                            'repository': {'type': 'string', 'name': 'Repository'},
-                                                            'critical': {'type': 'number', 'name': 'C'},
-                                                            'high': {'type': 'number', 'name': 'H'},
-                                                            'moderate': {'type': 'number', 'name': 'M'},
-                                                            'low': {'type': 'number', 'name': 'L'}
-                                                        },
-                                                        ['repository']
-                                                        )
-        dataset.put([])
-        formated_data = []
-        for repository, alerts in self.overview_report.items():
-            formated_data.append(alerts)
+    #     dataset = self.gbClient.datasets.find_or_create('overview.github.vulnerability.alerts.by_name',
+    #                                                     {
+    #                                                         'teams': {'type': 'string', 'name': 'Teams'},
+    #                                                         'repository': {'type': 'string', 'name': 'Repository'},
+    #                                                         'critical': {'type': 'number', 'name': 'C'},
+    #                                                         'high': {'type': 'number', 'name': 'H'},
+    #                                                         'moderate': {'type': 'number', 'name': 'M'},
+    #                                                         'low': {'type': 'number', 'name': 'L'}
+    #                                                     },
+    #                                                     ['repository']
+    #                                                     )
+    #     dataset.put([])
+    #     dataset.put(self.overview_report)
 
-        dataset.put(formated_data)
+    def __overviewListBoard(self):
+        data = list()
+
+        for info in self.overview_report[:15]:
+            data.append(
+                {
+                    'title':
+                    {
+                        'text': "C:{} H:{} M:{} L:{}".format(info['critical'], info['high'], info['moderate'], info['low'])
+                    },
+                    'description': "repository: {} Team(s): {}".format(info['repository'], info['teams'])
+                }
+            )
+
+        json_data = json.dumps({'api_key': self.GECKO_API_TOKEN, 'data': data})
+
+        request = requests.post(self.GECKO_OVERVIEW_BOARD, data=json_data)
 
     def push(self):
         self.__find_or_create_teams_dataset()
 
     def push_overview(self):
-        self.__find_or_create_overview_dataset()
+        self.__overviewListBoard()

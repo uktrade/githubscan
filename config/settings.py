@@ -34,7 +34,7 @@ DATABASE_NAME = env('DATABASE_NAME')
 GITHUB_TOKEN = env('GITHUB_TOKEN')
 GITHUB_API_URL = env('GITHUB_API_URL')
 GECKO_TOKEN = env('GECKO_TOKEN')
-
+GECKO_OVERVIEW_BOARD = env('GECKO_OVERVIEW_BOARD')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/

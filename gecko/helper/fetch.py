@@ -30,25 +30,32 @@ class DBReport:
         return report
 
     def getOverviewReport(self):
-        report = dict()
+        vulnerabilities = list()
         repository_set = set(
             (self.dbData.getRepos()).values_list('name', flat=True))
 
-        for repository in repository_set:
+        repository_with_vulnerability_enabled = set(self.dbData.getAllVulnerabilities(
+        ).values_list('repository', flat=True))
+
+        repository_with_vulnerability_disabled = repository_set.difference(
+            repository_with_vulnerability_enabled)
+
+        vulnerabilities = self.dbData.getAllVulnerabilities().order_by(
+            '-critical', '-high').values('repository', 'critical', 'high', 'moderate', 'low')
+
+        for repo in repository_with_vulnerability_disabled:
+            vulnerabilities.append(
+                {'repository': repo, 'critical': -1, 'high': -1, 'moderate': -1, 'low': -1})
+
+        for vulnerability in vulnerabilities:
+            repository = vulnerability['repository']
             repoteams_set = set(self.dbData.getRepoteams(
                 repository=repository).values_list('team', flat=True))
             repoteams = ' '.join(list(repoteams_set))
 
-            try:
-                alerts_set = self.dbData.getVulnerabilities(
-                    repository=repository).values('repository', 'critical', 'high', 'moderate', 'low')[0]
+            if len(repoteams) > 100:
+                repoteams = repoteams[:100]
 
-            except IndexError:
-                alerts_set = {'repository': repository, 'critical': -
-                              1, 'high': -1, 'moderate': -1, 'low': -1}
+            vulnerability.update({'teams': repoteams})
 
-            alerts_set.update({'teams': repoteams[:100]})
-
-            report[repository] = alerts_set
-
-        return report
+        return list(vulnerabilities)

@@ -16,6 +16,10 @@ class Data:
             repository=repository)
         return vulnerabilities
 
+    def getAllVulnerabilities(self):
+        vulnerabilities = GitHubVulnerabilityAlters.objects.all()
+        return vulnerabilities
+
     def getTeamRepos(self, team):
         teamrepos = GitHubTeamRepo.objects.filter(team=team)
         return teamrepos
