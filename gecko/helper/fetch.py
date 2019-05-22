@@ -41,8 +41,9 @@ class DBReport:
         repository_with_vulnerability_disabled = repository_set.difference(
             repository_with_vulnerability_enabled)
 
+        # Select top 20 results ordered_by , fields defined in queryset
         vulnerabilities = self.dbData.getAllVulnerabilities().order_by(
-            '-critical', '-high').values('repository', 'critical', 'high', 'moderate', 'low')
+            '-critical', '-high', 'repository').values('repository', 'critical', 'high', 'moderate', 'low')[:20]
 
         for repo in repository_with_vulnerability_disabled:
             vulnerabilities.append(
@@ -53,8 +54,14 @@ class DBReport:
             repoteams_set = set(self.dbData.getRepoteams(
                 repository=repository).values_list('team', flat=True))
 
-            if len(repoteams_set) > 1:
-                repoteam = choice(list(repoteams_set)) + '++'
+            if len(repository_set) == 0:
+                repoteam = 'None'
+            else:
+                if len(repoteams_set) == 1:
+                    repoteam = repoteams_set.pop()
+                else:
+                    if len(repoteams_set) > 1:
+                        repoteam = choice(list(repoteams_set)) + '++'
 
             vulnerability.update({'teams': repoteam})
 

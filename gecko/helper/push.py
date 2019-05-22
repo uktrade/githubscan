@@ -61,7 +61,7 @@ class GeckoDataSet:
                                                         },
                                                         )
         dataset.put([])
-        dataset.put(self.overview_report[:20])
+        dataset.put(self.overview_report)
 
     def push(self):
         self.__find_or_create_teams_dataset()
