@@ -12,7 +12,7 @@ class GitHubTeam(models.Model):
 
 class GitHubRepo(models.Model):
     name = models.CharField(primary_key=True, max_length=100)
-    skip_scan = models.BooleanField()
+    skip_scan = models.BooleanField(default=False)
 
     def __str__(self):
         return '{}'.format(self.name)

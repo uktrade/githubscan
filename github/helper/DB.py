@@ -46,17 +46,20 @@ class Update:
             GitHubRepo.objects.filter(name=record).delete()
 
         for record in add_records:
-            GitHubRepo(name=record, skip_scan=self.__skip_scan(
-                repository=record)).save()
+            GitHubRepo(name=record).save()
 
-    def __skip_scan(self, repository):
-        topics = self.githubInfo.getRepoTopics(repository=repository)
+    def skip_scan(self):
+        repostortiesInDb = set(
+            self.dbData.getRepos().values_list('name', flat=True))
 
-        if topics:
-            if self.skip_topic in topics:
-                return True
-
-        return False
+        for repository in repostortiesInDb:
+            topics = self.githubInfo.getRepoTopics(repository=repository)
+            skip_scan_status = False
+            if topics:
+                if self.skip_topic in topics:
+                    skip_scan_status = True
+            GitHubRepo.objects.filter(
+                name=repository).update(skip_scan=skip_scan_status)
 
     def vulnerabilities(self):
         repostorties = set(
@@ -128,5 +131,6 @@ class Update:
     def all(self):
         self.teams()
         self.repostorties()
+        self.skip_scan()
         self.vulnerabilities()
         self.teamRepositories()
