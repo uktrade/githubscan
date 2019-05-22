@@ -10,7 +10,6 @@ class GeckoDataSet:
 
     def __init__(self):
         self.GECKO_API_TOKEN = settings.GECKO_TOKEN
-        self.GECKO_OVERVIEW_BOARD = settings.GECKO_OVERVIEW_BOARD
         self.report = DBReport().getReport()
         self.overview_report = DBReport().getOverviewReport()
         try:
@@ -62,7 +61,7 @@ class GeckoDataSet:
                                                         },
                                                         )
         dataset.put([])
-        dataset.put(self.overview_report)
+        dataset.put(self.overview_report[:20])
 
     def push(self):
         self.__find_or_create_teams_dataset()

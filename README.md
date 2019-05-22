@@ -18,6 +18,7 @@ ORG_NAME=uktrade
 GITHUB_TOKEN=<git-hub-token>
 GITHUB_API_URL="https://api.github.com/graphql"
 GECKO_TOKEN=<gecko-board-token>
+SKIP_TOPIC='skip-vulnerability-scan'
 ```
 
 ### Commands
@@ -29,7 +30,17 @@ Push updates to Geckoboard
 ```bash
 $python manage.py run_report
 ```
+Update vulnerability db and , push updates to Geckoboard
+```bash
+$python manage.py run_update_and_report
+```
 
 ### Prerequisites
 - Enable Graph dependency in github 
 - Enable Aleters in github 
+
+### Feature
+- **Overview board:** showing top 20
+- '++' after team name indicates there are more than one team associated with repository
+- A seperate board for each team ( basedon github teams)
+- **Skip scan:** if topic 'skip-vulnerability-scan' is found on repo , it will skip running vulnerability scan and displaying it on board

@@ -4,12 +4,12 @@ from github.models import GitHubTeam, GitHubRepo, GitHubVulnerabilityAlters, Git
 # Register your models here.
 @admin.register(GitHubTeam)
 class GitHubTeamAdmin(admin.ModelAdmin):
-    list_display = ('name', 'id')
+    pass
 
 
 @admin.register(GitHubRepo)
 class GitHubRepoAdmin(admin.ModelAdmin):
-    list_display = ('name', 'id')
+    pass
 
 
 @admin.register(GitHubVulnerabilityAlters)

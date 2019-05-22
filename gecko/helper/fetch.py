@@ -1,4 +1,5 @@
 from github.helper.fetch.Db import Data
+from random import choice
 
 
 class DBReport:
@@ -51,11 +52,10 @@ class DBReport:
             repository = vulnerability['repository']
             repoteams_set = set(self.dbData.getRepoteams(
                 repository=repository).values_list('team', flat=True))
-            repoteams = ' '.join(list(repoteams_set))
 
-            if len(repoteams) > 100:
-                repoteams = repoteams[:100]
+            if len(repoteams_set) > 1:
+                repoteam = choice(list(repoteams_set)) + '++'
 
-            vulnerability.update({'teams': repoteams})
+            vulnerability.update({'teams': repoteam})
 
         return list(vulnerabilities)

@@ -2,6 +2,7 @@ from github.helper.fetch.Github import Info
 from github.helper.fetch.Db import Data
 from github.models import GitHubTeam, GitHubRepo, GitHubVulnerabilityAlters, GitHubTeamRepo
 from time import sleep
+from django.conf import settings
 
 
 class Update:
@@ -9,45 +10,53 @@ class Update:
     def __init__(self):
         self.githubInfo = Info()
         self.dbData = Data()
+        self.skip_topic = settings.SKIP_TOPIC
 
     def teams(self):
         teamsInGitHub = self.githubInfo.getTeams()
         teamsInDb = self.dbData.getTeams()
 
-        gitHubTeamSet = set(teamsInGitHub.items())
+        gitHubTeamSet = set(teamsInGitHub)
 
-        dbTeamSet = set(teamsInDb.values_list('id', 'name'))
+        dbTeamSet = set(teamsInDb.values_list('name', flat=True))
 
         add_records = gitHubTeamSet.difference(dbTeamSet)
         remove_rcords = dbTeamSet.difference(gitHubTeamSet)
 
         for record in remove_rcords:
-            id = record[0]
-            GitHubTeam.objects.filter(id=id).delete()
+            GitHubTeam.objects.filter(name=record).delete()
 
         for record in add_records:
-            id = record[0]
-            name = record[1]
-            GitHubTeam(id=id, name=name).save()
+            GitHubTeam(name=record).save()
 
     def repostorties(self):
         repostortiesInGitHub = self.githubInfo.getRepos()
         repostortiesInDb = self.dbData.getRepos()
 
-        gitHubRepositoriesSet = set(repostortiesInGitHub.items())
-        dbRepositoriesSet = set(repostortiesInDb.values_list('id', 'name'))
+        gitHubRepositoriesSet = set(repostortiesInGitHub)
+        dbRepositoriesSet = set(
+            repostortiesInDb.values_list('name', flat=True))
 
         add_records = gitHubRepositoriesSet.difference(dbRepositoriesSet)
         remove_records = dbRepositoriesSet.difference(gitHubRepositoriesSet)
 
+        # Add feature to remove record with the scan disabled
+
         for record in remove_records:
-            id = record[0]
-            GitHubRepo.objects.filter(id=id).delete()
+            GitHubRepo.objects.filter(name=record).delete()
 
         for record in add_records:
-            id = record[0]
-            name = record[1]
-            GitHubRepo(id=id, name=name).save()
+            GitHubRepo(name=record, skip_scan=self.__skip_scan(
+                repository=record)).save()
+
+    def __skip_scan(self, repository):
+        topics = self.githubInfo.getRepoTopics(repository=repository)
+
+        if topics:
+            if self.skip_topic in topics:
+                return True
+
+        return False
 
     def vulnerabilities(self):
         repostorties = set(

@@ -8,7 +8,7 @@ class Data:
         return teams
 
     def getRepos(self):
-        repositories = GitHubRepo.objects.all()
+        repositories = GitHubRepo.objects.filter(skip_scan=False)
         return repositories
 
     def getVulnerabilities(self, repository):

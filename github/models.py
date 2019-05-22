@@ -4,16 +4,15 @@ from django.db import models
 
 
 class GitHubTeam(models.Model):
-    id = models.CharField(primary_key=True, max_length=200)
-    name = models.CharField(max_length=100)
+    name = models.CharField(primary_key=True, max_length=100)
 
     def __str__(self):
         return '{}'.format(self.name)
 
 
 class GitHubRepo(models.Model):
-    id = models.CharField(primary_key=True, max_length=200)
-    name = models.CharField(max_length=100)
+    name = models.CharField(primary_key=True, max_length=100)
+    skip_scan = models.BooleanField()
 
     def __str__(self):
         return '{}'.format(self.name)

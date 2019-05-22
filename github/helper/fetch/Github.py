@@ -30,7 +30,7 @@ class Info:
             self.GITHUB_API_URL, data=payload)
 
     def getTeams(self):
-        teams = dict()
+        teams = list()
         query = self.__openQuery(os.path.join(
             self.APP_ROOT, 'github', 'gqlQueries', 'teams.gql'))
         query_variables = {"org_name": self.ORG_NAME, "first": self.first}
@@ -41,8 +41,8 @@ class Info:
         while True:
             for edge in response['data']['organization']['teams']['edges']:
                 if edge['node']['name'] != "default":
-                    teams[edge['node']['id']] = (
-                        edge['node']['name']).replace(' ', '-').lower()
+                    teams.append(
+                        (edge['node']['name']).replace(' ', '-').lower())
             if response['data']['organization']['teams']['pageInfo']['hasNextPage'] is False:
                 break
             else:
@@ -55,7 +55,7 @@ class Info:
         return teams
 
     def getRepos(self):
-        repos = dict()
+        repos = list()
         query = self.__openQuery(os.path.join(
             self.APP_ROOT, 'github', 'gqlQueries', 'repos.gql'))
         query_variables = {"org_name": self.ORG_NAME, "first": self.first}
@@ -67,7 +67,7 @@ class Info:
         while True:
             for edge in response['data']['organization']['repositories']['edges']:
                 if not edge['node']['isArchived']:
-                    repos[edge['node']['id']] = edge['node']['name']
+                    repos.append(edge['node']['name'])
             if response['data']['organization']['repositories']['pageInfo']['hasNextPage'] is False:
                 break
             else:
@@ -136,3 +136,34 @@ class Info:
                     payload=data)).json()
 
         return teamrepos
+
+    def getRepoTopics(self, repository):
+        topics = list()
+        query = self.__openQuery(os.path.join(
+            self.APP_ROOT, 'github', 'gqlQueries', 'repoTopics.gql'))
+        query_variables = {"org_name": self.ORG_NAME,
+                           "repo_name": repository, "first": self.first}
+
+        data = json.dumps({"query": query, "variables": query_variables})
+
+        response = (self.__GithubResponse(payload=data)).json()
+
+        while True:
+
+            edges = response['data']['organization']['repository']['repositoryTopics']['edges']
+
+            if edges:
+                for edge in edges:
+                    topics.append(edge['node']['topic']['name'])
+
+            if response['data']['organization']['repository']['repositoryTopics']['pageInfo']['hasNextPage'] is False:
+                break
+            else:
+                query_variables.update(
+                    {"after": response['data']['organization']['repository']['repositoryTopics']['pageInfo']['endCursor']})
+                data = json.dumps(
+                    {"query": query, "variables": query_variables})
+                response = (self.__GithubResponse(
+                    payload=data)).json()
+
+        return topics
