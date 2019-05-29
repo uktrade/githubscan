@@ -31,7 +31,7 @@ class GeckoDataSet:
         for team, alerts in self.report.items():
             self.__wait()
             dataset = self.gbClient.datasets.find_or_create(
-                team + 'github.vulnerability.alerts.by_name',
+                team + '.github.vulnerability.alerts.by_name',
                 {
                     'repository': {'type': 'string', 'name': 'Repository'},
                     'critical': {'type': 'number', 'name': 'C'},
@@ -39,7 +39,6 @@ class GeckoDataSet:
                     'moderate': {'type': 'number', 'name': 'M'},
                     'low': {'type': 'number', 'name': 'L'}
                 },
-                ['repository']
             )
 
             dataset.put([])
