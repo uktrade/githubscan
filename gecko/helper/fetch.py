@@ -42,8 +42,8 @@ class DBReport:
             repository_with_vulnerability_enabled)
 
         # Select top 20 results ordered_by , fields defined in queryset
-        vulnerabilities = self.dbData.getAllVulnerabilities().order_by(
-            '-critical', '-high', 'repository').values('repository', 'critical', 'high', 'moderate', 'low')[:20]
+        vulnerabilities = list(self.dbData.getAllVulnerabilities().order_by(
+            '-critical', '-high', 'repository').values('repository', 'critical', 'high', 'moderate', 'low')[:20])
 
         for repo in repository_with_vulnerability_disabled:
             vulnerabilities.append(

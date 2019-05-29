@@ -1,7 +1,0 @@
-applications:
-  buildpacks:
-    - appdbuildpack
-    - python_buildpack
-
-  env:
-    APPD_AGENT: python
