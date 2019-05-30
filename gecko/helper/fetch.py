@@ -54,7 +54,7 @@ class DBReport:
             repoteams_set = set(self.dbData.getRepoteams(
                 repository=repository).values_list('team', flat=True))
 
-            if len(repository_set) == 0:
+            if len(repoteams_set) == 0:
                 repoteam = 'None'
             else:
                 if len(repoteams_set) == 1:
