@@ -46,7 +46,7 @@ class GeckoDataSet:
             self.count += 3
 
     def __find_or_create_overview_dataset(self):
-
+    
         self.__wait()
 
         dataset = self.gbClient.datasets.find_or_create('overview.github.vulnerability.alerts.by_name',

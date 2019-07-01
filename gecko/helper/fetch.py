@@ -18,7 +18,8 @@ class DBReport:
             for repository in teamrepo_set:
                 try:
                     alerts_set = self.dbData.getVulnerabilities(
-                        repository=repository).values('repository', 'critical', 'high', 'moderate', 'low')[0]
+                        repository=repository).order_by(
+                        '-critical', '-high', '-low', 'repository').values('repository', 'critical', 'high', 'moderate', 'low')[0]
 
                 except IndexError:
                     alerts_set = {'repository': repository, 'critical': -1,
