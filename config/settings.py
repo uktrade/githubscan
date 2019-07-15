@@ -35,7 +35,9 @@ GITHUB_TOKEN = env('GITHUB_TOKEN')
 GITHUB_API_URL = env('GITHUB_API_URL')
 GECKO_TOKEN = env('GECKO_TOKEN')
 SKIP_TOPIC = env('SKIP_TOPIC')
-
+NOTIFY_API_KEY = env('NOTIFY_API_KEY')
+NOTIFY_TEMPLATE_ID = env('NOTIFY_TEMPLATE_ID')
+EMAIL_REPORT_TO = env.list('EMAIL_REPORT_TO')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
@@ -53,7 +55,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'core',
     'github',
-    'gecko'
+    'gecko',
+    'emailreport'
 ]
 
 MIDDLEWARE = [

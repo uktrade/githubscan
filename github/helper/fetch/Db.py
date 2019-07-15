@@ -1,3 +1,4 @@
+from django.db.models import Q
 from github.models import GitHubRepo, GitHubTeam, GitHubVulnerabilityAlters, GitHubTeamRepo
 
 
@@ -27,3 +28,8 @@ class Data:
     def getRepoteams(self, repository):
         repoteams = GitHubTeamRepo.objects.filter(repository=repository)
         return repoteams
+
+    def getVulnerableRepos(self):
+        vulnerableRepos = GitHubVulnerabilityAlters.objects.filter(
+            Q(critical__gt=0) | Q(high__gt=0)).values_list('repository', flat=True)
+        return vulnerableRepos

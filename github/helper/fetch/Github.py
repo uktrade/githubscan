@@ -1,4 +1,5 @@
 from django.conf import settings
+from operator import itemgetter
 import requests
 import os
 import json
@@ -170,3 +171,54 @@ class Info:
                     payload=data)).json()
 
         return topics
+
+    def getVulnerabilityDetails(self, repository):
+
+        report = dict()
+        severities = list()
+
+        self.session.headers.update(
+            {'Accept': 'application/vnd.github.vixen-preview+json'})
+        query = self.__openQuery(os.path.join(
+            self.APP_ROOT, 'github', 'gqlQueries', 'vulnerabilityAlerts.gql'))
+        query_variables = {"org_name": self.ORG_NAME,
+                           "repo_name": repository, "first": self.first}
+
+        data = json.dumps({"query": query, "variables": query_variables})
+
+        response = (self.__GithubResponse(payload=data)).json()
+
+        while True:
+            for node in response['data']['organization']['repository']['vulnerabilityAlerts']['nodes']:
+                cve = None
+                if node['dismissedAt'] is None:
+                    severity = (node['securityVulnerability']
+                                ['severity']).lower()
+                    if severity == 'critical' or severity == 'high':
+                        package_name = node['securityVulnerability']['package']['name']
+                        cve_url = None
+                        for identifier in node['securityAdvisory']['identifiers']:
+                            identifier_type = (identifier['type']).lower()
+                            if identifier_type == 'cve':
+                                cve = identifier['value']
+
+                                if len(node['securityAdvisory']['references']) > 1:
+                                    cve_url = node['securityAdvisory']['references'][1]['url']
+                                else:
+                                    cve_url = node['securityAdvisory']['references'][0]['url']
+
+                                details = tuple(
+                                    [package_name, severity, cve, cve_url])
+                                severities.append(details)
+
+            if response['data']['organization']['repository']['vulnerabilityAlerts']['pageInfo']['hasNextPage'] is False:
+                break
+            else:
+                query_variables.update(
+                    {"after": response['data']['organization']['repository']['vulnerabilityAlerts']['pageInfo']['endCursor']})
+                data = json.dumps(
+                    {"query": query, "variables": query_variables})
+                response = (self.__GithubResponse(payload=data)).json()
+
+        sorted_severities = sorted(severities, key=itemgetter(1))
+        return set(sorted_severities)
