@@ -1,6 +1,3 @@
-from tabulate import tabulate
-
-
 class ReportData:
 
     def __init__(self):
@@ -35,5 +32,6 @@ class ReportData:
                     severity_data = ['', team, '', '', '', '', '']
                     data.append(severity_data)
 
-        return tabulate(data, headers=[
-            "repository", "teams", "Package", "Severity", "CVE", "CVE URL", "Github URL"], tablefmt="grid")
+        data.insert(0, ["repository", "teams", "Package",
+                        "Severity", "CVE", "CVE URL", "Github URL"])
+        return data
