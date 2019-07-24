@@ -4,34 +4,44 @@ class ReportData:
         pass
 
     def format(self, raw_report):
-        names = raw_report.keys()
-        data = list()
+        repo_names = raw_report.keys()
+        csv_data = list()
+        email_content = str()
+        data = dict()
 
-        for name in names:
-            severities = raw_report[name]['severities']
-            teams = raw_report[name]['teams']
+        csv_data.append(["repository", "teams", "Package",
+                         "Severity", "CVE", "CVE URL", "Github URL"])
+
+        for repository in repo_names:
+            critical_count = 0
+            high_count = 0
+            summary_string = str()
+
+            severities = raw_report[repository]['severities']
+
+            if raw_report[repository]['teams']:
+                teams = "; ".join(raw_report[repository]['teams'])
+            else:
+                teams = 'None'
+
             severity_data = list()
-            team = str()
+
             github_alerts_link = "https://github.com/uktrade/{}/network/alerts".format(
-                name)
-            for index, severity in enumerate(severities):
-                if len(teams):
-                    team = teams.pop()
-                if index is 0:
-                    if not team:
-                        team = 'None'
-                    severity_data = [
-                        name, team] + list(severity) + [github_alerts_link]
-                else:
-                    severity_data = ['', team] + list(severity) + ['']
-                team = str()
-                data.append(severity_data)
+                repository)
+            for severity in severities:
+                severity_data = [repository, teams,
+                                 severity, github_alerts_link]
 
-            if len(teams):
-                for team in teams:
-                    severity_data = ['', team, '', '', '', '', '']
-                    data.append(severity_data)
+                if severity[1] == 'high':
+                    high_count += 1
+                if severity[1] == 'critical':
+                    critical_count += 1
 
-        data.insert(0, ["repository", "teams", "Package",
-                        "Severity", "CVE", "CVE URL", "Github URL"])
+                csv_data.append(severity_data)
+
+            email_content += "#{}\n * Critical: {} \n * High: {}\n * Associated team(s): {}\n * GitHub link: {} \n \n".format(
+                repository, critical_count, high_count, teams, github_alerts_link)
+
+        data = {'csv': csv_data, 'content': email_content}
+
         return data

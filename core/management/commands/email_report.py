@@ -13,11 +13,11 @@ class Command(BaseCommand):
 
             report = Report()
             process_report = ReportData()
-            text = process_report.format(raw_report=report.getReport())
+            data = process_report.format(raw_report=report.getReport())
             emails = settings.EMAIL_REPORT_TO
-            Email(emails, text)
+            Email(emails, data)
             self.stdout.write(self.style.SUCCESS(
-                "Email Sent:{} OK".format(email)))
+                "Email Sent to: {}".format(",".join(emails))))
         except Exception as e:
             print("Core Email Send Error:{}".format(e))
             traceback.print_exc()

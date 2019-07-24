@@ -7,14 +7,14 @@ import csv
 
 class Email:
 
-    def __init__(self, emails, text):
+    def __init__(self, emails, data):
         notifications_client = NotificationsAPIClient(settings.NOTIFY_API_KEY)
 
         FILE_NAME = 'report.csv'
 
         with open(FILE_NAME, 'w') as csvFile:
             f = csv.writer(csvFile)
-            f.writerows(text)
+            f.writerows(data['csv'])
             csvFile.close()
 
         for to in emails:
@@ -22,7 +22,11 @@ class Email:
                 response = notifications_client.send_email_notification(
                     email_address=to,
                     template_id=settings.NOTIFY_TEMPLATE_ID,
-                    personalisation={'link_to_document': prepare_upload(f)}
+                    personalisation={
+                        'content': data['content'],
+                        'report': prepare_upload(f),
+                        'signature': "Regards,\nWebOps\n\nDepartment for International Trade | 50 Victoria Street | London SW1E 5LB | E-mail: webops@digital.trade.gov.uk"
+                    }
                 )
 
         os.remove(FILE_NAME)
