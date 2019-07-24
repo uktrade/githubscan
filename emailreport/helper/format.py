@@ -20,7 +20,7 @@ class ReportData:
             severities = raw_report[repository]['severities']
 
             if raw_report[repository]['teams']:
-                teams = "; ".join(raw_report[repository]['teams'])
+                teams = "| ".join(raw_report[repository]['teams'])
             else:
                 teams = 'None'
 
@@ -29,8 +29,8 @@ class ReportData:
             github_alerts_link = "https://github.com/uktrade/{}/network/alerts".format(
                 repository)
             for severity in severities:
-                severity_data = [repository, teams,
-                                 severity, github_alerts_link]
+                severity_data = [repository, teams] + \
+                    list(severity) + [github_alerts_link]
 
                 if severity[1] == 'high':
                     high_count += 1
