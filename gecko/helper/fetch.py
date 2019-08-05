@@ -1,5 +1,6 @@
 from github.helper.fetch.Db import Data
 from random import choice
+from django.db.models import Q
 
 
 class DBReport:
@@ -42,8 +43,11 @@ class DBReport:
         repository_with_vulnerability_disabled = repository_set.difference(
             repository_with_vulnerability_enabled)
 
-        # Select top 20 results ordered_by , fields defined in queryset
-        vulnerabilities = list(self.dbData.getAllVulnerabilities().order_by(
+        # Select top 20 non zero result results ordered_by , fields defined in queryset
+        non_zero_values = self.dbData.getAllVulnerabilities().filter(
+            Q(critical__gte=1) | Q(high__gte=1) | Q(low__gte=1))
+
+        vulnerabilities = list(non_zero_values.order_by(
             '-critical', '-high', 'repository').values('repository', 'critical', 'high', 'moderate', 'low')[:20])
 
         for repo in repository_with_vulnerability_disabled:
