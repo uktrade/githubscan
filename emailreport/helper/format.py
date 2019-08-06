@@ -15,6 +15,9 @@ class ReportData:
         for repository in repo_names:
             critical_count = 0
             high_count = 0
+            moderate_count = 0
+            low_count = 0
+
             summary_string = str()
 
             severities = raw_report[repository]['severities']
@@ -36,11 +39,16 @@ class ReportData:
                     high_count += 1
                 if severity[1] == 'critical':
                     critical_count += 1
+                if severity[1] == 'moderate':
+                    moderate_count += 1
+                if severity[1] == 'low':
+                    low_count += 1
 
-                csv_data.append(severity_data)
+                if high_count or critical_count or moderate_count or low_count:
+                    csv_data.append(severity_data)
 
-            email_content += "#{}\n * Critical: {} \n * High: {}\n * Associated team(s): {}\n * GitHub link: {} \n \n".format(
-                repository, critical_count, high_count, teams, github_alerts_link)
+                    email_content += "#{}\n * Critical: {} \n * High: {}\n * Moderate: {}\n * Low:{}\n * Associated team(s): {}\n * GitHub link: {} \n \n".format(
+                        repository, critical_count, high_count, moderate_count, low_count, teams, github_alerts_link)
 
         data = {'csv': csv_data, 'content': email_content}
 
