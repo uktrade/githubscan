@@ -189,12 +189,15 @@ class Info:
         response = (self.__GithubResponse(payload=data)).json()
 
         while True:
-            for node in response['data']['organization']['repository']['vulnerabilityAlerts']['nodes']:
-                cve = None
-                if node['dismissedAt'] is None:
-                    severity = (node['securityVulnerability']
-                                ['severity']).lower()
-                    if severity == 'critical' or severity == 'high':
+            nodes = response['data']['organization']['repository']['vulnerabilityAlerts']['nodes']
+            # Lets not try to loop if it is None ( i.e. no Servrity exits)
+            if nodes:
+                for node in nodes:
+                    cve = None
+                    if node['dismissedAt'] is None:
+                        severity = (node['securityVulnerability']
+                                    ['severity']).lower()
+
                         package_name = node['securityVulnerability']['package']['name']
                         cve_url = None
                         for identifier in node['securityAdvisory']['identifiers']:
@@ -211,14 +214,17 @@ class Info:
                                     [package_name, severity, cve, cve_url])
                                 severities.append(details)
 
-            if response['data']['organization']['repository']['vulnerabilityAlerts']['pageInfo']['hasNextPage'] is False:
-                break
+                if response['data']['organization']['repository']['vulnerabilityAlerts']['pageInfo']['hasNextPage'] is False:
+                    break
+                else:
+                    query_variables.update(
+                        {"after": response['data']['organization']['repository']['vulnerabilityAlerts']['pageInfo']['endCursor']})
+                    data = json.dumps(
+                        {"query": query, "variables": query_variables})
+                    response = (self.__GithubResponse(payload=data)).json()
+
             else:
-                query_variables.update(
-                    {"after": response['data']['organization']['repository']['vulnerabilityAlerts']['pageInfo']['endCursor']})
-                data = json.dumps(
-                    {"query": query, "variables": query_variables})
-                response = (self.__GithubResponse(payload=data)).json()
+                break
 
         sorted_severities = sorted(severities, key=itemgetter(1))
         return set(sorted_severities)

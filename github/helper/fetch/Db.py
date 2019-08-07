@@ -30,6 +30,6 @@ class Data:
         return repoteams
 
     def getVulnerableRepos(self):
-        vulnerableRepos = GitHubVulnerabilityAlters.objects.filter(
-            Q(critical__gt=0) | Q(high__gt=0)).values_list('repository', flat=True)
+        vulnerableRepos = GitHubVulnerabilityAlters.objects.values_list(
+            'repository', flat=True)
         return vulnerableRepos
