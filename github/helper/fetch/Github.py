@@ -194,10 +194,10 @@ class Info:
             if nodes:
                 for node in nodes:
                     cve = None
+
                     if node['dismissedAt'] is None:
                         severity = (node['securityVulnerability']
                                     ['severity']).lower()
-
                         package_name = node['securityVulnerability']['package']['name']
                         cve_url = None
                         for identifier in node['securityAdvisory']['identifiers']:
