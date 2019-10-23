@@ -203,7 +203,7 @@ class Info:
                         has_cve_identifier = False
                         cve_url = None
                         for identifier in node['securityAdvisory']['identifiers']:
-                            if (identifier['type']).lower() == 'cve':
+                            if identifier['type'].lower() == 'cve':
                                 has_cve_identifier = True
                                 cve_identifier = identifier
 
@@ -219,11 +219,10 @@ class Info:
                             identifier_type = node['securityAdvisory']['identifiers'][0]['type']
                             identifier_value = node['securityAdvisory']['identifiers'][0]['value']
 
-                        details = tuple(
-                            [package_name, severity, identifier_type, identifier_value, cve_url])
-                        severities.append(details)
+                        severities.append(tuple(
+                            [package_name, severity, identifier_type, identifier_value, cve_url]))
 
-                if response['data']['organization']['repository']['vulnerabilityAlerts']['pageInfo']['hasNextPage'] is False:
+                if not response['data']['organization']['repository']['vulnerabilityAlerts']['pageInfo']['hasNextPage']:
                     break
                 else:
                     query_variables.update(
