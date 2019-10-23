@@ -13,7 +13,7 @@ class ReportData:
         data = dict()
         severity_counter = Counter()
         csv_data.append(["repository", "teams", "Package",
-                         "Severity", "CVE", "CVE URL", "Github URL"])
+                         "Severity", "type", "value", "URL", "Github URL"])
 
         for repository in repo_names:
 
