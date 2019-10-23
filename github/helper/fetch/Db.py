@@ -1,5 +1,5 @@
 from django.db.models import Q
-from github.models import GitHubRepo, GitHubTeam, GitHubVulnerabilityAlters, GitHubTeamRepo
+from github.models import GitHubRepo, GitHubTeam, GitHubVulnerabilityAlters, GitHubTeamRepo, GitHubTeamAdminEmail
 
 
 class Data:
@@ -33,3 +33,14 @@ class Data:
         vulnerableRepos = GitHubVulnerabilityAlters.objects.values_list(
             'repository', flat=True)
         return vulnerableRepos
+
+    def getTeamsFromAdminTable(self):
+        teamsInAdminTable = GitHubTeamAdminEmail.objects.values_list(
+            'team', flat=True)
+        return teamsInAdminTable
+
+    def getTeamAdminEmail(self, team):
+        admin_email = str()
+        admin_email = (GitHubTeamAdminEmail.objects.filter(
+            team=team).values_list('admin_email', flat=True))[0]
+        return admin_email

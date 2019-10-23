@@ -18,3 +18,18 @@ class Report:
                 'teams': teams, 'severities': self.gc.getVulnerabilityDetails(repository=repo)}
 
         return report
+
+    def getTeamReport(self, team):
+        report = dict()
+        teamRepos = set(self.dbData.getTeamRepos(
+            team=team).values_list('repository', flat=True))
+        vulnerableRepos = set(self.dbData.getVulnerableRepos())
+
+        vulnerableTeamRepos = teamRepos.intersection(vulnerableRepos)
+
+        if (vulnerableTeamRepos):
+            for repo in vulnerableTeamRepos:
+                report[repo] = {
+                    'teams': [team], 'severities': self.gc.getVulnerabilityDetails(repository=repo)}
+
+        return report
