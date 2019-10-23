@@ -199,22 +199,30 @@ class Info:
                                     ['severity']).lower()
 
                         package_name = node['securityVulnerability']['package']['name']
+                        cve_identifier = dict()
+                        has_cve_identifier = False
                         cve_url = None
                         for identifier in node['securityAdvisory']['identifiers']:
-                            identifier_type = (identifier['type']).lower()
-                            if identifier_type == 'cve':
-                                cve = identifier['value']
+                            if identifier['type'].lower() == 'cve':
+                                has_cve_identifier = True
+                                cve_identifier = identifier
 
-                                if len(node['securityAdvisory']['references']) > 1:
-                                    cve_url = node['securityAdvisory']['references'][1]['url']
-                                else:
-                                    cve_url = node['securityAdvisory']['references'][0]['url']
+                        if has_cve_identifier:
+                            identifier_type = cve_identifier['type']
+                            identifier_value = cve_identifier['value']
+                            if len(node['securityAdvisory']['references']) > 1:
+                                cve_url = node['securityAdvisory']['references'][1]['url']
+                            else:
+                                cve_url = node['securityAdvisory']['references'][0]['url']
 
-                                details = tuple(
-                                    [package_name, severity, cve, cve_url])
-                                severities.append(details)
+                        else:
+                            identifier_type = node['securityAdvisory']['identifiers'][0]['type']
+                            identifier_value = node['securityAdvisory']['identifiers'][0]['value']
 
-                if response['data']['organization']['repository']['vulnerabilityAlerts']['pageInfo']['hasNextPage'] is False:
+                        severities.append((
+                            package_name, severity, identifier_type, identifier_value, cve_url),)
+
+                if not response['data']['organization']['repository']['vulnerabilityAlerts']['pageInfo']['hasNextPage']:
                     break
                 else:
                     query_variables.update(
