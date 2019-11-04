@@ -14,6 +14,7 @@ import os
 import dj_database_url
 import environ
 import json
+import whitenoise
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -48,15 +49,18 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 # Application definition
 
 INSTALLED_APPS = [
+    'custom_usermodel',
+    'authbroker_client',
+    'core',
+    'github',
+    'gecko',
+    'emailreport',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'core',
-    'github',
-    'gecko',
-    'emailreport'
+    'django.contrib.staticfiles',
 ]
 
 MIDDLEWARE = [
@@ -67,7 +71,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
+
 
 ROOT_URLCONF = 'config.urls'
 
@@ -135,8 +141,27 @@ USE_L10N = True
 
 USE_TZ = True
 
+AUTH_USER_MODEL = 'custom_usermodel.User'
+
+AUTHBROKER_URL = env('AUTHBROKER_URL')
+AUTHBROKER_CLIENT_ID = env('AUTHBROKER_CLIENT_ID')
+AUTHBROKER_CLIENT_SECRET = env('AUTHBROKER_CLIENT_SECRET')
+AUTHBROKER_SCOPES = 'read write'
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'authbroker_client.backends.AuthbrokerBackend',
+]
+
+LOGIN_URL = '/auth/login'
+LOGIN_REDIRECT_UR = '/admin'
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'authbroker_client.backends.AuthbrokerBackend',
+]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
-
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
