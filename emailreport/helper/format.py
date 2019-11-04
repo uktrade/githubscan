@@ -7,7 +7,6 @@ class ReportData:
         pass
 
     def format(self, raw_report):
-
         if raw_report:
             repo_names = raw_report.keys()
             csv_data = list()
