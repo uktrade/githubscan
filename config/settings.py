@@ -49,8 +49,6 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 # Application definition
 
 INSTALLED_APPS = [
-    'custom_usermodel',
-    'authbroker_client',
     'core',
     'github',
     'gecko',
@@ -140,25 +138,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
-AUTH_USER_MODEL = 'custom_usermodel.User'
-
-AUTHBROKER_URL = env('AUTHBROKER_URL')
-AUTHBROKER_CLIENT_ID = env('AUTHBROKER_CLIENT_ID')
-AUTHBROKER_CLIENT_SECRET = env('AUTHBROKER_CLIENT_SECRET')
-AUTHBROKER_SCOPES = 'read write'
-
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'authbroker_client.backends.AuthbrokerBackend',
-]
-
-LOGIN_URL = '/auth/login'
-LOGIN_REDIRECT_UR = '/admin'
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'authbroker_client.backends.AuthbrokerBackend',
-]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
