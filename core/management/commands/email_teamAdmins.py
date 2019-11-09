@@ -11,18 +11,17 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             dbData = Data()
-            teams = set(dbData.getTeamsFromAdminTable())
+            teams = set(dbData.getTeams())
 
             for team in teams:
-                admin_email = dbData.getTeamAdminEmail(team=team)
-                if(admin_email):
+                if(team.admin_email):
                     report = Report()
                     process_report = ReportData()
                     data = process_report.format(
-                        raw_report=report.getTeamReport(team=team))
+                        raw_report=report.getTeamReport(team=team.name))
 
                     if (data):
-                        Email([admin_email], data)
+                        Email([team.admin_email], data)
 
         except Exception as e:
             print("Team Email Send Error:{}".format(e))

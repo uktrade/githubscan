@@ -1,6 +1,6 @@
 from github.helper.fetch.Github import Info
 from github.helper.fetch.Db import Data
-from github.models import GitHubTeam, GitHubRepo, GitHubVulnerabilityAlters, GitHubTeamRepo, GitHubTeamAdminEmail
+from github.models import GitHubTeam, GitHubRepo, GitHubVulnerabilityAlters, GitHubTeamRepo
 from time import sleep
 from django.conf import settings
 from django.db.models import Q
@@ -139,24 +139,9 @@ class Update:
                 GitHubTeamRepo.objects.filter(
                     team=team, repository=repository).delete()
 
-    def teamAdminEmail(self):
-        teams = set(self.dbData.getTeams().values_list('name', flat=True))
-        currentTeamsInAdminTable = set(self.dbData.getTeamsFromAdminTable())
-
-        add_record = teams.difference(currentTeamsInAdminTable)
-
-        remove_record = currentTeamsInAdminTable.difference(teams)
-
-        for team in add_record:
-            GitHubTeamAdminEmail(team=team).save()
-
-        for team in remove_record:
-            GitHubTeamAdminEmail.objects.filter(team=team).delete()
-
     def all(self):
         self.teams()
         self.repostorties()
         self.skip_scan()
         self.vulnerabilities()
         self.teamRepositories()
-        self.teamAdminEmail()

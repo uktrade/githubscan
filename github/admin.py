@@ -1,10 +1,12 @@
 from django.contrib import admin
 
-from github.models import GitHubTeam, GitHubRepo, GitHubVulnerabilityAlters, GitHubTeamRepo, GitHubTeamAdminEmail
+from github.models import GitHubTeam, GitHubRepo, GitHubVulnerabilityAlters, GitHubTeamRepo
+
+
 # Register your models here.
 @admin.register(GitHubTeam)
 class GitHubTeamAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('name','admin_email')
 
 
 @admin.register(GitHubRepo)
@@ -20,8 +22,3 @@ class GitHubVulnerabilityAltersAdmin(admin.ModelAdmin):
 @admin.register(GitHubTeamRepo)
 class GitHubTeamRepoAdmin(admin.ModelAdmin):
     list_display = ('team', 'repository')
-
-
-@admin.register(GitHubTeamAdminEmail)
-class GitHibTeamAdminEmailAdmin(admin.ModelAdmin):
-    list_display = ('team', 'admin_email')
