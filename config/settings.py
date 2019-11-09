@@ -43,7 +43,7 @@ EMAIL_REPORT_TO = env.list('EMAIL_REPORT_TO')
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 
 
 # Application definition
