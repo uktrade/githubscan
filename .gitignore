@@ -131,3 +131,5 @@ dmypy.json
 # VSCode config
 .vscode/
 # End of https://www.gitignore.io/api/django
+
+static/
