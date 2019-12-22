@@ -11,17 +11,20 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             dbData = Data()
-            teams = set(dbData.getTeams())
+            admin_emails = dbData.getTeamAdminEmails()
+            for email in admin_emails:
+                teams = dbData.getTeamsByAdminEmail(admin_email=email['admin_email'])
 
-            for team in teams:
-                if(team.admin_email):
-                    report = Report()
-                    process_report = ReportData()
-                    data = process_report.format(
-                        raw_report=report.getTeamReport(team=team.name))
+                report = Report()
+                process_report = ReportData()
+                raw_reports = {}
 
-                    if (data):
-                        Email([team.admin_email], data)
+                for team in teams:
+                    raw_reports.update(report.getTeamReport(team=team.name))
+                    
+                data = process_report.format(raw_report=raw_reports)
+                if (data):
+                    Email([team.admin_email], data)
 
         except Exception as e:
             print("Team Email Send Error:{}".format(e))
