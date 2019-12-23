@@ -8,6 +8,12 @@ class Data:
         teams = GitHubTeam.objects.all()
         return teams
 
+    def getTeamAdminEmails(self):
+        return self.getTeams().exclude(admin_email='').values('admin_email').distinct()
+
+    def getTeamsByAdminEmail(self,admin_email):
+        return self.getTeams().filter(admin_email=admin_email)
+
     def getRepos(self):
         repositories = GitHubRepo.objects.filter(skip_scan=False)
         return repositories
