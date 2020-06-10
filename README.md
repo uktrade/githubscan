@@ -11,14 +11,19 @@ is to fetch git hub alerts of each repository and update the Geckoboard dataset 
 
 ### Environment Varibales
 ```bash
-DEBUG=True
-SECRET_KEY=<django-secret-key>
-DATABASE_NAME=github.sqlite3
-ORG_NAME=uktrade
-GITHUB_TOKEN=<git-hub-token>
-GITHUB_API_URL="https://api.github.com/graphql"
-GECKO_TOKEN=<gecko-board-token>
-SKIP_TOPIC='skip-vulnerability-scan'
+{
+  "ALLOWED_HOSTS": "*",
+  "DEBUG": "False",
+  "EMAIL_REPORT_TO": "email1@domain.com,email2@anotherdomain.com",
+  "GECKO_TOKEN": "<GECKO_TOKEN>",
+  "GITHUB_API_URL": "https://api.github.com/graphql",
+  "GITHUB_TOKEN": "<GITHUB_TOKEN>",
+  "NOTIFY_API_KEY":"<GDS_NOTIFY_APIKEY>",
+  "NOTIFY_TEMPLATE_ID": "<GDS_NOTIFY_TEMPLATEID>",
+  "ORG_NAME": "<GITHUB_ORG>",
+  "SECRET_KEY": "<DJANGO_SECRET_KEY>",
+  "SKIP_TOPIC": "skip-vulnerability-scan"
+}
 ```
 
 ### Commands
@@ -34,6 +39,14 @@ Update vulnerability db and , push updates to Geckoboard
 ```bash
 $python manage.py run_update_and_report
 ```
+Send report to EMAIL_REPORT_TO specified in environment variables
+```bash
+$python manage.py email_report
+```
+Send report to team admins, as specefied in github team table
+```bash
+$python manage.py email_teamAdmin
+```
 
 ### Prerequisites
 - Enable Graph dependency in github 
@@ -44,3 +57,5 @@ $python manage.py run_update_and_report
 - '++' after team name indicates there are more than one team associated with repository
 - A seperate board for each team ( basedon github teams)
 - **Skip scan:** if topic 'skip-vulnerability-scan' is found on repo , it will skip running vulnerability scan and displaying it on board
+- send consolidated report of all the vulnurable repository in github organisation to team ( such as security team ) specified in EMAIL_REPORT_TO
+- send team specific reports to team admin, as specified in  githubteam table (This needs to be done manually by member of WebOps at the moment).
