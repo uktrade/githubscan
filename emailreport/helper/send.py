@@ -16,13 +16,14 @@ class Email:
             f = csv.writer(csvFile)
             f.writerows(data['csv'])
             csvFile.close()
-
-        for to in emails:
+    
+        for to,subject in emails.items():
             with open(FILE_NAME, 'rb') as f:
                 response = notifications_client.send_email_notification(
                     email_address=to,
                     template_id=settings.NOTIFY_TEMPLATE_ID,
                     personalisation={
+                        'subject': subject,
                         'content': data['content'],
                         'report': prepare_upload(f),
                         'signature': "Regards,\nWebOps\n\nDepartment for International Trade | 50 Victoria Street | London SW1E 5LB | E-mail: webops@digital.trade.gov.uk"

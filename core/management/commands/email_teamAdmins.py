@@ -17,7 +17,6 @@ class Command(BaseCommand):
             for email in admin_emails:
                 teams = dbData.getTeamsByAdminEmail(admin_email=email['admin_email'])
 
-
                 report_data = {}
                 for team in teams:
                     if (team.admin_email):
@@ -27,12 +26,15 @@ class Command(BaseCommand):
         
                         report_data = self.merge_reports(report_data,team_report)                     
                         
-            
+
                 if(report_data):
                     process_report = ReportData()
                     data = process_report.format(raw_report=report_data)
                 
-                    Email(admin_emails, data)
+                email = {};
+                
+                email[admin_emails[0]] = f'Daily : Github Team(s) Vulnerabilities Scan Report'
+                Email(email, data)
 
         except Exception as e:
             print("Team Email Send Error:{}".format(e))
