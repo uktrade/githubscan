@@ -7,7 +7,7 @@ import csv
 
 class Email:
 
-    def __init__(self, emails, data):
+    def __init__(self, emails,subject, data):
         notifications_client = NotificationsAPIClient(settings.NOTIFY_API_KEY)
 
         FILE_NAME = 'report.csv'
@@ -16,8 +16,8 @@ class Email:
             f = csv.writer(csvFile)
             f.writerows(data['csv'])
             csvFile.close()
-    
-        for to,subject in emails.items():
+
+        for to in emails:
             with open(FILE_NAME, 'rb') as f:
                 response = notifications_client.send_email_notification(
                     email_address=to,

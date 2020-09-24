@@ -12,13 +12,11 @@ class Command(BaseCommand):
         try:
 
             report = Report()
-            emails = {}
             process_report = ReportData()
             data = process_report.format(raw_report=report.getReport())
-            for email in settings.EMAIL_REPORT_TO:
-                emails[email] = f'Daily : Github Organisation Vulnerabilities Scan Report'
-                
-            Email(emails, data)
+            emails = settings.EMAIL_REPORT_TO
+            subject = f'Daily : Github Organisation Vulnerabilities Scan Report'
+            Email(emails,subject,data)
             self.stdout.write(self.style.SUCCESS(
                 "Email Sent to: {}".format(",".join(emails))))
         except Exception as e:
