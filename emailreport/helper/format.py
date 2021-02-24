@@ -13,9 +13,12 @@ class ReportData:
             email_content = ''
             data = dict()
             severity_counter = Counter()
+            total_severity = Counter()
+
             csv_data.append(["repository", "teams", "Package",
                              "Severity", "type", "value", "URL", "Github URL"])
 
+            email_content = "#Report Per repository\n"
             for repository in repo_names:
 
                 summary_string = ''
@@ -36,14 +39,19 @@ class ReportData:
                         list(severity) + [github_alerts_link]
 
                     severity_counter[severity[1]] += 1
-
+                
                 if(list(severity_counter.elements())):
                     csv_data.append(severity_data)
+                    total_severity += severity_counter
                     email_content += "#{}\n * Critical: {} \n * High: {}\n * Moderate: {}\n * Low:{}\n * Associated team(s): {}\n * GitHub link: {} \n \n".format(
                         repository, severity_counter['critical'], severity_counter['high'], severity_counter['moderate'], severity_counter['low'], teams, github_alerts_link)
                     severity_counter.clear()
 
-            data = {'csv': csv_data, 'content': email_content}
+            
+            summary_string = "#Total Severities in Report\n * Critial: {}\n * High: {}\n * Moderate: {}\n * Low: {}\n \n" .format(
+                total_severity['critial'],total_severity['high'],total_severity['moderate'],total_severity['low'])
+
+            data = {'csv': csv_data, 'content': email_content, 'summary': summary_string}
 
             return data
 

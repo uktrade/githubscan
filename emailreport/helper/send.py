@@ -25,6 +25,7 @@ class Email:
                     personalisation={
                         'subject': subject,
                         'content': data['content'],
+                        'summary': data['summary'],
                         'report': prepare_upload(f),
                         'signature': "Regards,\nWebOps\n\nDepartment for International Trade | 50 Victoria Street | London SW1E 5LB | E-mail: webops@digital.trade.gov.uk"
                     }
