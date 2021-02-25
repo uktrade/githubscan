@@ -39,6 +39,10 @@ SKIP_TOPIC = env('SKIP_TOPIC')
 NOTIFY_API_KEY = env('NOTIFY_API_KEY')
 NOTIFY_TEMPLATE_ID = env('NOTIFY_TEMPLATE_ID')
 EMAIL_REPORT_TO = env.list('EMAIL_REPORT_TO')
+SLACK_CHANNEL = env('SLACK_CHANNEL')
+SLACK_ENABLED = env('SLACK_ENABLED')
+SLACK_TOKEN = env('SLACK_TOKEN')
+SLACK_URL = env('SLACK_URL')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
