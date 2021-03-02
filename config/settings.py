@@ -38,11 +38,14 @@ GECKO_TOKEN = env('GECKO_TOKEN')
 SKIP_TOPIC = env('SKIP_TOPIC')
 NOTIFY_API_KEY = env('NOTIFY_API_KEY')
 NOTIFY_TEMPLATE_ID = env('NOTIFY_TEMPLATE_ID')
-EMAIL_REPORT_TO = env.list('EMAIL_REPORT_TO')
+ORG_REPORT_EMAILS = env.list('ORG_REPORT_EMAILS')
 SLACK_CHANNEL = env('SLACK_CHANNEL')
 SLACK_ENABLED = env('SLACK_ENABLED')
 SLACK_TOKEN = env('SLACK_TOKEN')
 SLACK_URL = env('SLACK_URL')
+SIGNATURE= env.str('SIGNATURE')
+TEAMS_REPORT_EMAILS=env('TEAMS_REPORT_EMAILS')
+FIRST_N_RECORDS=int(env('FIRST_N_RECORDS'))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
@@ -53,10 +56,7 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 # Application definition
 
 INSTALLED_APPS = [
-    'core',
     'github',
-    'gecko',
-    'emailreport',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

@@ -14,7 +14,7 @@ is to fetch git hub alerts of each repository and update the Geckoboard dataset 
 {
   "ALLOWED_HOSTS": "*",
   "DEBUG": "False",
-  "EMAIL_REPORT_TO": "email1@domain.com,email2@anotherdomain.com",
+  "ORG_REPORT_EMAILS": "email1@domain.com,email2@anotherdomain.com",
   "GECKO_TOKEN": "<GECKO_TOKEN>",
   "GITHUB_API_URL": "https://api.github.com/graphql",
   "GITHUB_TOKEN": "<GITHUB_TOKEN>",
@@ -39,7 +39,7 @@ Update vulnerability db and , push updates to Geckoboard
 ```bash
 $python manage.py run_update_and_report
 ```
-Send report to EMAIL_REPORT_TO specified in environment variables
+Send report to ORG_REPORT_EMAILS specified in environment variables
 ```bash
 $python manage.py email_report
 ```
@@ -57,5 +57,5 @@ $python manage.py email_teamAdmin
 - '++' after team name indicates there are more than one team associated with repository
 - A seperate board for each team ( basedon github teams)
 - **Skip scan:** if topic 'skip-vulnerability-scan' is found on repo , it will skip running vulnerability scan and displaying it on board
-- send consolidated report of all the vulnurable repository in github organisation to team ( such as security team ) specified in EMAIL_REPORT_TO
+- send consolidated report of all the vulnurable repository in github organisation to team ( such as security team ) specified in ORG_REPORT_EMAILS
 - send team specific reports to team admin, as specified in  githubteam table (This needs to be done manually by member of WebOps at the moment).

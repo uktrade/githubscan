@@ -1,14 +1,14 @@
 from django.core.management.base import BaseCommand
-from github.helper.DB import Update
 import traceback
-
+from github.db.updater import Updater
+from github.client import GHClient
 
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            Update().all()
+            Updater().all()
             self.stdout.write(self.style.SUCCESS("OK"))
         except Exception as e:
-            print("Update Error:{}".format(e))
+            print("Github Fetch Error:{}".format(e))
             traceback.print_exc()
