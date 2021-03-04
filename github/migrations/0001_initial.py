@@ -15,33 +15,39 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='GitHubRepo',
             fields=[
-                ('name', models.CharField(max_length=100, primary_key=True, serialize=False)),
+                ('name', models.CharField(max_length=100,
+                                          primary_key=True, serialize=False)),
                 ('skip_scan', models.BooleanField(default=False)),
             ],
         ),
         migrations.CreateModel(
             name='GitHubTeam',
             fields=[
-                ('name', models.CharField(max_length=100, primary_key=True, serialize=False)),
+                ('name', models.CharField(max_length=100,
+                                          primary_key=True, serialize=False)),
             ],
         ),
         migrations.CreateModel(
             name='GitHubVulnerabilityCount',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('critical', models.IntegerField()),
                 ('high', models.IntegerField()),
                 ('moderate', models.IntegerField()),
                 ('low', models.IntegerField()),
-                ('repository', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='github.githubrepo')),
+                ('repository', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='github.githubrepo')),
             ],
         ),
         migrations.CreateModel(
             name='GitHubTeamRepo',
             fields=[
                 ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('repository', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='github.githubrepo')),
-                ('team', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='github.githubteam')),
+                ('repository', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='github.githubrepo')),
+                ('team', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='github.githubteam')),
             ],
         ),
         migrations.CreateModel(
@@ -53,7 +59,8 @@ class Migration(migrations.Migration):
                 ('identifier_type', models.CharField(max_length=20)),
                 ('identifier_value', models.CharField(max_length=20)),
                 ('advisory_url', models.CharField(max_length=200, null=True)),
-                ('repository', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='github.githubrepo')),
+                ('repository', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='github.githubrepo')),
             ],
         ),
     ]

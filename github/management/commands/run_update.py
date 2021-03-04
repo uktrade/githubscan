@@ -3,6 +3,7 @@ import traceback
 from github.db.updater import Updater
 from github.client import GHClient
 
+
 class Command(BaseCommand):
 
     def handle(self, *args, **options):

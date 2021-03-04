@@ -43,9 +43,9 @@ SLACK_CHANNEL = env('SLACK_CHANNEL')
 SLACK_ENABLED = env('SLACK_ENABLED')
 SLACK_TOKEN = env('SLACK_TOKEN')
 SLACK_URL = env('SLACK_URL')
-SIGNATURE= env.str('SIGNATURE')
-TEAMS_REPORT_EMAILS=env('TEAMS_REPORT_EMAILS')
-FIRST_N_RECORDS=int(env('FIRST_N_RECORDS'))
+SIGNATURE = env.str('SIGNATURE')
+TEAMS_REPORT_EMAILS = env('TEAMS_REPORT_EMAILS')
+FIRST_N_RECORDS = int(env('FIRST_N_RECORDS'))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 

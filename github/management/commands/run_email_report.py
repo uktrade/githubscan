@@ -23,31 +23,31 @@ class Command(BaseCommand):
     def email_org_report(self):
         try:
             report = EmailReport()
-            data =report.getReport()
+            data = report.getReport()
             emails = settings.ORG_REPORT_EMAILS
-            self.__send_email__(emails,data)
+            self.__send_email__(emails, data)
             self.stdout.write(self.style.SUCCESS(
                 "Org Email Sent to: {}".format(",".join(emails))))
         except Exception as e:
             print("Org  Email Send Error:{}".format(e))
             traceback.print_exc()
-    
+
     def email_team_reports(self):
         try:
             report = EmailReport()
-            teams_emails = json.loads(settings.TEAMS_REPORT_EMAILS)
-            for team,emails in teams_emails.items():
-                data =report.getTeamReport(team=team)
-                if data['content']:
-                    self.__send_email__(emails,data)
+            teams_emails = json.loads(
+                settings.TEAMS_REPORT_EMAILS.replace('=>', ':'))
+            for team, emails in teams_emails.items():
+                data = report.getTeamReport(team=team)
+                if data['content'] and emails:
+                    self.__send_email__(emails, data)
                     self.stdout.write(self.style.SUCCESS(
-                         "Team Email Sent to: {}".format(",".join(emails))))
+                        "Team Email Sent to: {}".format(",".join(emails))))
         except Exception as e:
             print("Org  Email Send Error:{}".format(e))
             traceback.print_exc()
-    
 
-    def __send_email__(self, emails,data):
+    def __send_email__(self, emails, data):
         notifications_client = NotificationsAPIClient(settings.NOTIFY_API_KEY)
 
         FILE_NAME = 'report.csv'

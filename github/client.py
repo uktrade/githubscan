@@ -17,7 +17,7 @@ class GHClient:
     ORG_NAME = settings.ORG_NAME
     APP_ROOT = settings.BASE_DIR
     GITHUB_API_URL = settings.GITHUB_API_URL
-    
+
     def __init__(self):
         self.session = requests.Session()
         self.session.headers.update(self.HEADERS)
@@ -31,17 +31,17 @@ class GHClient:
     def __GithubResponse(self, payload):
         return self.session.post(
             self.GITHUB_API_URL, data=payload)
-    
+
     def getRepos(self):
         repos = list()
         query = self.__openQuery(os.path.join(
-            self.APP_ROOT,'github', 'gqlQueries', 'repos.gql'))
+            self.APP_ROOT, 'github', 'gqlQueries', 'repos.gql'))
         query_variables = {"org_name": self.ORG_NAME, "first": self.first}
 
         data = json.dumps({"query": query, "variables": query_variables})
 
         response = (self.__GithubResponse(payload=data)).json()
- 
+
         while True:
             for edge in response['data']['organization']['repositories']['edges']:
                 if not edge['node']['isArchived']:
@@ -143,7 +143,7 @@ class GHClient:
         return teamrepos
 
     def getVulnerabilityAlerts(self, repository):
-    
+
         severities = list()
 
         self.session.headers.update(
@@ -162,7 +162,7 @@ class GHClient:
             # Lets not try to loop if it is None ( i.e. no Servrity exits)
             if nodes is not None:
                 for node in nodes:
-      
+
                     if node['dismissedAt'] is None:
                         severity = (node['securityVulnerability']
                                     ['severity']).lower()

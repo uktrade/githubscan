@@ -16,23 +16,23 @@ class Retriver:
     def getTeamRepos(self, team):
         return GitHubTeamRepo.objects.filter(team=team)
 
-    def getRepoTeams(self,repository):
+    def getRepoTeams(self, repository):
         return GitHubTeamRepo.objects.filter(repository=repository)
 
-    def getRepo(self,repository):
+    def getRepo(self, repository):
         return (self.getRepos()).filter(name=repository).first()
 
-    def getTeam(self,team):
+    def getTeam(self, team):
         return (self.getTeams()).filter(name=team).first()
 
     def getVulnerableRepositories(self):
         return GitHubRepoVulnerabilites.objects.values('repository').distinct()
 
-    def getVulnerableRepoReport(self,repository):
+    def getVulnerableRepoReport(self, repository):
         return GitHubVulnerabilityCount.objects.filter(repository=repository)
-    
-    def getSortedVunrableRepos(self,repositories):
-        return GitHubVulnerabilityCount.objects.filter(repository__in=repositories).order_by('critical','high','moderate','low').reverse()
 
-    def getDetailsRepoVulnerabilities(self,repository):
+    def getSortedVunrableRepos(self, repositories):
+        return GitHubVulnerabilityCount.objects.filter(repository__in=repositories).order_by('critical', 'high', 'moderate', 'low').reverse()
+
+    def getDetailsRepoVulnerabilities(self, repository):
         return GitHubRepoVulnerabilites.objects.filter(repository=repository)
