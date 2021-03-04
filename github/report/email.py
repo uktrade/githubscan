@@ -10,7 +10,7 @@ import json
 class EmailReport(Report):
 
     def __init__(self):
-        self.signature = json.loads(settings.SIGNATURE)
+        self.signature = settings.SIGNATURE
         super().__init__()
 
     def getReport(self):
