@@ -38,9 +38,10 @@ class Command(BaseCommand):
             teams_emails = json.loads(settings.TEAMS_REPORT_EMAILS)
             for team,emails in teams_emails.items():
                 data =report.getTeamReport(team=team)
-                self.__send_email__(emails,data)
-                self.stdout.write(self.style.SUCCESS(
-                     "Team Email Sent to: {}".format(",".join(emails))))
+                if data['content']:
+                    self.__send_email__(emails,data)
+                    self.stdout.write(self.style.SUCCESS(
+                         "Team Email Sent to: {}".format(",".join(emails))))
         except Exception as e:
             print("Org  Email Send Error:{}".format(e))
             traceback.print_exc()
