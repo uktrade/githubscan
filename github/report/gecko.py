@@ -40,7 +40,7 @@ class GeskoReport(Report):
             data = {}
             if teams == None:
                 repo_teams = list(self.db_client.getRepoTeams(
-                    repository=repository).values_list('team', flat=True))
+                    repository=repository).values_list('name', flat=True))
 
                 if len(repo_teams) > 1:
                     repo_teams = f'{repo_teams.pop()}++'

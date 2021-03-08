@@ -1,38 +1,48 @@
-from github.models import GitHubRepo
-from github.models import GitHubTeam
-from github.models import GitHubTeamRepo
-from github.models import GitHubRepoVulnerabilites
-from github.models import GitHubVulnerabilityCount
-
+from github.models import Repository
+from github.models import Team
+from github.models import RepositoryVulnerability
+from github.models import RepositoryVulnerabilityCount
+from github.models import RepositorySLOBreachCount
 
 class Retriver:
 
     def getRepos(self):
-        return GitHubRepo.objects.all()
+        return Repository.objects.all()
 
     def getTeams(self):
-        return GitHubTeam.objects.all()
+        return Team.objects.all()
 
     def getTeamRepos(self, team):
-        return GitHubTeamRepo.objects.filter(team=team)
+        return Team(name=team)
 
     def getRepoTeams(self, repository):
-        return GitHubTeamRepo.objects.filter(repository=repository)
+        #This is how you retrive all the team for repository in many to many realtion
+        return Team.objects.filter(repositories__name=repository)
 
     def getRepo(self, repository):
-        return (self.getRepos()).filter(name=repository).first()
+        return Repository(name=repository)
 
     def getTeam(self, team):
         return (self.getTeams()).filter(name=team).first()
 
     def getVulnerableRepositories(self):
-        return GitHubRepoVulnerabilites.objects.values('repository').distinct()
+        return RepositoryVulnerability.objects.values('repository').distinct()
 
     def getVulnerableRepoReport(self, repository):
-        return GitHubVulnerabilityCount.objects.filter(repository=repository)
+        return RepositoryVulnerabilityCount.objects.filter(repository=repository)
 
     def getSortedVunrableRepos(self, repositories):
-        return GitHubVulnerabilityCount.objects.filter(repository__in=repositories).order_by('critical', 'high', 'moderate', 'low').reverse()
+        return RepositoryVulnerabilityCount.objects.filter(repository__in=repositories).order_by('critical', 'high', 'moderate', 'low').reverse()
 
     def getDetailsRepoVulnerabilities(self, repository):
-        return GitHubRepoVulnerabilites.objects.filter(repository=repository)
+        return RepositoryVulnerability.objects.filter(repository=repository)
+
+
+    def getRepoSloBreach(self,repository):
+        return RepositorySLOBreachCount.objects.filter(repository=repository)
+
+    def getSloBreachRepos(self):
+        return RepositorySLOBreachCount.objects.all()
+
+    def getSloBreachReposOfInterest(self,repositories):
+        return RepositorySLOBreachCount.objects.filter(repository__in=repositories)

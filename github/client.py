@@ -187,8 +187,10 @@ class GHClient:
                             identifier_type = node['securityAdvisory']['identifiers'][0]['type']
                             identifier_value = node['securityAdvisory']['identifiers'][0]['value']
 
+                        published_at = node['securityAdvisory']['publishedAt']
+                        
                         severities.append((
-                            package_name, severity, identifier_type, identifier_value, cve_url),)
+                            package_name, severity, identifier_type, identifier_value, cve_url,published_at))
 
                 if not response['data']['organization']['repository']['vulnerabilityAlerts']['pageInfo']['hasNextPage']:
                     break
