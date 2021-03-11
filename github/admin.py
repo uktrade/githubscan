@@ -28,6 +28,7 @@ class GitHubRepoVulnerabilitesAdmin(admin.ModelAdmin):
     list_display = ('repository', 'identifier_type',
                     'identifier_value', 'severity_level', 'advisory_url')
 
+
 @admin.register(RepositorySLOBreachCount)
 class GitHubSloBreachCountAdmin(admin.ModelAdmin):
     list_display = ('repository', 'critical', 'high', 'moderate', 'low')

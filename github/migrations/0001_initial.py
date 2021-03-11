@@ -16,26 +16,30 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Repository',
             fields=[
-                ('name', models.CharField(max_length=100, primary_key=True, serialize=False)),
+                ('name', models.CharField(max_length=100,
+                                          primary_key=True, serialize=False)),
                 ('skip_scan', models.BooleanField(default=False)),
             ],
         ),
         migrations.CreateModel(
             name='Team',
             fields=[
-                ('name', models.CharField(max_length=100, primary_key=True, serialize=False)),
+                ('name', models.CharField(max_length=100,
+                                          primary_key=True, serialize=False)),
                 ('repositories', models.ManyToManyField(to='github.Repository')),
             ],
         ),
         migrations.CreateModel(
             name='RepositoryVulnerabilityCount',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('critical', models.IntegerField()),
                 ('high', models.IntegerField()),
                 ('moderate', models.IntegerField()),
                 ('low', models.IntegerField()),
-                ('repository', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='github.repository')),
+                ('repository', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='github.repository')),
             ],
         ),
         migrations.CreateModel(
@@ -47,23 +51,27 @@ class Migration(migrations.Migration):
                 ('identifier_type', models.CharField(max_length=20)),
                 ('identifier_value', models.CharField(max_length=20)),
                 ('advisory_url', models.CharField(max_length=200, null=True)),
-                ('published_at', models.DateTimeField(default=django.utils.timezone.now)),
+                ('published_at', models.DateTimeField(
+                    default=django.utils.timezone.now)),
                 ('detection_date', models.DateTimeField(auto_now_add=True)),
                 ('publish_age_in_days', models.IntegerField(default=0)),
                 ('detection_age_in_days', models.IntegerField(default=0)),
                 ('slo_breach', models.BooleanField(default=False)),
-                ('repository', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='github.repository')),
+                ('repository', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='github.repository')),
             ],
         ),
         migrations.CreateModel(
             name='RepositorySLOBreachCount',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('critical', models.IntegerField()),
                 ('high', models.IntegerField()),
                 ('moderate', models.IntegerField()),
                 ('low', models.IntegerField()),
-                ('repository', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='github.repository')),
+                ('repository', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='github.repository')),
             ],
         ),
     ]

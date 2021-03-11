@@ -4,6 +4,7 @@ from github.models import RepositoryVulnerability
 from github.models import RepositoryVulnerabilityCount
 from github.models import RepositorySLOBreachCount
 
+
 class Retriver:
 
     def getRepos(self):
@@ -16,7 +17,7 @@ class Retriver:
         return Team(name=team)
 
     def getRepoTeams(self, repository):
-        #This is how you retrive all the team for repository in many to many realtion
+        # This is how you retrive all the team for repository in many to many realtion
         return Team.objects.filter(repositories__name=repository)
 
     def getRepo(self, repository):
@@ -37,12 +38,11 @@ class Retriver:
     def getDetailsRepoVulnerabilities(self, repository):
         return RepositoryVulnerability.objects.filter(repository=repository)
 
-
-    def getRepoSloBreach(self,repository):
+    def getRepoSloBreach(self, repository):
         return RepositorySLOBreachCount.objects.filter(repository=repository)
 
     def getSloBreachRepos(self):
         return RepositorySLOBreachCount.objects.all()
 
-    def getSloBreachReposOfInterest(self,repositories):
+    def getSloBreachReposOfInterest(self, repositories):
         return RepositorySLOBreachCount.objects.filter(repository__in=repositories)

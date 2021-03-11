@@ -41,6 +41,7 @@ class RepositoryVulnerabilityCount(models.Model):
     moderate = models.IntegerField()
     low = models.IntegerField()
 
+
 class RepositorySLOBreachCount(models.Model):
     repository = models.ForeignKey('Repository', on_delete=models.CASCADE)
     critical = models.IntegerField()

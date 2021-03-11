@@ -8,7 +8,6 @@ class SlackReport(Report):
     def __init__(self):
         super().__init__()
         self.slack_message = []
-        
 
     def getReportMessage(self):
         self.__getSummaryReport__()
@@ -17,14 +16,14 @@ class SlackReport(Report):
         self.__getOrphanRepoReport__()
         return self.slack_message
 
+    def __addHeaderAndSectionToBlock__(self, header, section_text):
+        message_header = {"type": "header", "text": {
+            "type": "plain_text", "text": header}}
+        message_section = {"type": "section", "text": {
+            "type": "mrkdwn", "text": section_text}}
 
-    def __addHeaderAndSectionToBlock__(self,header,section_text):
-        message_header = { "type": "header", "text": {"type":"plain_text","text": header } }
-        message_section = { "type": "section", "text": {"type":"mrkdwn","text": section_text } }
-        
         self.slack_message.append(message_header)
         self.slack_message.append(message_section)
-
 
     def __getSummaryReport__(self):
 
@@ -42,8 +41,9 @@ class SlackReport(Report):
 
         header = "GitHub Severity Report Summary"
         section_text = f"```Total Repositories: {total_repositories}\ntotal Critical: {total_critical}\ntotal High: {total_high}\ntotal Moderate: {total_moderate}\ntotal Low: {total_low}```"
-        
-        self.__addHeaderAndSectionToBlock__(header=header,section_text=section_text)
+
+        self.__addHeaderAndSectionToBlock__(
+            header=header, section_text=section_text)
 
         #self.slack_message += f"```\nThis is the daily Github severity report summary.\nTotal Repositories: {total_repositories}\ntotal Critical: {total_critical}\ntotal High: {total_high}\ntotal Moderate: {total_moderate}\ntotal Low: {total_low}\n```\n"
 
@@ -60,16 +60,14 @@ class SlackReport(Report):
             'sum']
         total_low = report_repositories.aggregate(sum=Sum('low'))['sum']
 
-        
-
         if total_repositories >= 1:
 
             total_header = "Github UNMONITORED Repos severity summary"
 
-            total_section_text = f"```Total Repositories: {total_repositories}\ntotal Critical: {total_critical}\ntotal High: {total_high}\ntotal Moderate: {total_moderate}\ntotal Low: {total_low}```" 
-        
-            self.__addHeaderAndSectionToBlock__(header=total_header,section_text=total_section_text)
+            total_section_text = f"```Total Repositories: {total_repositories}\ntotal Critical: {total_critical}\ntotal High: {total_high}\ntotal Moderate: {total_moderate}\ntotal Low: {total_low}```"
 
+            self.__addHeaderAndSectionToBlock__(
+                header=total_header, section_text=total_section_text)
 
             header = "Github UNMONITORED Repos report"
             section_text = ""
@@ -93,8 +91,8 @@ class SlackReport(Report):
 
             section_text += "```\n"
 
-            self.__addHeaderAndSectionToBlock__(header=header,section_text=section_text)
-
+            self.__addHeaderAndSectionToBlock__(
+                header=header, section_text=section_text)
 
     def __getSloBreachReport__(self):
         repositories = set((self.db_client.getRepos()).filter(
@@ -102,9 +100,11 @@ class SlackReport(Report):
         slo_breaching_repositories = set(
             self.db_client.getSloBreachRepos().values_list('repository', flat=True))
 
-        repositories_of_interest = repositories.intersection(slo_breaching_repositories)
+        repositories_of_interest = repositories.intersection(
+            slo_breaching_repositories)
 
-        report_repositories = self.db_client.getSloBreachReposOfInterest(repositories=repositories_of_interest)
+        report_repositories = self.db_client.getSloBreachReposOfInterest(
+            repositories=repositories_of_interest)
 
         total_repositories = report_repositories.count()
         total_critical = report_repositories.aggregate(sum=Sum('critical'))[
@@ -112,21 +112,24 @@ class SlackReport(Report):
         total_high = report_repositories.aggregate(sum=Sum('high'))['sum']
         total_moderate = report_repositories.aggregate(sum=Sum('moderate'))[
             'sum']
-        
-        if total_repositories >=1:
+
+        if total_repositories >= 1:
             total_header = "Github SLO Breach report summary"
 
-            total_section_text = f"```Total Repositories: {total_repositories}\ntotal Critical: {total_critical}\ntotal High: {total_high}\ntotal Moderate: {total_moderate}```" 
-        
-            self.__addHeaderAndSectionToBlock__(header=total_header,section_text=total_section_text)
+            total_section_text = f"```Total Repositories: {total_repositories}\ntotal Critical: {total_critical}\ntotal High: {total_high}\ntotal Moderate: {total_moderate}```"
+
+            self.__addHeaderAndSectionToBlock__(
+                header=total_header, section_text=total_section_text)
 
     def __getOrphanRepoReport__(self):
-        all_repositories = set(self.db_client.getRepos().values_list('name',flat=True))
-        
+        all_repositories = set(
+            self.db_client.getRepos().values_list('name', flat=True))
+
         repos_with_team = []
         for team in self.db_client.getTeams():
             if team.name != 'default':
-                repos_with_team += list(set(team.repositories.values_list('name',flat=True)))
+                repos_with_team += list(
+                    set(team.repositories.values_list('name', flat=True)))
 
         orphan_repositories = all_repositories.difference(set(repos_with_team))
 
@@ -141,8 +144,10 @@ class SlackReport(Report):
                 else:
                     section_text += "```"
                     if not header_set:
-                        self.__addHeaderAndSectionToBlock__(header=header,section_text=section_text)
+                        self.__addHeaderAndSectionToBlock__(
+                            header=header, section_text=section_text)
                         header_set = True
                     else:
-                        self.__addHeaderAndSectionToBlock__(header="-",section_text=section_text)                        
+                        self.__addHeaderAndSectionToBlock__(
+                            header="-", section_text=section_text)
                     section_text = "```"

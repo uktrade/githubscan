@@ -16,7 +16,7 @@ class Command(BaseCommand):
         try:
             report = SlackReport()
             slack_message = report.getReportMessage()
-        
+
             if settings.SLACK_ENABLED == 'True':
                 url = f'{settings.SLACK_URL}/api/chat.postMessage'
                 data = {'channel': f'{settings.SLACK_CHANNEL}',
@@ -26,7 +26,7 @@ class Command(BaseCommand):
                 response = requests.post(
                     url, data=json.dumps(data), headers=headers)
                 slack_response = response.json()
-           
+
                 if not slack_response['ok']:
                     raise Exception(slack_response)
 
