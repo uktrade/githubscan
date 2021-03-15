@@ -93,7 +93,7 @@ class EmailReport(Report):
                                  vulnerability.slo_breach, vulnerability.publish_age_in_days, vulnerability.detection_age_in_days])
 
         # Vulnerability Summary
-        summary += "#Vulnerability Summary\n * total Repositories: {}\n * total Critial: {}\n * total High: {}\n * total Moderate: {}\n * total Low: {}\n \n".format(
+        summary += "#Vulnerability Summary\n * total Repositories: {}\n * total Critical: {}\n * total High: {}\n * total Moderate: {}\n * total Low: {}\n \n".format(
             report_repositories.count(),
             report_repositories.aggregate(sum=Sum('critical'))[
                 'sum'], report_repositories.aggregate(sum=Sum('high'))['sum'],
@@ -106,7 +106,7 @@ class EmailReport(Report):
         slo_breached_report_repositories = self.db_client.getSloBreachReposOfInterest(
             repositories=slo_breached_repositories_of_interest)
 
-        summary += "#SLO Breach Summary\n * total Repositories: {}\n * total Critial breach: {}\n * total High breach: {}\n * total Moderate breach: {}\n\n".format(
+        summary += "#SLO Breach Summary\n * total Repositories: {}\n * total Critical breach: {}\n * total High breach: {}\n * total Moderate breach: {}\n\n".format(
             slo_breached_report_repositories.count(),
             slo_breached_report_repositories.aggregate(sum=Sum('critical'))[
                 'sum'], slo_breached_report_repositories.aggregate(sum=Sum('high'))['sum'],
