@@ -99,9 +99,7 @@ class GHClient:
         response = (self.__GithubResponse(payload=data)).json()
         while True:
             for edge in response['data']['organization']['teams']['edges']:
-                if edge['node']['name'] != "default":
-                    teams.append(
-                        (edge['node']['name']).replace(' ', '-').lower())
+                teams.append((edge['node']['name']).replace(' ', '-').lower())
             if response['data']['organization']['teams']['pageInfo']['hasNextPage'] is False:
                 break
             else:
