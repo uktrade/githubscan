@@ -157,7 +157,7 @@ class Updater:
                     id=high_alert_record.id).update(slo_breach=True)
 
         for moderate_alert_record in RepositoryVulnerability.objects.filter(severity_level='moderate').all():
-            if high_alert_record.publish_age_in_days > max_moderate_alert_age:
+            if moderate_alert_record.publish_age_in_days > max_moderate_alert_age:
                 RepositoryVulnerability.objects.filter(
                     id=moderate_alert_record.id).update(slo_breach=True)
 
