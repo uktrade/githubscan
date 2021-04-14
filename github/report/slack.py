@@ -14,6 +14,7 @@ class SlackReport(Report):
         self.__getSkippedRepoReport__()
         self.__getSloBreachReport__()
         self.__getOrphanRepoReport__()
+        breakpoint()
         return self.slack_message
 
     def __addHeaderAndSectionToBlock__(self, header, section_text):
@@ -45,8 +46,6 @@ class SlackReport(Report):
         self.__addHeaderAndSectionToBlock__(
             header=header, section_text=section_text)
 
-        #self.slack_message += f"```\nThis is the daily Github severity report summary.\nTotal Repositories: {total_repositories}\ntotal Critical: {total_critical}\ntotal High: {total_high}\ntotal Moderate: {total_moderate}\ntotal Low: {total_low}\n```\n"
-
     def __getSkippedRepoReport__(self):
         repositories_of_interest = self.getSkippedRepos()
         report_repositories = self.db_client.getSortedVunrableRepos(
@@ -60,14 +59,14 @@ class SlackReport(Report):
             'sum']
         total_low = report_repositories.aggregate(sum=Sum('low'))['sum']
 
+        total_header = "Github UNMONITORED Repos severity summary"
+
+        total_section_text = f"```Total Repositories: {total_repositories}\ntotal Critical: {total_critical}\ntotal High: {total_high}\ntotal Moderate: {total_moderate}\ntotal Low: {total_low}```"
+
+        self.__addHeaderAndSectionToBlock__(
+            header=total_header, section_text=total_section_text)
+
         if total_repositories >= 1:
-
-            total_header = "Github UNMONITORED Repos severity summary"
-
-            total_section_text = f"```Total Repositories: {total_repositories}\ntotal Critical: {total_critical}\ntotal High: {total_high}\ntotal Moderate: {total_moderate}\ntotal Low: {total_low}```"
-
-            self.__addHeaderAndSectionToBlock__(
-                header=total_header, section_text=total_section_text)
 
             header = "Github UNMONITORED Repos report"
             section_text = ""
@@ -113,13 +112,12 @@ class SlackReport(Report):
         total_moderate = report_repositories.aggregate(sum=Sum('moderate'))[
             'sum']
 
-        if total_repositories >= 1:
-            total_header = "Github SLO Breach report summary"
+        total_header = "Github SLO Breach report summary"
 
-            total_section_text = f"```Total Repositories: {total_repositories}\ntotal Critical: {total_critical}\ntotal High: {total_high}\ntotal Moderate: {total_moderate}```"
+        total_section_text = f"```Total Repositories: {total_repositories}\ntotal Critical: {total_critical}\ntotal High: {total_high}\ntotal Moderate: {total_moderate}```"
 
-            self.__addHeaderAndSectionToBlock__(
-                header=total_header, section_text=total_section_text)
+        self.__addHeaderAndSectionToBlock__(
+            header=total_header, section_text=total_section_text)
 
     def __getOrphanRepoReport__(self):
         all_repositories = set(
@@ -133,21 +131,26 @@ class SlackReport(Report):
 
         orphan_repositories = all_repositories.difference(set(repos_with_team))
 
-        if orphan_repositories:
-            header = "Github Orphan repos report"
-            section_text = f"```Total Orphan Repositories:{len(orphan_repositories)}\n"
-            header_set = False
-            for orphan_repo in orphan_repositories:
-                if len(section_text) < 2800:
-                    section_text += f"* <https://github.com/uktrade/{orphan_repo}/settings/access | {orphan_repo}>\n"
+        header = "Github Orphan repos report"
+        section_text = f"```Total Orphan Repositories:{len(orphan_repositories)}\n"
+    
+        added_section_to_block = False
 
-                else:
-                    section_text += "```"
-                    if not header_set:
-                        self.__addHeaderAndSectionToBlock__(
-                            header=header, section_text=section_text)
-                        header_set = True
-                    else:
-                        self.__addHeaderAndSectionToBlock__(
-                            header="-", section_text=section_text)
+        if orphan_repositories:
+            for orphan_repo in orphan_repositories:
+                if len(section_text) <= 2800:
+                    added_section_to_block = False
+                    section_text += f"* <https://github.com/uktrade/{orphan_repo}/settings/access | {orphan_repo}>\n"
+                
+                else:            
+                    section_text +="```"
+                    self.__addHeaderAndSectionToBlock__(header=header, section_text=section_text)
+                    header = "-"
+                    added_section_to_block = True
                     section_text = "```"
+
+        if not added_section_to_block:
+            section_text += "```"
+            self.__addHeaderAndSectionToBlock__(header=header,section_text=section_text)
+            
+        
