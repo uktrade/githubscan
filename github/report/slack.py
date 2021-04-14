@@ -14,7 +14,7 @@ class SlackReport(Report):
         self.__getSkippedRepoReport__()
         self.__getSloBreachReport__()
         self.__getOrphanRepoReport__()
-        breakpoint()
+
         return self.slack_message
 
     def __addHeaderAndSectionToBlock__(self, header, section_text):
@@ -133,24 +133,20 @@ class SlackReport(Report):
 
         header = "Github Orphan repos report"
         section_text = f"```Total Orphan Repositories:{len(orphan_repositories)}\n"
-    
-        added_section_to_block = False
 
         if orphan_repositories:
             for orphan_repo in orphan_repositories:
                 if len(section_text) <= 2800:
-                    added_section_to_block = False
                     section_text += f"* <https://github.com/uktrade/{orphan_repo}/settings/access | {orphan_repo}>\n"
-                
-                else:            
-                    section_text +="```"
-                    self.__addHeaderAndSectionToBlock__(header=header, section_text=section_text)
+
+                else:
+                    section_text += "```"
+                    self.__addHeaderAndSectionToBlock__(
+                        header=header, section_text=section_text)
                     header = "-"
-                    added_section_to_block = True
                     section_text = "```"
 
-        if not added_section_to_block:
+        if len(section_text) >= 4:
             section_text += "```"
-            self.__addHeaderAndSectionToBlock__(header=header,section_text=section_text)
-            
-        
+            self.__addHeaderAndSectionToBlock__(
+                header=header, section_text=section_text)
