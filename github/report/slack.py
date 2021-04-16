@@ -11,6 +11,7 @@ class SlackReport(Report):
 
     def getReportMessage(self):
         self.__getSummaryReport__()
+        self.__getTeamSummaryReport__()
         self.__getSkippedRepoReport__()
         self.__getSloBreachReport__()
         self.__getOrphanRepoReport__()
@@ -45,6 +46,46 @@ class SlackReport(Report):
 
         self.__addHeaderAndSectionToBlock__(
             header=header, section_text=section_text)
+
+    def __getTeamSummaryReport__(self):
+
+        teams = self.db_client.getTeams()
+        teams_report = []
+        for team in teams:
+            repositories_of_interest = self.getTeamReportRepos(team=team.name)
+            if repositories_of_interest:
+                report_repositories = self.db_client.getSortedVunrableRepos(
+                    repositories=repositories_of_interest)
+                total_critical = report_repositories.aggregate(sum=Sum('critical'))[
+                    'sum']
+                total_high = report_repositories.aggregate(sum=Sum('high'))[
+                    'sum']
+                total_moderate = report_repositories.aggregate(sum=Sum('moderate'))[
+                    'sum']
+                total_low = report_repositories.aggregate(sum=Sum('low'))[
+                    'sum']
+                teams_report.append(
+                    {team.name: f'[{total_critical},{total_high},{total_moderate},{total_low}]'})
+
+        header = "GitHub Teams Severity Report Summary"
+        section_text = f"```Total teams: {len(teams_report)}\n\n"
+
+        if teams_report:
+            for report in teams_report:
+                if len(section_text) <= 2800:
+                    for key, value in report.items():
+                        section_text += f"{key}: {value}\n"
+                else:
+                    section_text += "```"
+                    self.__addHeaderAndSectionToBlock__(
+                        header=header, section_text=section_text)
+                    header = "-"
+                    section_text = "```"
+
+        if len(section_text) >= 4:
+            section_text += "```"
+            self.__addHeaderAndSectionToBlock__(
+                header=header, section_text=section_text)
 
     def __getSkippedRepoReport__(self):
         repositories_of_interest = self.getSkippedRepos()
