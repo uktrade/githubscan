@@ -3,7 +3,7 @@ from github.models import Team
 from github.models import RepositoryVulnerability
 from github.models import RepositoryVulnerabilityCount
 from github.models import RepositorySLOBreachCount
-
+from github.models import TeamVulnerabilityCount
 
 class Retriver:
 
@@ -46,3 +46,6 @@ class Retriver:
 
     def getSloBreachReposOfInterest(self, repositories):
         return RepositorySLOBreachCount.objects.filter(repository__in=repositories)
+
+    def getSortedTeamsVulnerabilitySummaryReport(self):
+        return TeamVulnerabilityCount.objects.order_by('critical', 'high', 'moderate', 'low').reverse()

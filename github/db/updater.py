@@ -10,6 +10,7 @@ from github.models import Team
 from github.models import RepositoryVulnerability
 from github.models import RepositoryVulnerabilityCount
 from github.models import RepositorySLOBreachCount
+from github.models import TeamVulnerabilityCount
 
 from github.db.retriver import Retriver
 from datetime import datetime, timezone
@@ -205,6 +206,38 @@ class Updater:
                 RepositorySLOBreachCount(repository=repository_obj, critical=critical_count,
                                          high=high_count, moderate=moderate_count, low=low_count).save()
 
+    
+    def __updat_team_vulnerability_count(self):
+        # Clear table
+        TeamVulnerabilityCount.objects.all().delete()
+
+        teams = self.db_client.getTeams()
+
+        for team in teams:
+            team_repositories = set(self.db_client.getTeamRepos(team=team.name).repositories.all().values_list('name',flat=True))
+            vulnerable_repositories = set(self.db_client.getVulnerableRepositories().values_list('repository',flat=True))
+            repositories_of_interest = list(team_repositories.intersection(vulnerable_repositories))
+
+            #if there is/are vulnerable repos
+            if repositories_of_interest:
+                critical_count = 0
+                high_count = 0
+                moderate_count = 0
+                low_count = 0
+
+                for repository in repositories_of_interest:
+                    repository_report = self.db_client.getVulnerableRepoReport(repository=repository)
+                    critical_count += repository_report.values_list('critical',flat=True)[0]
+                    high_count +=repository_report.values_list('high',flat=True)[0]
+                    moderate_count += repository_report.values_list('moderate',flat=True)[0]
+                    low_count += repository_report.values_list('low',flat=True)[0]
+
+                TeamVulnerabilityCount(team=team,critical=critical_count,high=high_count,moderate=moderate_count,low=low_count).save()
+
+
+
+
+
     def all(self):
         self.__repositories__()
         self.__set_skip_scan__()
@@ -215,3 +248,4 @@ class Updater:
         self.__update_slo_breach_status__()
         self.__update_counts__()
         self.__update_slo_breach_count__()
+        self.__updat_team_vulnerability_count()

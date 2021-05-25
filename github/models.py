@@ -48,3 +48,10 @@ class RepositorySLOBreachCount(models.Model):
     high = models.IntegerField()
     moderate = models.IntegerField()
     low = models.IntegerField()
+    
+class TeamVulnerabilityCount(models.Model):
+    team = models.ForeignKey('Team', on_delete=models.CASCADE)
+    critical = models.IntegerField()
+    high = models.IntegerField()
+    moderate = models.IntegerField()
+    low = models.IntegerField()    

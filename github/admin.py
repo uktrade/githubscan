@@ -5,6 +5,7 @@ from github.models import Team
 from github.models import RepositoryVulnerabilityCount
 from github.models import RepositoryVulnerability
 from github.models import RepositorySLOBreachCount
+from github.models import TeamVulnerabilityCount
 # Register your models here.
 
 
@@ -32,3 +33,7 @@ class GitHubRepoVulnerabilitesAdmin(admin.ModelAdmin):
 @admin.register(RepositorySLOBreachCount)
 class GitHubSloBreachCountAdmin(admin.ModelAdmin):
     list_display = ('repository', 'critical', 'high', 'moderate', 'low')
+
+@admin.register(TeamVulnerabilityCount)
+class TeamVulnerabilityCountAdmin(admin.ModelAdmin):
+    list_display = ('team', 'critical', 'high', 'moderate', 'low')

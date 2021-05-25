@@ -49,23 +49,11 @@ class SlackReport(Report):
 
     def __getTeamSummaryReport__(self):
 
-        teams = self.db_client.getTeams()
+        teams_summary_report = self.db_client.getSortedTeamsVulnerabilitySummaryReport()
         teams_report = []
-        for team in teams:
-            repositories_of_interest = self.getTeamReportRepos(team=team.name)
-            if repositories_of_interest:
-                report_repositories = self.db_client.getSortedVunrableRepos(
-                    repositories=repositories_of_interest)
-                total_critical = report_repositories.aggregate(sum=Sum('critical'))[
-                    'sum']
-                total_high = report_repositories.aggregate(sum=Sum('high'))[
-                    'sum']
-                total_moderate = report_repositories.aggregate(sum=Sum('moderate'))[
-                    'sum']
-                total_low = report_repositories.aggregate(sum=Sum('low'))[
-                    'sum']
-                teams_report.append(
-                    {team.name: f'[{total_critical},{total_high},{total_moderate},{total_low}]'})
+        
+        for report in teams_summary_report:
+            teams_report.append({report.team.name: f'[{report.critical},{report.moderate},{report.high},{report.low}]'})
 
         header = "GitHub Teams Severity Report Summary"
         section_text = f"```Total teams: {len(teams_report)}\n\n"
@@ -102,7 +90,10 @@ class SlackReport(Report):
 
         total_header = "Github UNMONITORED Repos severity summary"
 
-        total_section_text = f"```Total Repositories: {total_repositories}\ntotal Critical: {total_critical}\ntotal High: {total_high}\ntotal Moderate: {total_moderate}\ntotal Low: {total_low}```"
+        if total_repositories <= 0:
+            total_section_text = "None"
+        else:
+            total_section_text = f"```Total Repositories: {total_repositories}\ntotal Critical: {total_critical}\ntotal High: {total_high}\ntotal Moderate: {total_moderate}\ntotal Low: {total_low}```"
 
         self.__addHeaderAndSectionToBlock__(
             header=total_header, section_text=total_section_text)
