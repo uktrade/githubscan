@@ -53,7 +53,7 @@ class SlackReport(Report):
         teams_report = []
         
         for report in teams_summary_report:
-            teams_report.append({report.team.name: f'[{report.critical},{report.moderate},{report.high},{report.low}]'})
+            teams_report.append({report.team.name: f'[{report.critical},{report.high},{report.moderate},{report.low}]'})
 
         header = "GitHub Teams Severity Report Summary"
         section_text = f"```Total teams: {len(teams_report)}\n\n"
