@@ -27,7 +27,7 @@ class GitHubVulnerabilityCountAdmin(admin.ModelAdmin):
 @admin.register(RepositoryVulnerability)
 class GitHubRepoVulnerabilitesAdmin(admin.ModelAdmin):
     list_display = ('repository', 'identifier_type',
-                    'identifier_value', 'severity_level', 'effective_severity_level','detection_age_in_days','advisory_url')
+                    'identifier_value', 'severity_level', 'effective_severity_level','detection_date','detection_age_in_days','advisory_url')
 
 
 @admin.register(RepositorySLOBreachCount)
