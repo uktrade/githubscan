@@ -92,6 +92,7 @@ class Updater:
 
         # collect active alerts per repo and delete non
         for repository in repositories:
+
             active_repo_alerts = []
             alertsInGithub = self.github_client.getVulnerabilityAlerts(
                 repository=repository)
@@ -107,17 +108,26 @@ class Updater:
                         [repository, package_name, severity_level, identifier_type, identifier_value, advisory_url, published_at])
 
             # add/remove alerts
-            alertsInDb = self.db_client.getDetailsRepoVulnerabilities(
-                repository=repository)
+            from django.db.models import F, Func, Value, CharField
+
+            # this added a dynamic filed which converts date time back to iso 8601 string matching that of Github publishedAt string format
+            alertsInDb = (self.db_client.getDetailsRepoVulnerabilities(repository=repository)).annotate(publishedAt_as_string=Func(   F('published_at'),
+                                                                                                                                    Value('YYYY-MM-DD"T"HH24:MI:SS"Z"'),
+                                                                                                                                    function='to_char',
+                                                                                                                                    output_field=CharField()
+                                                                                                                                ))
 
             # if repo has active alert check if therre are new to add or have old to delete
             if active_repo_alerts:
+    
                 alertsSetInDb = set(alertsInDb.values_list('repository', 'package_name', 'severity_level',
-                                                           'identifier_type', 'identifier_value', 'advisory_url', 'published_at'))
+                                                          'identifier_type', 'identifier_value', 'advisory_url', 'publishedAt_as_string'))
+
                 alertsSetInGithub = set(tuple(row)
                                         for row in active_repo_alerts)
 
                 add_records = alertsSetInGithub.difference(alertsSetInDb)
+
                 remove_records = alertsSetInDb.difference(alertsSetInGithub)
 
                 for record in remove_records:
