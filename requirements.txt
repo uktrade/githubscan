@@ -6,4 +6,3 @@ gunicorn==20.0.4
 psycopg2-binary==2.8.2
 notifications-python-client==6.0.2
 whitenoise==4.1.4
-tabulate==0.8.9

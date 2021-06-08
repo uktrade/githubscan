@@ -24,7 +24,7 @@ class RepositoryVulnerability(models.Model):
     repository = models.ForeignKey('Repository', on_delete=models.CASCADE)
     package_name = models.CharField(max_length=50)
     severity_level = models.CharField(max_length=20)
-    effective_severity_level = models.CharField(max_length=20,blank=True)
+    effective_severity_level = models.CharField(max_length=20, blank=True)
     identifier_type = models.CharField(max_length=20)
     identifier_value = models.CharField(max_length=20)
     advisory_url = models.CharField(max_length=200, null=True)
@@ -48,6 +48,7 @@ class RepositoryVulnerabilityCount(models.Model):
     effective_moderate = models.IntegerField(default=0)
     effective_low = models.IntegerField(default=0)
 
+
 class RepositorySLOBreachCount(models.Model):
     id = models.AutoField(primary_key=True)
     repository = models.ForeignKey('Repository', on_delete=models.CASCADE)
@@ -55,16 +56,17 @@ class RepositorySLOBreachCount(models.Model):
     high = models.IntegerField()
     moderate = models.IntegerField()
     low = models.IntegerField()
-    
+
+
 class TeamVulnerabilityCount(models.Model):
-    id = models.AutoField(primary_key=True)    
+    id = models.AutoField(primary_key=True)
     team = models.ForeignKey('Team', on_delete=models.CASCADE)
     critical = models.IntegerField()
     high = models.IntegerField()
     moderate = models.IntegerField()
-    low = models.IntegerField()    
+    low = models.IntegerField()
     effective_slabreach = models.IntegerField(default=0)
     effective_critical = models.IntegerField(default=0)
     effective_high = models.IntegerField(default=0)
     effective_moderate = models.IntegerField(default=0)
-    effective_low = models.IntegerField(default=0)    
+    effective_low = models.IntegerField(default=0)

@@ -63,7 +63,7 @@ class Command(BaseCommand):
                     email_address=to,
                     template_id=settings.NOTIFY_TEMPLATE_ID,
                     personalisation={
-                        'subject': data['subject'],
+                        'subject': f"{data['subject_prefix']} {data['subject']}",
                         'content': data['content'],
                         'summary': data['summary'],
                         'report': prepare_upload(f),

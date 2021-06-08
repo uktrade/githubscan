@@ -4,6 +4,7 @@ from django.db.models import Sum
 
 from tabulate import tabulate
 
+
 class SlackReport(Report):
 
     def __init__(self):
@@ -18,17 +19,20 @@ class SlackReport(Report):
         # self.__getOrphanRepoReport__()
 
         return self.slack_message
-        #print(self.slack_message)
-    def __addHeaderAndSectionToBlock__(self, header, section_text,fields_array=[]):
+        # print(self.slack_message)
+
+    def __addHeaderAndSectionToBlock__(self, header, section_text, fields_array=[]):
         message_header = {"type": "header", "text": {
             "type": "plain_text", "text": header}}
 
         message_section = {}
         if fields_array:
-            message_section.update({"type": "section", "fields": fields_array[:10]})
+            message_section.update(
+                {"type": "section", "fields": fields_array[:10]})
 
         else:
-            message_section.update({"type": "section", "text": { "type": "mrkdwn", "text": section_text} })
+            message_section.update(
+                {"type": "section", "text": {"type": "mrkdwn", "text": section_text}})
 
         self.slack_message.append(message_header)
         self.slack_message.append(message_section)
@@ -51,14 +55,17 @@ class SlackReport(Report):
             'sum']
         total_effective_critical = report_repositories.aggregate(sum=Sum('effective_critical'))[
             'sum']
-        total_effective_high = report_repositories.aggregate(sum=Sum('effective_high'))['sum']
- 
-        total_effective_moderate = report_repositories.aggregate(sum=Sum('effective_moderate'))['sum']
+        total_effective_high = report_repositories.aggregate(
+            sum=Sum('effective_high'))['sum']
 
-        total_effective_low = report_repositories.aggregate(sum=Sum('effective_low'))['sum']
-  
+        total_effective_moderate = report_repositories.aggregate(
+            sum=Sum('effective_moderate'))['sum']
+
+        total_effective_low = report_repositories.aggregate(
+            sum=Sum('effective_low'))['sum']
+
         header = "GitHub Severity Report Summary"
-        section_text = f"```Total Repositories: {total_repositories}\nSLA Breach: {total_effective_slabreach}\ntotal Critical: {total_critical} --> Effective Critical: {total_effective_critical}\ntotal High: {total_high} --> Effective High: {total_effective_high} \ntotal Moderate: {total_moderate} --> Efeective Moderate: {total_effective_moderate}\ntotal Low: {total_low} --> Effective Low: {total_effective_low}```"
+        section_text = f"```Total Repositories: {total_repositories}\nCritical Breach: {total_effective_slabreach}\ntotal Critical: {total_critical} --> Effective Critical: {total_effective_critical}\ntotal High: {total_high} --> Effective High: {total_effective_high} \ntotal Moderate: {total_moderate} --> Efeective Moderate: {total_effective_moderate}\ntotal Low: {total_low} --> Effective Low: {total_effective_low}```"
 
         self.__addHeaderAndSectionToBlock__(
             header=header, section_text=section_text)
@@ -68,9 +75,10 @@ class SlackReport(Report):
         teams_summary_report = self.db_client.getSortedTeamsVulnerabilitySummaryReport()
 
         teams_report = []
-        
+
         for report in teams_summary_report:
-            teams_report.append({report.team.name: f'[{report.critical},{report.high},{report.moderate},{report.low}] --> [{report.effective_slabreach},{report.effective_critical},{report.effective_high},{report.effective_moderate},{report.effective_low}]'})
+            teams_report.append(
+                {report.team.name: f'[{report.critical},{report.high},{report.moderate},{report.low}] --> [{report.effective_slabreach},{report.effective_critical},{report.effective_high},{report.effective_moderate},{report.effective_low}]'})
 
         header = "GitHub Teams Severity Report Summary"
         section_text = f"```Total teams: {len(teams_report)}\n\n"

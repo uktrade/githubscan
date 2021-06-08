@@ -111,17 +111,18 @@ class Updater:
             from django.db.models import F, Func, Value, CharField
 
             # this added a dynamic filed which converts date time back to iso 8601 string matching that of Github publishedAt string format
-            alertsInDb = (self.db_client.getDetailsRepoVulnerabilities(repository=repository)).annotate(publishedAt_as_string=Func(   F('published_at'),
-                                                                                                                                    Value('YYYY-MM-DD"T"HH24:MI:SS"Z"'),
-                                                                                                                                    function='to_char',
-                                                                                                                                    output_field=CharField()
-                                                                                                                                ))
+            alertsInDb = (self.db_client.getDetailsRepoVulnerabilities(repository=repository)).annotate(publishedAt_as_string=Func(F('published_at'),
+                                                                                                                                   Value(
+                                                                                                                                       'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
+                                                                                                                                   function='to_char',
+                                                                                                                                   output_field=CharField()
+                                                                                                                                   ))
 
             # if repo has active alert check if therre are new to add or have old to delete
             if active_repo_alerts:
-    
+
                 alertsSetInDb = set(alertsInDb.values_list('repository', 'package_name', 'severity_level',
-                                                          'identifier_type', 'identifier_value', 'advisory_url', 'publishedAt_as_string'))
+                                                           'identifier_type', 'identifier_value', 'advisory_url', 'publishedAt_as_string'))
 
                 alertsSetInGithub = set(tuple(row)
                                         for row in active_repo_alerts)
@@ -156,31 +157,31 @@ class Updater:
 
         for vulnerablity in RepositoryVulnerability.objects.all():
 
-                #if detection age is more than lowest allowed age before it upgrades ( i.e. max_critical_alert_age  ) than do something!
-                if vulnerablity.detection_age_in_days >= max_critical_alert_age:
-                    effective_severity_level = ''
-                    #if original severity level is 'critical' it is a breach!
-                    if vulnerablity.severity_level == 'critical':
+            # if detection age is more than lowest allowed age before it upgrades ( i.e. max_critical_alert_age  ) than do something!
+            if vulnerablity.publish_age_in_days >= max_critical_alert_age:
+                effective_severity_level = ''
+                # if original severity level is 'critical' it is a breach!
+                if vulnerablity.severity_level == 'critical':
+                    effective_severity_level = 'SLA_BREACH'
+
+                if vulnerablity.severity_level == 'high':
+                    if vulnerablity.publish_age_in_days >= max_high_alert_age and vulnerablity.publish_age_in_days < max_high_alert_age + max_critical_alert_age:
+                        effective_severity_level = 'critical'
+                    if vulnerablity.publish_age_in_days >= max_high_alert_age + max_critical_alert_age:
                         effective_severity_level = 'SLA_BREACH'
 
+                if vulnerablity.severity_level == 'moderate':
+                    if vulnerablity.publish_age_in_days >= max_moderate_alert_age and vulnerablity.publish_age_in_days < max_moderate_alert_age + max_high_alert_age:
+                        effective_severity_level = 'high'
+                    if vulnerablity.publish_age_in_days >= max_moderate_alert_age + max_high_alert_age and vulnerablity.publish_age_in_days < max_moderate_alert_age + max_high_alert_age + max_critical_alert_age:
+                        effective_severity_level = 'critical'
+                    if vulnerablity.publish_age_in_days >= max_moderate_alert_age + max_high_alert_age + max_critical_alert_age:
+                        effective_severity_level = 'SLA_BREACH'
 
-                    if vulnerablity.severity_level == 'high':
-                        if vulnerablity.detection_age_in_days >= max_high_alert_age and vulnerablity.detection_age_in_days < max_high_alert_age + max_critical_alert_age:
-                            effective_severity_level = 'critical'
-                        if vulnerablity.detection_age_in_days >= max_high_alert_age + max_critical_alert_age:
-                            effective_severity_level = 'SLA_BREACH'
-
-                    if vulnerablity.severity_level == 'moderate':
-                        if vulnerablity.detection_age_in_days >= max_moderate_alert_age and vulnerablity.detection_age_in_days < max_moderate_alert_age + max_high_alert_age:
-                            effective_severity_level = 'high'
-                        if vulnerablity.detection_age_in_days >= max_moderate_alert_age + max_high_alert_age and vulnerablity.detection_age_in_days < max_moderate_alert_age + max_high_alert_age + max_critical_alert_age:
-                            effective_severity_level = 'critical'
-                        if vulnerablity.detection_age_in_days >= max_moderate_alert_age + max_high_alert_age + max_critical_alert_age:
-                            effective_severity_level = 'SLA_BREACH'
-
-                    #update effective severity level if it is not blank
-                    if effective_severity_level:
-                        RepositoryVulnerability.objects.filter(id=vulnerablity.id).update(effective_severity_level=effective_severity_level)
+                # update effective severity level if it is not blank
+                if effective_severity_level:
+                    RepositoryVulnerability.objects.filter(id=vulnerablity.id).update(
+                        effective_severity_level=effective_severity_level)
 
     def __update_slo_breach_status__(self):
         # Max alert accepable age in days
@@ -223,37 +224,37 @@ class Updater:
                 repository=repository_obj, severity_level='low').count()
 
             effective_slabreach_count = RepositoryVulnerability.objects.filter(
-                repository=repository_obj,effective_severity_level='SLA_BREACH').count()
+                repository=repository_obj, effective_severity_level='SLA_BREACH').count()
 
-            
-            effective_critical_count = ( critical_count + RepositoryVulnerability.objects.filter(
-                repository=repository_obj,effective_severity_level='critical').count() ) -  RepositoryVulnerability.objects.filter(
-                repository=repository_obj,severity_level='critical',effective_severity_level='SLA_BREACH').count()
+            effective_critical_count = (critical_count + RepositoryVulnerability.objects.filter(
+                repository=repository_obj, effective_severity_level='critical').count()) - RepositoryVulnerability.objects.filter(
+                repository=repository_obj, severity_level='critical', effective_severity_level='SLA_BREACH').count()
 
+            effective_high_count = (high_count + RepositoryVulnerability.objects.filter(
+                repository=repository_obj, effective_severity_level='high').count()) - (
+                    RepositoryVulnerability.objects.filter(repository=repository_obj, severity_level='high', effective_severity_level='SLA_BREACH').count() +
+                    RepositoryVulnerability.objects.filter(
+                        repository=repository_obj, severity_level='high', effective_severity_level='critical').count()
+            )
 
-            effective_high_count = ( high_count + RepositoryVulnerability.objects.filter(
-                repository=repository_obj,effective_severity_level='high').count() ) - (
-                    RepositoryVulnerability.objects.filter(repository=repository_obj,severity_level='high',effective_severity_level='SLA_BREACH').count() +
-                    RepositoryVulnerability.objects.filter(repository=repository_obj,severity_level='high',effective_severity_level='critical').count()                     
-                )
-          
-            effective_moderate_count = ( moderate_count + RepositoryVulnerability.objects.filter(
-                repository=repository_obj,effective_severity_level='moderate').count() ) - (
-                    RepositoryVulnerability.objects.filter(repository=repository_obj,severity_level='moderate',effective_severity_level='SLA_BREACH').count() +
-                    RepositoryVulnerability.objects.filter(repository=repository_obj,severity_level='moderate',effective_severity_level='critical').count() + 
-                    RepositoryVulnerability.objects.filter(repository=repository_obj,severity_level='moderate',effective_severity_level='high').count()
-                )
+            effective_moderate_count = (moderate_count + RepositoryVulnerability.objects.filter(
+                repository=repository_obj, effective_severity_level='moderate').count()) - (
+                    RepositoryVulnerability.objects.filter(repository=repository_obj, severity_level='moderate', effective_severity_level='SLA_BREACH').count() +
+                    RepositoryVulnerability.objects.filter(repository=repository_obj, severity_level='moderate', effective_severity_level='critical').count() +
+                    RepositoryVulnerability.objects.filter(
+                        repository=repository_obj, severity_level='moderate', effective_severity_level='high').count()
+            )
 
             effective_low_count = low_count - (
-                    RepositoryVulnerability.objects.filter(repository=repository_obj,severity_level='low',effective_severity_level='SLA_BREACH').count() +
-                    RepositoryVulnerability.objects.filter(repository=repository_obj,severity_level='low',effective_severity_level='critical').count() + 
-                    RepositoryVulnerability.objects.filter(repository=repository_obj,severity_level='low',effective_severity_level='high').count() +
-                    RepositoryVulnerability.objects.filter(repository=repository_obj,severity_level='low',effective_severity_level='moderate').count()
-                )
-
+                RepositoryVulnerability.objects.filter(repository=repository_obj, severity_level='low', effective_severity_level='SLA_BREACH').count() +
+                RepositoryVulnerability.objects.filter(repository=repository_obj, severity_level='low', effective_severity_level='critical').count() +
+                RepositoryVulnerability.objects.filter(repository=repository_obj, severity_level='low', effective_severity_level='high').count() +
+                RepositoryVulnerability.objects.filter(
+                    repository=repository_obj, severity_level='low', effective_severity_level='moderate').count()
+            )
 
             RepositoryVulnerabilityCount(repository=repository_obj, critical=critical_count,
-                                         high=high_count, moderate=moderate_count, low=low_count,effective_slabreach=effective_slabreach_count,effective_critical=effective_critical_count,effective_high=effective_high_count,effective_moderate=effective_moderate_count,effective_low=effective_low_count).save()
+                                         high=high_count, moderate=moderate_count, low=low_count, effective_slabreach=effective_slabreach_count, effective_critical=effective_critical_count, effective_high=effective_high_count, effective_moderate=effective_moderate_count, effective_low=effective_low_count).save()
 
     def __update_slo_breach_count__(self):
 
@@ -280,7 +281,6 @@ class Updater:
                 RepositorySLOBreachCount(repository=repository_obj, critical=critical_count,
                                          high=high_count, moderate=moderate_count, low=low_count).save()
 
-    
     def __updat_team_vulnerability_count(self):
         # Clear table
         TeamVulnerabilityCount.objects.all().delete()
@@ -288,39 +288,49 @@ class Updater:
         teams = self.db_client.getTeams()
 
         for team in teams:
-            team_repositories = set(self.db_client.getTeamRepos(team=team.name).repositories.all().values_list('name',flat=True))
-            vulnerable_repositories = set(self.db_client.getVulnerableRepositories().values_list('repository',flat=True))
-            repositories_of_interest = list(team_repositories.intersection(vulnerable_repositories))
+            team_repositories = set(self.db_client.getTeamRepos(
+                team=team.name).repositories.all().values_list('name', flat=True))
+            vulnerable_repositories = set(
+                self.db_client.getVulnerableRepositories().values_list('repository', flat=True))
+            repositories_of_interest = list(
+                team_repositories.intersection(vulnerable_repositories))
 
-            #if there is/are vulnerable repos
+            # if there is/are vulnerable repos
             if repositories_of_interest:
                 critical_count = 0
                 high_count = 0
                 moderate_count = 0
                 low_count = 0
-                effective_slabreach_count = 0 
+                effective_slabreach_count = 0
                 effective_critical_count = 0
-                effective_high_count = 0 
+                effective_high_count = 0
                 effective_moderate_count = 0
-                effective_low_count = 0 
-                
+                effective_low_count = 0
+
                 for repository in repositories_of_interest:
-                    repository_report = self.db_client.getVulnerableRepoReport(repository=repository)
-                    critical_count += repository_report.values_list('critical',flat=True)[0]
-                    high_count +=repository_report.values_list('high',flat=True)[0]
-                    moderate_count += repository_report.values_list('moderate',flat=True)[0]
-                    low_count += repository_report.values_list('low',flat=True)[0]
-                    effective_slabreach_count += repository_report.values_list('effective_slabreach',flat=True)[0]
-                    effective_critical_count += repository_report.values_list('effective_critical',flat=True)[0]
-                    effective_high_count += repository_report.values_list('effective_high',flat=True)[0]
-                    effective_moderate_count += repository_report.values_list('effective_moderate',flat=True)[0]
-                    effective_low_count += repository_report.values_list('effective_low',flat=True)[0]
+                    repository_report = self.db_client.getVulnerableRepoReport(
+                        repository=repository)
+                    critical_count += repository_report.values_list(
+                        'critical', flat=True)[0]
+                    high_count += repository_report.values_list('high', flat=True)[
+                        0]
+                    moderate_count += repository_report.values_list(
+                        'moderate', flat=True)[0]
+                    low_count += repository_report.values_list('low', flat=True)[
+                        0]
+                    effective_slabreach_count += repository_report.values_list(
+                        'effective_slabreach', flat=True)[0]
+                    effective_critical_count += repository_report.values_list(
+                        'effective_critical', flat=True)[0]
+                    effective_high_count += repository_report.values_list(
+                        'effective_high', flat=True)[0]
+                    effective_moderate_count += repository_report.values_list(
+                        'effective_moderate', flat=True)[0]
+                    effective_low_count += repository_report.values_list(
+                        'effective_low', flat=True)[0]
 
-                TeamVulnerabilityCount(team=team,critical=critical_count,high=high_count,moderate=moderate_count,low=low_count,effective_slabreach=effective_slabreach_count,effective_critical=effective_critical_count,effective_high=effective_high_count,effective_moderate=effective_moderate_count,effective_low=effective_low_count).save()
-
-
-
-
+                TeamVulnerabilityCount(team=team, critical=critical_count, high=high_count, moderate=moderate_count, low=low_count, effective_slabreach=effective_slabreach_count,
+                                       effective_critical=effective_critical_count, effective_high=effective_high_count, effective_moderate=effective_moderate_count, effective_low=effective_low_count).save()
 
     def all(self):
         self.__repositories__()
