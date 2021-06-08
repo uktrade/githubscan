@@ -157,7 +157,7 @@ class Updater:
         for vulnerablity in RepositoryVulnerability.objects.all():
 
                 #if detection age is more than lowest allowed age before it upgrades ( i.e. max_critical_alert_age  ) than do something!
-                if vulnerablity.detection_age_in_days > max_critical_alert_age:
+                if vulnerablity.detection_age_in_days >= max_critical_alert_age:
                     effective_severity_level = ''
                     #if original severity level is 'critical' it is a breach!
                     if vulnerablity.severity_level == 'critical':
@@ -165,17 +165,17 @@ class Updater:
 
 
                     if vulnerablity.severity_level == 'high':
-                        if vulnerablity.detection_age_in_days > max_high_alert_age and vulnerablity.detection_age_in_days <= max_high_alert_age + max_critical_alert_age:
+                        if vulnerablity.detection_age_in_days >= max_high_alert_age and vulnerablity.detection_age_in_days < max_high_alert_age + max_critical_alert_age:
                             effective_severity_level = 'critical'
-                        if vulnerablity.detection_age_in_days > max_high_alert_age + max_critical_alert_age:
+                        if vulnerablity.detection_age_in_days >= max_high_alert_age + max_critical_alert_age:
                             effective_severity_level = 'SLA_BREACH'
 
                     if vulnerablity.severity_level == 'moderate':
-                        if vulnerablity.detection_age_in_days > max_moderate_alert_age and vulnerablity.detection_age_in_days <= max_moderate_alert_age + max_high_alert_age:
+                        if vulnerablity.detection_age_in_days >= max_moderate_alert_age and vulnerablity.detection_age_in_days < max_moderate_alert_age + max_high_alert_age:
                             effective_severity_level = 'high'
-                        if vulnerablity.detection_age_in_days > max_moderate_alert_age + max_high_alert_age and vulnerablity.detection_age_in_days <= max_moderate_alert_age + max_high_alert_age + max_critical_alert_age:
+                        if vulnerablity.detection_age_in_days >= max_moderate_alert_age + max_high_alert_age and vulnerablity.detection_age_in_days < max_moderate_alert_age + max_high_alert_age + max_critical_alert_age:
                             effective_severity_level = 'critical'
-                        if vulnerablity.detection_age_in_days > max_moderate_alert_age + max_high_alert_age + max_critical_alert_age:
+                        if vulnerablity.detection_age_in_days >= max_moderate_alert_age + max_high_alert_age + max_critical_alert_age:
                             effective_severity_level = 'SLA_BREACH'
 
                     #update effective severity level if it is not blank
