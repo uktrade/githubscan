@@ -65,7 +65,7 @@ class SlackReport(Report):
             sum=Sum('effective_low'))['sum']
 
         header = "GitHub Severity Report Summary"
-        section_text = f"```Total Repositories: {total_repositories}\nCritical Breach: {total_effective_slabreach}\ntotal Critical: {total_critical} --> Effective Critical: {total_effective_critical}\ntotal High: {total_high} --> Effective High: {total_effective_high} \ntotal Moderate: {total_moderate} --> Efeective Moderate: {total_effective_moderate}\ntotal Low: {total_low} --> Effective Low: {total_effective_low}```"
+        section_text = f"```Total Repositories: {total_repositories}\nTotal Effective Critical Breach: {total_effective_slabreach}\ntotal Critical: {total_critical} --> Effective Critical: {total_effective_critical}\ntotal High: {total_high} --> Effective High: {total_effective_high} \ntotal Moderate: {total_moderate} --> Efeective Moderate: {total_effective_moderate}\ntotal Low: {total_low} --> Effective Low: {total_effective_low}```"
 
         self.__addHeaderAndSectionToBlock__(
             header=header, section_text=section_text)

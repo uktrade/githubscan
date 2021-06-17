@@ -34,7 +34,7 @@ class Retriver:
         return RepositoryVulnerabilityCount.objects.filter(repository=repository)
 
     def getSortedVunrableRepos(self, repositories):
-        return RepositoryVulnerabilityCount.objects.filter(repository__in=repositories).order_by('effective_slabreach','critical', 'high', 'moderate', 'low').reverse()
+        return RepositoryVulnerabilityCount.objects.filter(repository__in=repositories).order_by('effective_slabreach', 'critical', 'high', 'moderate', 'low').reverse()
 
     def getDetailsRepoVulnerabilities(self, repository):
         return RepositoryVulnerability.objects.filter(repository=repository)

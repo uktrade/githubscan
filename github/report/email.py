@@ -73,7 +73,7 @@ class EmailReport(Report):
             github_alerts_link = "https://github.com/uktrade/{}/network/alerts".format(
                 repository)
 
-            SLA_BREACH_TEXT = f"* Critical Breach: {vulnerable_repository.effective_slabreach:3d}"
+            SLA_BREACH_TEXT = f"* Effective Critical Breach: {vulnerable_repository.effective_slabreach:3d}"
             CRITICAL_ALERT_TEXT = "{:12s} {:3d} --> {:20s} {:3d}".format(
                 "* Critical:", vulnerable_repository.critical, "Effective Critical:", vulnerable_repository.effective_critical)
             HIGH_ALERT_TEXT = "{:12s} {:3d} --> {:20s} {:3d}".format(
@@ -104,8 +104,7 @@ class EmailReport(Report):
                                  vulnerability.identifier_type, vulnerability.identifier_value, vulnerability.advisory_url, github_alerts_link,
                                  vulnerability.slo_breach, vulnerability.publish_age_in_days, vulnerability.detection_age_in_days])
 
-
-        #subject_prefix
+        # subject_prefix
         subject_prefix = 'GREEN'
 
         if report_repositories.aggregate(sum=Sum('effective_slabreach'))['sum']:
@@ -119,9 +118,8 @@ class EmailReport(Report):
             if report_repositories.aggregate(sum=Sum('effective_moderate'))['sum'] != report_repositories.aggregate(sum=Sum('moderate'))['sum']:
                 subject_prefix = 'AMBER'
 
-
         # Vulnerability Summary
-        summary += f"#Report Rating\n {subject_prefix}\n #Vulnerability Summary\n * total Repositories: {report_repositories.count()}\n * total Critical Breach: {report_repositories.aggregate(sum=Sum('effective_slabreach'))['sum']}\n * total Critical: {report_repositories.aggregate(sum=Sum('critical'))['sum']} --> Effective Critical: {report_repositories.aggregate(sum=Sum('effective_critical'))['sum']}\n * total High: {report_repositories.aggregate(sum=Sum('high'))['sum']} ---> Effective High: { report_repositories.aggregate(sum=Sum('effective_high'))['sum']}\n * total Moderate: { report_repositories.aggregate(sum=Sum('moderate'))['sum']} --> Effective Moderate: { report_repositories.aggregate(sum=Sum('effective_moderate'))['sum']}\n * total Low: { report_repositories.aggregate(sum=Sum('low'))['sum']} --> Effective Low: { report_repositories.aggregate(sum=Sum('effective_low'))['sum']}\n \n"
+        summary += f"#Report Rating\n {subject_prefix}\n #Vulnerability Summary\n * total Repositories: {report_repositories.count()}\n * total Effective Critical Breach: {report_repositories.aggregate(sum=Sum('effective_slabreach'))['sum']}\n * total Critical: {report_repositories.aggregate(sum=Sum('critical'))['sum']} --> Effective Critical: {report_repositories.aggregate(sum=Sum('effective_critical'))['sum']}\n * total High: {report_repositories.aggregate(sum=Sum('high'))['sum']} ---> Effective High: { report_repositories.aggregate(sum=Sum('effective_high'))['sum']}\n * total Moderate: { report_repositories.aggregate(sum=Sum('moderate'))['sum']} --> Effective Moderate: { report_repositories.aggregate(sum=Sum('effective_moderate'))['sum']}\n * total Low: { report_repositories.aggregate(sum=Sum('low'))['sum']} --> Effective Low: { report_repositories.aggregate(sum=Sum('effective_low'))['sum']}\n \n"
 
         # SLO Breach Summary
         slo_breached_repositories_of_interest = set(self.db_client.getSloBreachRepos().values_list(
@@ -136,5 +134,4 @@ class EmailReport(Report):
                 'sum'], slo_breached_report_repositories.aggregate(sum=Sum('high'))['sum'],
             slo_breached_report_repositories.aggregate(sum=Sum('moderate'))['sum'])
 
-
-        return {'csv': csv_data, 'content': content, 'summary': summary,'subject_prefix': f'[{subject_prefix}]'}
+        return {'csv': csv_data, 'content': content, 'summary': summary, 'subject_prefix': f'[{subject_prefix}]'}
