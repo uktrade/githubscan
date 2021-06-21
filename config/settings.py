@@ -53,16 +53,31 @@ FIRST_N_RECORDS = int(env('FIRST_N_RECORDS'))
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 
 
+#staff-sso config
+AUTHBROKER_URL = env('AUTHBROKER_URL')
+AUTHBROKER_CLIENT_ID = env('AUTHBROKER_CLIENT_ID')
+AUTHBROKER_CLIENT_SECRET = env('AUTHBROKER_CLIENT_SECRET')
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'authbroker_client.backends.AuthbrokerBackend',
+]
+
+LOGIN_REDIRECT_URL = 'admin:index'
+AUTH_USER_MODEL = 'user.User'
+
 # Application definition
 
 INSTALLED_APPS = [
     'github',
+    'authbroker_client',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'user',
 ]
 
 MIDDLEWARE = [
@@ -74,6 +89,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',    
 ]
 
 

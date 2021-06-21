@@ -1,9 +1,5 @@
 from github.report import Report
-
 from django.db.models import Sum
-
-from tabulate import tabulate
-
 
 class SlackReport(Report):
 
@@ -14,12 +10,11 @@ class SlackReport(Report):
     def getReportMessage(self):
         self.__getSummaryReport__()
         self.__getTeamSummaryReport__()
-        # self.__getSkippedRepoReport__()
-        # self.__getSloBreachReport__()
-        # self.__getOrphanRepoReport__()
+        self.__getSkippedRepoReport__()
+        self.__getSloBreachReport__()
+        self.__getOrphanRepoReport__()
 
         return self.slack_message
-        # print(self.slack_message)
 
     def __addHeaderAndSectionToBlock__(self, header, section_text, fields_array=[]):
         message_header = {"type": "header", "text": {
