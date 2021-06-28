@@ -66,7 +66,7 @@ class Command(BaseCommand):
                         'subject': f"{data['subject_prefix']} {data['subject']}",
                         'content': data['content'],
                         'summary': data['summary'],
-                        'report': prepare_upload(f),
+                        'report': prepare_upload(f,is_csv=True),
                         'signature': data['signature']
                     }
                 )
