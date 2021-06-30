@@ -157,31 +157,32 @@ class Updater:
 
         for vulnerablity in RepositoryVulnerability.objects.all():
 
+            effective_severity_level = ''
             # if detection age is more than lowest allowed age before it upgrades ( i.e. max_critical_alert_age  ) than do something!
-            if vulnerablity.publish_age_in_days >= max_critical_alert_age:
-                effective_severity_level = ''
+            if vulnerablity.detection_age_in_days >= max_critical_alert_age:
                 # if original severity level is 'critical' it is a breach!
                 if vulnerablity.severity_level == 'critical':
                     effective_severity_level = 'SLA_BREACH'
 
                 if vulnerablity.severity_level == 'high':
-                    if vulnerablity.publish_age_in_days >= max_high_alert_age and vulnerablity.publish_age_in_days < max_high_alert_age + max_critical_alert_age:
+                    if vulnerablity.detection_age_in_days >= max_high_alert_age and vulnerablity.detection_age_in_days < max_high_alert_age + max_critical_alert_age:
                         effective_severity_level = 'critical'
-                    if vulnerablity.publish_age_in_days >= max_high_alert_age + max_critical_alert_age:
+                    if vulnerablity.detection_age_in_days >= max_high_alert_age + max_critical_alert_age:
                         effective_severity_level = 'SLA_BREACH'
 
                 if vulnerablity.severity_level == 'moderate':
-                    if vulnerablity.publish_age_in_days >= max_moderate_alert_age and vulnerablity.publish_age_in_days < max_moderate_alert_age + max_high_alert_age:
+                    if vulnerablity.detection_age_in_days >= max_moderate_alert_age and vulnerablity.detection_age_in_days < max_moderate_alert_age + max_high_alert_age:
                         effective_severity_level = 'high'
-                    if vulnerablity.publish_age_in_days >= max_moderate_alert_age + max_high_alert_age and vulnerablity.publish_age_in_days < max_moderate_alert_age + max_high_alert_age + max_critical_alert_age:
+                    if vulnerablity.detection_age_in_days >= max_moderate_alert_age + max_high_alert_age and vulnerablity.detection_age_in_days < max_moderate_alert_age + max_high_alert_age + max_critical_alert_age:
                         effective_severity_level = 'critical'
-                    if vulnerablity.publish_age_in_days >= max_moderate_alert_age + max_high_alert_age + max_critical_alert_age:
+                    if vulnerablity.detection_age_in_days >= max_moderate_alert_age + max_high_alert_age + max_critical_alert_age:
                         effective_severity_level = 'SLA_BREACH'
 
-                # update effective severity level if it is not blank
-                if effective_severity_level:
-                    RepositoryVulnerability.objects.filter(id=vulnerablity.id).update(
-                        effective_severity_level=effective_severity_level)
+
+            #this can help us manage the case where we need to reset effective_severity to blank
+            RepositoryVulnerability.objects.filter(id=vulnerablity.id).update(effective_severity_level=effective_severity_level)
+                
+
 
     def __update_slo_breach_status__(self):
         # Max alert accepable age in days
@@ -192,19 +193,28 @@ class Updater:
         max_moderate_alert_age = 15
 
         for critical_alert_record in RepositoryVulnerability.objects.filter(severity_level='critical').all():
-            if critical_alert_record.publish_age_in_days > max_critical_alert_age:
+            if critical_alert_record.detection_age_in_days > max_critical_alert_age:
                 RepositoryVulnerability.objects.filter(
                     id=critical_alert_record.id).update(slo_breach=True)
+            else:
+                RepositoryVulnerability.objects.filter(
+                    id=critical_alert_record.id).update(slo_breach=False)
 
         for high_alert_record in RepositoryVulnerability.objects.filter(severity_level='high').all():
-            if high_alert_record.publish_age_in_days > max_high_alert_age:
+            if high_alert_record.detection_age_in_days > max_high_alert_age:
                 RepositoryVulnerability.objects.filter(
                     id=high_alert_record.id).update(slo_breach=True)
+            else:
+                RepositoryVulnerability.objects.filter(
+                    id=high_alert_record.id).update(slo_breach=False)
 
         for moderate_alert_record in RepositoryVulnerability.objects.filter(severity_level='moderate').all():
-            if moderate_alert_record.publish_age_in_days > max_moderate_alert_age:
+            if moderate_alert_record.detection_age_in_days > max_moderate_alert_age:
                 RepositoryVulnerability.objects.filter(
                     id=moderate_alert_record.id).update(slo_breach=True)
+            else:
+               RepositoryVulnerability.objects.filter(
+                    id=moderate_alert_record.id).update(slo_breach=False)
 
     def __update_counts__(self):
         # Drop all before updating
