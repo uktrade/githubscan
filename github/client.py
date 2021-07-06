@@ -148,8 +148,11 @@ class GHClient:
             {'Accept': 'application/vnd.github.vixen-preview+json'})
         query = self.__openQuery(os.path.join(
             self.APP_ROOT,  'github', 'gqlQueries', 'vulnerabilityAlerts.gql'))
+        # query_variables = {"org_name": self.ORG_NAME,
+        #                    "repo_name": repository, "first": self.first}
+
         query_variables = {"org_name": self.ORG_NAME,
-                           "repo_name": repository, "first": self.first}
+                           "repo_name": "trade-access-program", "first": self.first}
 
         data = json.dumps({"query": query, "variables": query_variables})
 
@@ -165,30 +168,32 @@ class GHClient:
                         severity = (node['securityVulnerability']
                                     ['severity']).lower()
                         package_name = node['securityVulnerability']['package']['name']
-                        cve_identifier = dict()
-                        has_cve_identifier = False
-                        cve_url = None
-                        for identifier in node['securityAdvisory']['identifiers']:
-                            if identifier['type'].lower() == 'cve':
-                                has_cve_identifier = True
-                                cve_identifier = identifier
+                        ghsa_identifier = dict()
 
-                        if has_cve_identifier:
-                            identifier_type = cve_identifier['type']
-                            identifier_value = cve_identifier['value']
-                            if len(node['securityAdvisory']['references']) > 1:
-                                cve_url = node['securityAdvisory']['references'][1]['url']
-                            else:
-                                cve_url = node['securityAdvisory']['references'][0]['url']
+                        ghsaId = node['securityAdvisory']['ghsaId']
+                        refrences = node ['securityAdvisory']['references']
+                        identifiers = node['securityAdvisory']['identifiers']
 
-                        else:
-                            identifier_type = node['securityAdvisory']['identifiers'][0]['type']
-                            identifier_value = node['securityAdvisory']['identifiers'][0]['value']
+                        identifier_type = identifiers[0]['type']
+                        identifier_value = identifiers[0]['value']                            
+                        refrence_url = refrences[0]
+
+                        if ghsaId:
+                            for id in identifiers:
+                                if id['type'] == 'GHSA':
+                                    identifier_type  = id['type']
+                                    identifier_value = id['value']
+                                    break
+
+                            for ref in refrences:
+                                if ghsaId == ref['url'].split('/')[-1]:
+                                    refrence_url = ref['url']
+                                    break                      
 
                         published_at = node['securityAdvisory']['publishedAt']
 
                         severities.append((
-                            package_name, severity, identifier_type, identifier_value, cve_url, published_at))
+                            package_name, severity, identifier_type, identifier_value, refrence_url, published_at))
 
                 if not response['data']['organization']['repository']['vulnerabilityAlerts']['pageInfo']['hasNextPage']:
                     break
