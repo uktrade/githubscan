@@ -148,11 +148,9 @@ class GHClient:
             {'Accept': 'application/vnd.github.vixen-preview+json'})
         query = self.__openQuery(os.path.join(
             self.APP_ROOT,  'github', 'gqlQueries', 'vulnerabilityAlerts.gql'))
-        # query_variables = {"org_name": self.ORG_NAME,
-        #                    "repo_name": repository, "first": self.first}
-
+            
         query_variables = {"org_name": self.ORG_NAME,
-                           "repo_name": "trade-access-program", "first": self.first}
+                           "repo_name": repository, "first": self.first}
 
         data = json.dumps({"query": query, "variables": query_variables})
 
