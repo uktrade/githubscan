@@ -6,6 +6,7 @@ from django.conf import settings
 from django.db.models import Sum
 import json
 
+from django.db.models import Case, When
 
 class EmailReport(Report):
 
@@ -43,9 +44,17 @@ class EmailReport(Report):
         data.update(
             {'subject': f'Daily : Github {team.capitalize()} Team Vulnerabilities Scan Report'})
         data.update({'signature': self.signature})
-
+      
         return data
 
+    def getDetailedTeamReport(self,team):
+        data = {}
+        data.update(self.__detailed_repository_report(repositories_of_interest=self.getTeamReportRepos(team=team),team=team))
+        data.update(
+            {'subject': f'Daily : Github {team.capitalize()} Team Detailed Vulnerabilities Scan Report'})
+        data.update({'signature': self.signature})
+        return data 
+    
     def __format_email_report__(self, repositories_of_interest, teams=None):
 
         content = ''
@@ -135,3 +144,53 @@ class EmailReport(Report):
             slo_breached_report_repositories.aggregate(sum=Sum('moderate'))['sum'])
 
         return {'csv': csv_data, 'content': content, 'summary': summary, 'subject_prefix': f'[{subject_prefix}]'}
+
+
+
+    def __detailed_repository_report(self,repositories_of_interest,team):
+
+        max_critical_alert_age = 1
+        max_high_alert_age = 7
+        max_moderate_alert_age = 15
+        time_since_current_level = 0
+
+        content = ''
+        
+        vulnerabilities = self.db_client.getRepositoriesVulnerabilities(repositories=repositories_of_interest)
+        
+        sorted_vulnerabilities = vulnerabilities.annotate(
+                        ranking = Case(When(severity_level='critical',then=1),When(severity_level='high',then=2),When(severity_level='moderate',then=3),When(severity_level='low',then=4)),
+                        effective_ranking = Case(When(effective_severity_level='SLA_BREACH',then=1),When(effective_severity_level='critical',then=2),When(effective_severity_level='high',then=3),When(effective_severity_level='moderate',then=4),When(effective_severity_level='low',then=5))
+                    ).order_by('effective_ranking','ranking')
+
+        for v in sorted_vulnerabilities:
+
+            current_severity_level = v.effective_severity_level or v.severity_level
+
+            time_since_key = f'Time Being {(current_severity_level).capitalize()}' 
+            days_left_to_breach_key = f'Time Till {(current_severity_level).capitalize()} Breach'
+
+            days_left_to_breach = ''
+
+            if current_severity_level == 'SLA_BREACH':
+                current_severity_level = "Critical Breach"
+                time_since_key = f"Time Since {current_severity_level}"
+                days_left_to_breach_key = f"Time Till {(current_severity_level).capitalize()}"
+                days_left_to_breach = f"{v.time_since_current_level} day(s) over SLA Budget"
+
+            elif current_severity_level == 'critical':
+                time_left = max_critical_alert_age - v.time_since_current_level
+                days_left_to_breach = f'{time_left} days(s)'
+
+            elif current_severity_level == 'high':
+                time_left = max_high_alert_age - v.time_since_current_level
+                days_left_to_breach = f'{time_left} days(s)'
+
+            elif current_severity_level == 'moderate':
+                time_left = max_moderate_alert_age - v.time_since_current_level
+                days_left_to_breach = f'{time_left} days(s)'                        
+
+            repository_name = v.repository.name
+            content += f'#Package: {v.package_name.capitalize()} \n * Effective severity level: {current_severity_level.capitalize()}\n * Severity level: {v.severity_level.capitalize()}\n * {time_since_key}: {v.time_since_current_level} day(s)\n * {days_left_to_breach_key}: {days_left_to_breach}\n * Repository: {repository_name}\n * Repository URL: https://github.com/uktrade/{repository_name})\n * Advisory URL: {v.advisory_url}\n\n'
+
+        return {'content': content,'csv':'','subject_prefix':'','summary':''}

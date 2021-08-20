@@ -125,7 +125,7 @@ class SlackReport(Report):
             for vulnerable_repository in report_repositories:
                 repository = vulnerable_repository.repository.name
                 repo_teams = list(self.db_client.getRepoTeams(
-                    repository=repository).values_list('team', flat=True))
+                    repository=repository).values_list('name', flat=True))
                 repo_teams = " | ".join(repo_teams)
 
                 github_alerts_link = f"https://github.com/uktrade/{repository}/network/alerts"
@@ -172,6 +172,7 @@ class SlackReport(Report):
             header=total_header, section_text=total_section_text)
 
     def __getOrphanRepoReport__(self):
+
         all_repositories = set(
             self.db_client.getRepos().values_list('name', flat=True))
 
@@ -179,9 +180,14 @@ class SlackReport(Report):
         for team in self.db_client.getTeams():
             if team.name != 'default':
                 repos_with_team += list(
-                    set(team.repositories.values_list('name', flat=True)))
+                    set (
+                        self.db_client.getTeamRepos(team=team).repositories.values_list('name', flat=True)
+                    ))
+    
 
         orphan_repositories = all_repositories.difference(set(repos_with_team))
+
+    
 
         header = "Github Orphan repos report"
         section_text = f"```Total Orphan Repositories:{len(orphan_repositories)}\n"

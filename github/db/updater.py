@@ -158,29 +158,40 @@ class Updater:
         for vulnerablity in RepositoryVulnerability.objects.all():
 
             effective_severity_level = ''
+            time_since_current_level = vulnerablity.detection_age_in_days
+
             # if detection age is more than lowest allowed age before it upgrades ( i.e. max_critical_alert_age  ) than do something!
             if vulnerablity.detection_age_in_days >= max_critical_alert_age:
                 # if original severity level is 'critical' it is a breach!
                 if vulnerablity.severity_level == 'critical':
                     effective_severity_level = 'SLA_BREACH'
+                    time_since_current_level = vulnerablity.detection_age_in_days - max_critical_alert_age
 
                 if vulnerablity.severity_level == 'high':
                     if vulnerablity.detection_age_in_days >= max_high_alert_age and vulnerablity.detection_age_in_days < max_high_alert_age + max_critical_alert_age:
                         effective_severity_level = 'critical'
+                        time_since_current_level = vulnerablity.detection_age_in_days - max_high_alert_age
+
                     if vulnerablity.detection_age_in_days >= max_high_alert_age + max_critical_alert_age:
                         effective_severity_level = 'SLA_BREACH'
+                        time_since_current_level = vulnerablity.detection_age_in_days - (max_high_alert_age + max_critical_alert_age)
 
                 if vulnerablity.severity_level == 'moderate':
                     if vulnerablity.detection_age_in_days >= max_moderate_alert_age and vulnerablity.detection_age_in_days < max_moderate_alert_age + max_high_alert_age:
                         effective_severity_level = 'high'
+                        time_since_current_level = vulnerablity.detection_age_in_days - max_moderate_alert_age 
+
                     if vulnerablity.detection_age_in_days >= max_moderate_alert_age + max_high_alert_age and vulnerablity.detection_age_in_days < max_moderate_alert_age + max_high_alert_age + max_critical_alert_age:
                         effective_severity_level = 'critical'
+                        time_since_current_level = vulnerablity.detection_age_in_days - (max_moderate_alert_age + max_high_alert_age)
+
                     if vulnerablity.detection_age_in_days >= max_moderate_alert_age + max_high_alert_age + max_critical_alert_age:
                         effective_severity_level = 'SLA_BREACH'
+                        time_since_current_level = vulnerablity.detection_age_in_days - (max_moderate_alert_age + max_high_alert_age + max_critical_alert_age)
 
-
+                #set         
             #this can help us manage the case where we need to reset effective_severity to blank
-            RepositoryVulnerability.objects.filter(id=vulnerablity.id).update(effective_severity_level=effective_severity_level)
+            RepositoryVulnerability.objects.filter(id=vulnerablity.id).update(effective_severity_level=effective_severity_level,time_since_current_level=time_since_current_level)
                 
 
 

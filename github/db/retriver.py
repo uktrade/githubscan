@@ -50,3 +50,9 @@ class Retriver:
 
     def getSortedTeamsVulnerabilitySummaryReport(self):
         return TeamVulnerabilityCount.objects.order_by('critical', 'high', 'moderate', 'low').reverse()
+
+    def getReposityVulnerabilities(self,repository):
+        return RepositoryVulnerability.objects.filter(repository=repository)
+
+    def getRepositoriesVulnerabilities(self, repositories):
+        return   RepositoryVulnerability.objects.filter(repository__in=repositories)

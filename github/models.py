@@ -32,6 +32,7 @@ class RepositoryVulnerability(models.Model):
     detection_date = models.DateTimeField(auto_now_add=True)
     publish_age_in_days = models.IntegerField(default=0)
     detection_age_in_days = models.IntegerField(default=0)
+    time_since_current_level = models.IntegerField(default=0)
     slo_breach = models.BooleanField(default=False)
 
 

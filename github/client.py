@@ -125,9 +125,8 @@ class GHClient:
 
         while True:
             for edge in response['data']['organization']['team']['repositories']['edges']:
-                if not edge['node']['isArchived'] and (edge['permission'] == 'WRITE' or edge['permission'] == 'ADMIN'):
+                if not edge['node']['isArchived'] and (edge['permission'] == 'WRITE' or edge['permission'] == 'ADMIN' or edge['permission'] == 'MAINTAIN'):
                     teamrepos.append(edge['node']['name'])
-
             if response['data']['organization']['team']['repositories']['pageInfo']['hasNextPage'] is False:
                 break
             else:
