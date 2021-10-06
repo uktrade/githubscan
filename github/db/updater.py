@@ -104,8 +104,9 @@ class Updater:
                     identifier_value = alert[3]
                     advisory_url = alert[4]
                     published_at = alert[5]
+                    patched_version = alert[6]
                     active_repo_alerts.append(
-                        [repository, package_name, severity_level, identifier_type, identifier_value, advisory_url, published_at])
+                        [repository, package_name, severity_level, identifier_type, identifier_value, advisory_url, published_at,patched_version])
 
             # add/remove alerts
             from django.db.models import F, Func, Value, CharField
@@ -122,7 +123,7 @@ class Updater:
             if active_repo_alerts:
 
                 alertsSetInDb = set(alertsInDb.values_list('repository', 'package_name', 'severity_level',
-                                                           'identifier_type', 'identifier_value', 'advisory_url', 'publishedAt_as_string'))
+                                                           'identifier_type', 'identifier_value', 'advisory_url', 'publishedAt_as_string','patched_version'))
 
                 alertsSetInGithub = set(tuple(row)
                                         for row in active_repo_alerts)
@@ -137,7 +138,7 @@ class Updater:
 
                 for record in add_records:
                     RepositoryVulnerability(repository=self.db_client.getRepo(repository=record[0]), package_name=record[1], severity_level=record[
-                                            2], identifier_type=record[3], identifier_value=record[4], advisory_url=record[5], published_at=record[6]).save()
+                                            2], identifier_type=record[3], identifier_value=record[4], advisory_url=record[5], published_at=record[6],patched_version=record[7]).save()
             else:
                 # if repo does not have any active alerts , delete it from record too
                 alertsInDb.delete()

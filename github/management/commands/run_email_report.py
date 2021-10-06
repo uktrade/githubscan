@@ -17,7 +17,7 @@ import traceback
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        #self.email_org_report()
+        self.email_org_report()
         self.email_team_reports()
         self.email_detailed_team_reports()
 
@@ -80,16 +80,17 @@ class Command(BaseCommand):
                 upload_file = prepare_upload(f,is_csv=True) 
 
         for to in emails:
-            response = notifications_client.send_email_notification(
-                email_address=to,
-                template_id=settings.NOTIFY_TEMPLATE_ID,
-                personalisation={
+            personalisation_data={
                     'subject': f"{data['subject_prefix']} {data['subject']}",
                     'content': data['content'],
                     'summary': data['summary'],
                     'report': upload_file,
                     'signature': data['signature']
-                }
+            }            
+            response = notifications_client.send_email_notification(
+                email_address=to,
+                template_id=settings.NOTIFY_TEMPLATE_ID,
+                personalisation=personalisation_data
             )
-
+            
         os.remove(FILE_NAME)

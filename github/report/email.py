@@ -7,6 +7,8 @@ from django.db.models import Sum
 import json
 
 from django.db.models import Case, When
+from datetime import  datetime,timedelta
+import calendar
 
 class EmailReport(Report):
 
@@ -21,7 +23,7 @@ class EmailReport(Report):
         data.update(self.__format_email_report__(
             repositories_of_interest=self.getReportRepos()))
         data.update(
-            {'subject': 'Daily : Github Organisation Vulnerabilities Scan Report'})
+            {'subject': 'Daily: Github Organisation Vulnerabilities Scan Report'})
         data.update({'signature': self.signature})
         return data
 
@@ -31,7 +33,7 @@ class EmailReport(Report):
         data.update(self.__format_email_report__(
             repositories_of_interest=self.getSkippedRepos()))
         data.update(
-            {'subject': 'Daily : Github Organisation Unmonitored Repositories Vulnerabilities Scan Report'})
+            {'subject': 'Daily: Github Organisation Unmonitored Repositories Vulnerabilities Scan Report'})
         data.update({'signature': self.signature})
 
         return data
@@ -42,7 +44,7 @@ class EmailReport(Report):
         data.update(self.__format_email_report__(
             repositories_of_interest=self.getTeamReportRepos(team=team), teams=team))
         data.update(
-            {'subject': f'Daily : Github {team.capitalize()} Team Vulnerabilities Scan Report'})
+            {'subject': f'Daily: Github {team.capitalize()} Team Vulnerabilities Scan Report'})
         data.update({'signature': self.signature})
       
         return data
@@ -51,7 +53,8 @@ class EmailReport(Report):
         data = {}
         data.update(self.__detailed_repository_report(repositories_of_interest=self.getTeamReportRepos(team=team),team=team))
         data.update(
-            {'subject': f'Daily : Github {team.capitalize()} Team Detailed Vulnerabilities Scan Report'})
+            {'subject': f"{data['subject_prefix']} - {team.capitalize()} Team Github Report"})
+        data.update({'subject_prefix':''})
         data.update({'signature': self.signature})
         return data 
     
@@ -157,40 +160,110 @@ class EmailReport(Report):
         content = ''
         
         vulnerabilities = self.db_client.getRepositoriesVulnerabilities(repositories=repositories_of_interest)
-        
-        sorted_vulnerabilities = vulnerabilities.annotate(
-                        ranking = Case(When(severity_level='critical',then=1),When(severity_level='high',then=2),When(severity_level='moderate',then=3),When(severity_level='low',then=4)),
+
+        sorted_uniq_vulnerabilities = vulnerabilities.values('package_name','severity_level','effective_severity_level','detection_age_in_days','time_since_current_level','advisory_url','patched_version').distinct().annotate(ranking = Case(When(severity_level='critical',then=1),When(severity_level='high',then=2),When(severity_level='moderate',then=3),When(severity_level='low',then=4)),
                         effective_ranking = Case(When(effective_severity_level='SLA_BREACH',then=1),When(effective_severity_level='critical',then=2),When(effective_severity_level='high',then=3),When(effective_severity_level='moderate',then=4),When(effective_severity_level='low',then=5))
                     ).order_by('effective_ranking','ranking')
 
-        for v in sorted_vulnerabilities:
+        subject_prefix = ''
+        vulnerable_package_count = sorted_uniq_vulnerabilities.count()
 
-            current_severity_level = v.effective_severity_level or v.severity_level
+        for index,v in enumerate(sorted_uniq_vulnerabilities):
+
+            package_name = v['package_name']
+            patched_version = v['patched_version']
+            severity_level = v['severity_level']
+            current_severity_level = v['effective_severity_level'] or v['severity_level']
+
+            time_in_hand = 0
+            time_in_hand_suffix = 'days'
 
             time_since_key = f'Time Being {(current_severity_level).capitalize()}' 
             days_left_to_breach_key = f'Time Till {(current_severity_level).capitalize()} Breach'
 
             days_left_to_breach = ''
+            advisory_url = v['advisory_url']
+
+            repository_key = 'Repository'
+
+            time_since_current_level = v['time_since_current_level']
 
             if current_severity_level == 'SLA_BREACH':
                 current_severity_level = "Critical Breach"
+                time_in_hand = -1
+                time_in_hand_suffix = 'Breached Already'
                 time_since_key = f"Time Since {current_severity_level}"
                 days_left_to_breach_key = f"Time Till {(current_severity_level).capitalize()}"
                 days_left_to_breach = f"{v.time_since_current_level} day(s) over SLA Budget"
 
             elif current_severity_level == 'critical':
-                time_left = max_critical_alert_age - v.time_since_current_level
+                time_left = max_critical_alert_age - v['time_since_current_level']
+                time_in_hand = time_left
+                time_in_hand_suffix = 'day'
                 days_left_to_breach = f'{time_left} days(s)'
 
             elif current_severity_level == 'high':
-                time_left = max_high_alert_age - v.time_since_current_level
+                time_left = max_high_alert_age - v['time_since_current_level']
+                time_in_hand = time_left + max_critical_alert_age
                 days_left_to_breach = f'{time_left} days(s)'
 
             elif current_severity_level == 'moderate':
-                time_left = max_moderate_alert_age - v.time_since_current_level
+                time_left = max_moderate_alert_age - v['time_since_current_level']
+                time_in_hand = time_left + max_high_alert_age + max_critical_alert_age
                 days_left_to_breach = f'{time_left} days(s)'                        
 
-            repository_name = v.repository.name
-            content += f'#Package: {v.package_name.capitalize()} \n * Effective severity level: {current_severity_level.capitalize()}\n * Severity level: {v.severity_level.capitalize()}\n * {time_since_key}: {v.time_since_current_level} day(s)\n * {days_left_to_breach_key}: {days_left_to_breach}\n * Repository: {repository_name}\n * Repository URL: https://github.com/uktrade/{repository_name})\n * Advisory URL: {v.advisory_url}\n\n'
 
-        return {'content': content,'csv':'','subject_prefix':'','summary':''}
+
+            repositories = vulnerabilities.filter(package_name=v['package_name'],
+                                                severity_level=v['severity_level'],
+                                                effective_severity_level=v['effective_severity_level'],
+                                                detection_age_in_days=v['detection_age_in_days'],
+                                                time_since_current_level=v['time_since_current_level']).values('repository_id').distinct();
+
+            
+            if len(repositories) > 1:
+               repository_key = 'Repositories'
+            due_date = datetime.today() + timedelta(time_in_hand)
+
+            due_day = due_date.day
+            due_day_suffix = ''
+
+            if 4 <= due_day <= 20 or 24 <= due_day <= 30:
+                due_day_suffix = "th"
+            else:
+                due_day_suffix = ["st", "nd", "rd"][due_day % 10 - 1]
+
+            due_month = calendar.month_name[due_date.month]
+ 
+            if time_in_hand == 1:
+                time_in_hand = 'Tomorrow'
+
+            elif time_in_hand == 0:
+                time_in_hand = 'Today'
+
+            elif time_in_hand == -1:
+                time_in_hand = 'Yesterday'
+
+            elif time_in_hand < -1:
+                time_in_hand = f'{abs(time_in_hand)} days ago'
+                time_in_hand_suffix = ''
+            else:
+                time_in_hand = f'{time_in_hand} {time_in_hand_suffix}'            
+
+            due_date_str = f'{due_day}{due_day_suffix} {due_month} {due_date.year} ({time_in_hand})'
+            repo_urls = '' 
+
+
+            for repo in repositories:
+                repo_urls += f" - https://github.com/uktrade/{repo['repository_id']}/security/dependabot\n "
+            
+            content += f'#{package_name.capitalize()}\nPatch by: {due_date_str} \n * Patched version: {patched_version}\n * Effective severity: {current_severity_level.capitalize()}\n *Original severity: {severity_level.capitalize()} \n * Advisory: \n  - {advisory_url} \n * {repository_key}:\n {repo_urls}\n\n'
+
+            if index == 0:
+
+                subject_prefix = f'Action by: {due_day}{due_day_suffix} {due_month} {due_date.year}'
+                if current_severity_level == 'SLA_BREACH':
+                    subject_prefix = 'Critical Breach'
+
+
+        return {'content': content,'csv':'','subject_prefix': f'[{subject_prefix}] {vulnerable_package_count} Vulnerable packages','summary':''}

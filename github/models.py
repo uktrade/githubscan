@@ -34,7 +34,7 @@ class RepositoryVulnerability(models.Model):
     detection_age_in_days = models.IntegerField(default=0)
     time_since_current_level = models.IntegerField(default=0)
     slo_breach = models.BooleanField(default=False)
-
+    patched_version = models.CharField(max_length=20, blank=True)
 
 class RepositoryVulnerabilityCount(models.Model):
     id = models.AutoField(primary_key=True)

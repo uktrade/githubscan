@@ -159,8 +159,7 @@ class GHClient:
             nodes = response['data']['organization']['repository']['vulnerabilityAlerts']['nodes']
             # Lets not try to loop if it is None ( i.e. no Servrity exits)
             if nodes is not None:
-                for node in nodes:
-
+                for node in nodes:                    
                     if node['dismissedAt'] is None:
                         severity = (node['securityVulnerability']
                                     ['severity']).lower()
@@ -189,8 +188,14 @@ class GHClient:
 
                         published_at = node['securityAdvisory']['publishedAt']
 
+                
+                        patched_version = 'Not Known'
+
+                        if node['securityVulnerability']['firstPatchedVersion'] is not None:
+                            patched_version = node['securityVulnerability']['firstPatchedVersion']['identifier']
+
                         severities.append((
-                            package_name, severity, identifier_type, identifier_value, refrence_url, published_at))
+                            package_name, severity, identifier_type, identifier_value, refrence_url, published_at,patched_version))
 
                 if not response['data']['organization']['repository']['vulnerabilityAlerts']['pageInfo']['hasNextPage']:
                     break
@@ -204,5 +209,5 @@ class GHClient:
             else:
                 break
 
-        sorted_severities = sorted(severities, key=itemgetter(1))
+        sorted_severities = sorted(severities, key=itemgetter(1))    
         return set(sorted_severities)
