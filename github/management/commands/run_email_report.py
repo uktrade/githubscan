@@ -22,11 +22,12 @@ class Command(BaseCommand):
         self.email_detailed_team_reports()
 
     def email_org_report(self):
+        notify_template_id = settings.NOTIFY_TEMPLATE_ID
         try:
             report = EmailReport()
             data = report.getReport()
             emails = settings.ORG_REPORT_EMAILS
-            self.__send_email__(emails, data)
+            self.__send_email__(emails, data,notify_template_id)
             self.stdout.write(self.style.SUCCESS(
                 "Org Email Sent to: {}".format(",".join(emails))))
         except Exception as e:
@@ -34,6 +35,7 @@ class Command(BaseCommand):
             traceback.print_exc()
 
     def email_team_reports(self):
+        notify_template_id = settings.NOTIFY_TEMPLATE_ID
         try:
             report = EmailReport()
 
@@ -42,7 +44,7 @@ class Command(BaseCommand):
             for team, emails in teams_emails.items():
                 data = report.getTeamReport(team=team)
                 if data['content'] and emails:
-                    self.__send_email__(emails, data)
+                    self.__send_email__(emails, data,notify_template_id)
                     self.stdout.write(self.style.SUCCESS(
                         "Team Email Sent to: {}".format(",".join(emails))))
         except Exception as e:
@@ -52,18 +54,19 @@ class Command(BaseCommand):
     def email_detailed_team_reports(self):
         report = EmailReport()
         teams_emails = json.loads(settings.TEAMS_REPORT_EMAILS.replace('=>', ':'))
+        notify_template_id = settings.NOTIFY_DETAILED_VULNURABILITY_TEMPLATE_ID
         for team, emails in teams_emails.items():
             try:
                 data = report.getDetailedTeamReport(team=team)
                 if data['content'] and emails:
-                    self.__send_email__(emails, data)
+                    self.__send_email__(emails, data,notify_template_id)
                     self.stdout.write(self.style.SUCCESS(f"Detailed Team[{team}] Report Email Sent to: {''.join(emails)}"))
 
             except Exception as e:
                 print(f"Detailed Team[{team}] Report Send Error:{e}")
                 traceback.print_exc()            
 
-    def __send_email__(self, emails, data):
+    def __send_email__(self, emails, data,notify_template_id):
         notifications_client = NotificationsAPIClient(settings.NOTIFY_API_KEY)
     
         FILE_NAME = 'report.csv'
@@ -74,7 +77,7 @@ class Command(BaseCommand):
             csvFile.close()
 
         upload_file = ''
-
+  
         if data['csv']:
             with open(FILE_NAME, 'rb') as f:
                 upload_file = prepare_upload(f,is_csv=True) 
@@ -89,7 +92,7 @@ class Command(BaseCommand):
             }            
             response = notifications_client.send_email_notification(
                 email_address=to,
-                template_id=settings.NOTIFY_TEMPLATE_ID,
+                template_id=notify_template_id,
                 personalisation=personalisation_data
             )
             
