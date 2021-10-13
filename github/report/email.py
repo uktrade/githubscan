@@ -212,6 +212,8 @@ class EmailReport(Report):
                 time_in_hand = time_left + max_high_alert_age + max_critical_alert_age
                 days_left_to_breach = f'{time_left} days(s)'                        
 
+            elif current_severity_level == 'low':
+                time_in_hand = 9999;
 
 
             repositories = vulnerabilities.filter(package_name=v['package_name'],
@@ -250,7 +252,9 @@ class EmailReport(Report):
             else:
                 time_in_hand = f'{time_in_hand} {time_in_hand_suffix}'            
 
+        
             due_date_str = f'{due_day}{due_day_suffix} {due_month} {due_date.year} ({time_in_hand})'
+
             repo_urls = '' 
 
 
