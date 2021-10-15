@@ -213,7 +213,7 @@ class EmailReport(Report):
                 days_left_to_breach = f'{time_left} days(s)'                        
 
             elif current_severity_level == 'low':
-                time_in_hand = 9999;
+                time_in_hand = 365;
 
 
             repositories = vulnerabilities.filter(package_name=v['package_name'],
