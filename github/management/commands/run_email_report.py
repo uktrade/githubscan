@@ -43,9 +43,8 @@ class Command(BaseCommand):
                 settings.TEAMS_REPORT_EMAILS.replace('=>', ':'))
             for team, emails in teams_emails.items():
                 data = report.getTeamReport(team=team)
-                if data['content'] and emails:
-                    self.__send_email__(emails, data,notify_template_id)
-                    self.stdout.write(self.style.SUCCESS(
+                self.__send_email__(emails, data,notify_template_id)
+                self.stdout.write(self.style.SUCCESS(
                         "Team Email Sent to: {}".format(",".join(emails))))
         except Exception as e:
             print("Team  Email Send Error:{}".format(e))
