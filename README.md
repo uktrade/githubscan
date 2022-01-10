@@ -27,7 +27,9 @@ is to fetch git hub alerts of each repository and update the Geckoboard dataset 
 ```
 
 
-# Database (non-Cloud Foundation environments)
+# Development
+
+## Database (non-Cloud Foundation environments)
 
 You may need to set up a database instance for development-like environments.
 
@@ -48,8 +50,7 @@ Ensure all database migrations have been applied:
 
     $ python manage.py migrate
 
-
-# Development
+## Superuser account
 
 Once a local database instance is configured, create a user with superuser
 privileges:
@@ -59,6 +60,11 @@ privileges:
 It should now be possible to navigate to the admin site
 (http://localhost:8000/admin/)
 
+## GOV.UK Notify
+
+Got to https://www.notifications.service.gov.uk/register where an account can be
+created in order to test sending notification emails. You will need to create
+two email templates
 
 # Commands
 Update vulnerability db
