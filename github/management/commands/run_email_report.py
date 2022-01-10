@@ -40,27 +40,32 @@ class Command(BaseCommand):
             report = EmailReport()
 
             teams_emails = json.loads(
-                settings.TEAMS_REPORT_EMAILS.replace('=>', ':'))
+                settings.TEAMS_REPORT_EMAILS.replace('=>', ':')
+            )
             for team, emails in teams_emails.items():
                 data = report.getTeamReport(team=team)
-                self.__send_email__(emails, data,notify_template_id)
+                self.__send_email__(emails, data, notify_template_id)
                 self.stdout.write(self.style.SUCCESS(
-                        "Team Email Sent to: {}".format(",".join(emails))))
+                    "Team Email Sent to: {}".format(",".join(emails))
+                ))
         except Exception as e:
-            print("Team  Email Send Error:{}".format(e))
             traceback.print_exc()
 
     def email_detailed_team_reports(self):
         report = EmailReport()
-        teams_emails = json.loads(settings.TEAMS_REPORT_EMAILS.replace('=>', ':'))
+        teams_emails = json.loads(
+            settings.TEAMS_REPORT_EMAILS.replace('=>', ':')
+        )
         notify_template_id = settings.NOTIFY_DETAILED_VULNURABILITY_TEMPLATE_ID
         for team, emails in teams_emails.items():
             try:
                 data = report.getDetailedTeamReport(team=team)
                 if data['content'] and emails:
-                    self.__send_email__(emails, data,notify_template_id)
-                    self.stdout.write(self.style.SUCCESS(f"Detailed Team[{team}] Report Email Sent to: {''.join(emails)}"))
+                    self.__send_email__(emails, data, notify_template_id)
 
+                    self.stdout.write(self.style.SUCCESS(
+                        f"Detailed Team[{team}] Report Email Sent to: {''.join(emails)}"
+                    ))
             except Exception as e:
                 print(f"Detailed Team[{team}] Report Send Error:{e}")
                 traceback.print_exc()            
@@ -94,5 +99,5 @@ class Command(BaseCommand):
                 template_id=notify_template_id,
                 personalisation=personalisation_data
             )
-            
+
         os.remove(FILE_NAME)

@@ -48,7 +48,8 @@ class Updater:
             if topics:
                 if self.skip_topic in topics:
                     Repository.objects.filter(
-                        name=repository).update(skip_scan=True)
+                        name=repository
+                    ).update(skip_scan=True)
 
     def __teams__(self):
         teamsInGitHub = self.github_client.getTeams()

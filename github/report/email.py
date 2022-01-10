@@ -76,8 +76,13 @@ class EmailReport(Report):
             repository = vulnerable_repository.repository.name
             repo_teams = None
             if teams == None:
-                repo_teams = list(self.db_client.getRepoTeams(
-                    repository=repository).values_list('name', flat=True))
+                repo_teams = list(
+                    self.db_client.getRepoTeams(
+                        repository=repository
+                    ).values_list(
+                        'name', flat=True
+                    )
+                )
                 repo_teams = " | ".join(repo_teams)
             else:
                 repo_teams = teams
