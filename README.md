@@ -9,7 +9,7 @@ is to fetch git hub alerts of each repository and update the Geckoboard dataset 
 - get github vulnerability alters count for each repository
 - create dataset for each team on gecko board, which can be used to create the dashboard
 
-# Environment Varibales
+# Environment Variables
 ```bash
 {
     "ALLOWED_HOSTS": "*",
@@ -25,6 +25,40 @@ is to fetch git hub alerts of each repository and update the Geckoboard dataset 
     "SKIP_TOPIC": "skip-vulnerability-scan"
 }
 ```
+
+
+# Database (non-Cloud Foundation environments)
+
+You may need to set up a database instance for development-like environments.
+
+Create a database instance and user:
+
+    $ sudo su - postgres
+    postgres $ createdb githubscan
+    postgres $ psql -c "CREATE USER <username> SUPERUSER PASSWORD '<password>';"
+
+Make a note of the `<username>` and `<password>` for use in the `DATABASE_URL`
+environment variable.
+
+You may also wish to import from a dump of an existing development database:
+
+    postgres $ psql -d githubscan -f /tmp/githubscan-db-dump.sql
+
+Ensure all database migrations have been applied:
+
+    $ python manage.py migrate
+
+
+# Development
+
+Once a local database instance is configured, create a user with superuser
+privileges:
+
+    $ python manage.py createsuperuser
+
+It should now be possible to navigate to the admin site
+(http://localhost:8000/admin/)
+
 
 # Commands
 Update vulnerability db
