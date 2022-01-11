@@ -8,6 +8,10 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
+from github.models import OrganisationNotificationTarget
+from github.models import Team
+from github.models import TeamNotificationTarget
+
 import os
 import csv
 import json
@@ -22,52 +26,73 @@ class Command(BaseCommand):
         self.email_detailed_team_reports()
 
     def email_org_report(self):
-        notify_template_id = settings.NOTIFY_TEMPLATE_ID
         try:
             report = EmailReport()
             data = report.getReport()
-            emails = settings.ORG_REPORT_EMAILS
-            self.__send_email__(emails, data,notify_template_id)
+            emails = [
+                obj.email
+                for obj in OrganisationNotificationTarget.objects.all()
+            ]
+            self.__send_email__(emails, data, settings.NOTIFY_TEMPLATE_ID)
             self.stdout.write(self.style.SUCCESS(
-                "Org Email Sent to: {}".format(",".join(emails))))
+                "Org Email Sent to: {}".format(",".join(emails)))
+            )
         except Exception as e:
             print("Org  Email Send Error:{}".format(e))
             traceback.print_exc()
 
     def email_team_reports(self):
-        notify_template_id = settings.NOTIFY_TEMPLATE_ID
-        try:
-            report = EmailReport()
-
-            teams_emails = json.loads(
-                settings.TEAMS_REPORT_EMAILS.replace('=>', ':')
-            )
-            for team, emails in teams_emails.items():
-                data = report.getTeamReport(team=team)
-                self.__send_email__(emails, data, notify_template_id)
+        report = EmailReport()
+        for team in Team.objects.filter(reporting_enabled__exact=True):
+            try:
+                emails = [
+                    obj.email
+                    for obj in TeamNotificationTarget.objects.filter(
+                        team__exact=team
+                    )
+                ]
+                if not emails:
+                    self.stdout.write(self.style.NOTICE(
+                        f'Team Report: Unable to notify "{team.name}" - no '
+                        f'associated TeamNotificationTarget instances.'
+                    ))
+                    continue
+                data = report.getTeamReport(team=team.name)
+                self.__send_email__(emails, data, settings.NOTIFY_TEMPLATE_ID)
                 self.stdout.write(self.style.SUCCESS(
                     "Team Email Sent to: {}".format(",".join(emails))
                 ))
-        except Exception as e:
-            traceback.print_exc()
+            except Exception as e:
+                traceback.print_exc()
 
     def email_detailed_team_reports(self):
         report = EmailReport()
-        teams_emails = json.loads(
-            settings.TEAMS_REPORT_EMAILS.replace('=>', ':')
-        )
-        notify_template_id = settings.NOTIFY_DETAILED_VULNURABILITY_TEMPLATE_ID
-        for team, emails in teams_emails.items():
+        for team in Team.objects.filter(reporting_enabled__exact=True):
             try:
-                data = report.getDetailedTeamReport(team=team)
+                emails = [
+                    obj.email
+                    for obj in TeamNotificationTarget.objects.filter(
+                        team__exact=team
+                    )
+                ]
+                if not emails:
+                    self.stdout.write(self.style.NOTICE(
+                        f'Detailed Team Report: Unable to notify "{team.name}" '
+                        f'- no associated TeamNotificationTarget instances.'
+                    ))
+                    continue
+                data = report.getDetailedTeamReport(team=team.name)
                 if data['content'] and emails:
-                    self.__send_email__(emails, data, notify_template_id)
-
+                    self.__send_email__(
+                        emails,
+                        data,
+                        settings.NOTIFY_DETAILED_VULNURABILITY_TEMPLATE_ID
+                    )
                     self.stdout.write(self.style.SUCCESS(
-                        f"Detailed Team[{team}] Report Email Sent to: {''.join(emails)}"
+                        f"Detailed Team[{team.name}] Report Email Sent to: {''.join(emails)}"
                     ))
             except Exception as e:
-                print(f"Detailed Team[{team}] Report Send Error:{e}")
+                print(f"Detailed Team[{team.name}] Report Send Error:{e}")
                 traceback.print_exc()            
 
     def __send_email__(self, emails, data,notify_template_id):
