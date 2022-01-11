@@ -5,6 +5,7 @@ from github.client import GHClient
 
 
 class Command(BaseCommand):
+    help = Updater.all.__doc__
 
     def handle(self, *args, **options):
         try:
