@@ -40,13 +40,11 @@ SKIP_TOPIC = env('SKIP_TOPIC')
 NOTIFY_API_KEY = env('NOTIFY_API_KEY')
 NOTIFY_TEMPLATE_ID = env('NOTIFY_TEMPLATE_ID')
 NOTIFY_DETAILED_VULNURABILITY_TEMPLATE_ID = env('NOTIFY_DETAILED_VULNURABILITY_TEMPLATE_ID')
-ORG_REPORT_EMAILS = env.list('ORG_REPORT_EMAILS')
 SLACK_CHANNEL = env('SLACK_CHANNEL')
 SLACK_ENABLED = env('SLACK_ENABLED')
 SLACK_TOKEN = env('SLACK_TOKEN')
 SLACK_URL = env('SLACK_URL')
 SIGNATURE = env.str('SIGNATURE', multiline=True)
-TEAMS_REPORT_EMAILS = env('TEAMS_REPORT_EMAILS')
 FIRST_N_RECORDS = int(env('FIRST_N_RECORDS'))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
