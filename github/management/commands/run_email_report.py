@@ -14,7 +14,6 @@ from github.models import TeamNotificationTarget
 
 import os
 import csv
-import json
 import traceback
 
 
@@ -42,22 +41,36 @@ class Command(BaseCommand):
             traceback.print_exc()
 
     def email_team_reports(self):
+        """ Send team report to those teams configured with a notification
+        target. Teams that have no actively vulnerable repos will only
+        received notifications to targets that wish to receive all alerts -
+        "RED" and "GREEN".
+        """
         report = EmailReport()
-        for team in Team.objects.filter(reporting_enabled__exact=True):
+        for team in Team.objects.filter(reporting_enabled=True):
             try:
-                emails = [
-                    obj.email
-                    for obj in TeamNotificationTarget.objects.filter(
-                        team__exact=team
-                    )
-                ]
-                if not emails:
+                notification_targets = TeamNotificationTarget.objects.filter(
+                    team=team
+                )
+                if not notification_targets:
                     self.stdout.write(self.style.NOTICE(
                         f'Team Report: Unable to notify "{team.name}" - no '
                         f'associated TeamNotificationTarget instances.'
                     ))
                     continue
+
                 data = report.getTeamReport(team=team.name)
+                if data['vulnerable_repo_count'] == 0:
+                    # No vulnerable repos, so only notify those teams who want
+                    # to be notified of "GREEN" alerts (as well as those that
+                    # are "RED").
+                    notification_targets = notification_targets.filter(
+                        red_alerts_only=False
+                    )
+                emails = [obj.email for obj in notification_targets]
+                if not emails:
+                    continue
+
                 self.__send_email__(emails, data, settings.NOTIFY_TEMPLATE_ID)
                 self.stdout.write(self.style.SUCCESS(
                     "Team Email Sent to: {}".format(",".join(emails))
@@ -66,22 +79,24 @@ class Command(BaseCommand):
                 traceback.print_exc()
 
     def email_detailed_team_reports(self):
+        """ Send detailed team report to those teams configured with a
+        notification target and which have vulnerable repos.
+        """
         report = EmailReport()
-        for team in Team.objects.filter(reporting_enabled__exact=True):
+        for team in Team.objects.filter(reporting_enabled=True):
             try:
-                emails = [
-                    obj.email
-                    for obj in TeamNotificationTarget.objects.filter(
-                        team__exact=team
-                    )
-                ]
-                if not emails:
+                notification_targets = TeamNotificationTarget.objects.filter(
+                    team=team
+                )
+                if not notification_targets:
                     self.stdout.write(self.style.NOTICE(
                         f'Detailed Team Report: Unable to notify "{team.name}" '
                         f'- no associated TeamNotificationTarget instances.'
                     ))
                     continue
+
                 data = report.getDetailedTeamReport(team=team.name)
+                emails = [obj.email for obj in notification_targets]
                 if data['content'] and emails:
                     self.__send_email__(
                         emails,
