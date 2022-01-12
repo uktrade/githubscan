@@ -39,21 +39,52 @@ class EmailReport(Report):
         return data
 
     def getTeamReport(self, team):
-        data = {}
-
+        """ Constructs and returns a dictionary of report data, in the following
+        format, for the given team:
+            {
+                "content": "",
+                "csv": "",
+                "subject_prefix": "[] 0 Vulnerable packages",
+                "summary": "",
+                "vulnerable_repo_count": 0
+            }
+        """
+        vulnerable_repos = self.getTeamReportRepos(team=team)
+        data = {
+            'vulnerable_repo_count': len(vulnerable_repos)
+        }
         data.update(self.__format_email_report__(
-            repositories_of_interest=self.getTeamReportRepos(team=team), teams=team))
-        data.update(
-            {'subject': f'Daily: Github {team.capitalize()} Team Vulnerabilities Scan Report'})
+            repositories_of_interest=vulnerable_repos,
+            teams=team,
+        ))
+        data.update({
+            'subject': f'Daily: Github {team.capitalize()} Team Vulnerabilities Scan Report'
+        })
         data.update({'signature': self.signature})
-      
         return data
 
-    def getDetailedTeamReport(self,team):
-        data = {}
-        data.update(self.__detailed_repository_report(repositories_of_interest=self.getTeamReportRepos(team=team),team=team))
-        data.update(
-            {'subject': f"{data['subject_prefix']} - {team.capitalize()} Team Github Report"})
+    def getDetailedTeamReport(self, team):
+        """ Constructs and returns a dictionary of detailed report data, in the
+        following format, for the given team:
+            {
+                "content": "",
+                "csv": "",
+                "subject_prefix": "[] 0 Vulnerable packages",
+                "summary": "",
+                "vulnerable_repo_count": 0
+            }
+        """
+        vulnerable_repos = self.getTeamReportRepos(team=team)
+        data = {
+            'vulnerable_repo_count': len(vulnerable_repos)
+        }
+        data.update(self.__detailed_repository_report(
+            repositories_of_interest=vulnerable_repos,
+            team=team,
+        ))
+        data.update({
+            'subject': f"{data['subject_prefix']} - {team.capitalize()} Team Github Report"
+        })
         data.update({'subject_prefix':''})
         data.update({'signature': self.signature})
         return data 
