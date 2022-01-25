@@ -13,13 +13,26 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
 
 from github.admin_views import admin_login_view
 
+
 urlpatterns = [
-    path('auth/', include('authbroker_client.urls', namespace='authbroker')),
-    path('admin/login/', admin_login_view),    
     path('admin/', admin.site.urls, name='admin'),
 ]
+
+if not settings.SSO_DISABLED:
+    urlpatterns = [
+        path(
+            'admin/login/',
+            admin_login_view,
+        ),    
+        path(
+            'auth/',
+            include('authbroker_client.urls', namespace='authbroker'),
+        ),
+        *urlpatterns,
+    ]

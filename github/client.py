@@ -33,6 +33,10 @@ class GHClient:
             self.GITHUB_API_URL, data=payload)
 
     def getRepos(self):
+        """ Retrieve a list of all non-archived repositories owned by the
+        organisation (settings.ORG_NAME).
+        """
+
         repos = list()
         query = self.__openQuery(os.path.join(
             self.APP_ROOT, 'github', 'gqlQueries', 'repos.gql'))
@@ -58,6 +62,8 @@ class GHClient:
         return repos
 
     def getRepoTopics(self, repository):
+        """ Retrieve all topics for a repo.
+        """
         topics = list()
         query = self.__openQuery(os.path.join(
             self.APP_ROOT,  'github', 'gqlQueries', 'repoTopics.gql'))
@@ -89,6 +95,9 @@ class GHClient:
         return topics
 
     def getTeams(self):
+        """ Retrieve a list of all Github teams belonging to the organisation
+        (settings.ORG_NAME).
+        """
         teams = list()
         query = self.__openQuery(os.path.join(
             self.APP_ROOT,  'github', 'gqlQueries', 'teams.gql'))
@@ -112,6 +121,8 @@ class GHClient:
         return teams
 
     def getTeamRepos(self, team):
+        """ Retrieve a list of all repositories for a Github team.
+        """
         teamrepos = list()
 
         query = self.__openQuery(os.path.join(
@@ -140,6 +151,9 @@ class GHClient:
         return teamrepos
 
     def getVulnerabilityAlerts(self, repository):
+        """ Retrieve a list of vulnerability alerts, sorted by level of
+        severity.
+        """
 
         severities = list()
 

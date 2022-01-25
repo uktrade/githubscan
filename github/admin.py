@@ -1,12 +1,27 @@
 from django.contrib import admin
 
+from github.models import OrganisationNotificationTarget
 from github.models import Repository
-from github.models import Team
 from github.models import RepositoryVulnerabilityCount
 from github.models import RepositoryVulnerability
 from github.models import RepositorySLOBreachCount
+from github.models import Team
+from github.models import TeamNotificationTarget
 from github.models import TeamVulnerabilityCount
-# Register your models here.
+
+
+@admin.register(OrganisationNotificationTarget)
+class OrganisationNotificationTargetAdmin(admin.ModelAdmin):
+    list_display = ('id', 'email')
+
+
+@admin.register(TeamNotificationTarget)
+class TeamNotificationTargetAdmin(admin.ModelAdmin):
+    list_display = ('id', 'team', 'email', 'red_alerts_only')
+
+
+class TeamNotificationTargetInline(admin.TabularInline):
+    model = TeamNotificationTarget
 
 
 @admin.register(Repository)
@@ -16,7 +31,7 @@ class GitHubRepoAdmin(admin.ModelAdmin):
 
 @admin.register(Team)
 class GitHubTeamAdmin(admin.ModelAdmin):
-    pass
+    inlines = [TeamNotificationTargetInline]
 
 
 @admin.register(RepositoryVulnerabilityCount)

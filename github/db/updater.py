@@ -24,6 +24,9 @@ class Updater:
         self.db_client = Retriver()
 
     def __repositories__(self):
+        """ Update the set of Repository instances in the database from the
+        organisation's active repos on Github.
+        """
         repositoriesInGitHub = self.github_client.getRepos()
         repositoriesInDb = self.db_client.getRepos()
 
@@ -41,6 +44,9 @@ class Updater:
             Repository(name=record).save()
 
     def __set_skip_scan__(self):
+        """ Update the skip_scan attribute of all Repository instances by
+        retrieving each repo's tags and checking against settings.SKIP_TOPIC.
+        """
         repositoriesInDb = set(
             self.db_client.getRepos().values_list('name', flat=True))
         for repository in repositoriesInDb:
@@ -48,9 +54,14 @@ class Updater:
             if topics:
                 if self.skip_topic in topics:
                     Repository.objects.filter(
-                        name=repository).update(skip_scan=True)
+                        name=repository
+                    ).update(skip_scan=True)
 
     def __teams__(self):
+        """ Update the set of Team instances in the database from the
+        organisation's active teams on Github - removing any that are no longer
+        in the org's set of teams and adding any that are missing in the DB.
+        """
         teamsInGitHub = self.github_client.getTeams()
         teamsInDb = self.db_client.getTeams()
 
@@ -68,6 +79,9 @@ class Updater:
             Team(name=record).save()
 
     def __teamRepositories__(self):
+        """ Update the repositories for each Team instance in the database
+        from those on Github.
+        """
         # We don't need to remove team-repo association since it will be cascaded and removed
 
         teamsInDb = (self.db_client.getTeams()).values_list('name', flat=True)
@@ -86,6 +100,10 @@ class Updater:
                     teamRepositoriesInGitHub)
 
     def __vulnerabilities__(self):
+        """ For each Repository instance in the database, get its active
+        set of vulnerabilities from github and update its associated
+        RepositoryVulnerability instances - adding and deleting as necessary.
+        """
 
         repositories = set(
             self.db_client.getRepos().values_list('name', flat=True))
@@ -144,6 +162,9 @@ class Updater:
                 alertsInDb.delete()
 
     def __update_vulnerability_age__(self):
+        """ Iterate over all RepositoryVulnerbility instances, updating each
+        with vulnerability ages values.
+        """
         now = datetime.now(timezone.utc)
         for record in RepositoryVulnerability.objects.all():
             publish_age_in_days = (now - record.published_at).days
@@ -152,6 +173,9 @@ class Updater:
                 publish_age_in_days=publish_age_in_days, detection_age_in_days=detection_age_in_days)
 
     def __update_effective_servity_(self):
+        """ Iterate over all RepositoryVulnerbility instances, updating and
+        assign to each the highest level of severity.
+        """
         max_critical_alert_age = 1
         max_high_alert_age = 7
         max_moderate_alert_age = 15
@@ -197,6 +221,9 @@ class Updater:
 
 
     def __update_slo_breach_status__(self):
+        """ Iterate through all RepositoryVulnerability instances, updating
+        the slo_breach attribute (True, False).
+        """
         # Max alert accepable age in days
         # ref: https://readme.trade.gov.uk/docs/procedures/security-patching.html
 
@@ -229,6 +256,9 @@ class Updater:
                     id=moderate_alert_record.id).update(slo_breach=False)
 
     def __update_counts__(self):
+        """ Refresh the count of vulnerabilities for each repository against
+        each of its RepositoryVulnerabilityCount instances in the database.
+        """
         # Drop all before updating
         RepositoryVulnerabilityCount.objects.all().delete()
         repositories = self.db_client.getVulnerableRepositories(
@@ -279,6 +309,9 @@ class Updater:
                                          high=high_count, moderate=moderate_count, low=low_count, effective_slabreach=effective_slabreach_count, effective_critical=effective_critical_count, effective_high=effective_high_count, effective_moderate=effective_moderate_count, effective_low=effective_low_count).save()
 
     def __update_slo_breach_count__(self):
+        """ Refresh the count of SLO breaches for each repository against
+        each of its RepositorySLOBreachCount instances in the database.
+        """
 
         # Clear table
         RepositorySLOBreachCount.objects.all().delete()
@@ -304,6 +337,9 @@ class Updater:
                                          high=high_count, moderate=moderate_count, low=low_count).save()
 
     def __updat_team_vulnerability_count(self):
+        """ Refresh the count of vulnerabilities for each team against
+        each of its TeamVulnerabilityCount instances in the database.
+        """
         # Clear table
         TeamVulnerabilityCount.objects.all().delete()
 
@@ -355,11 +391,19 @@ class Updater:
                                        effective_critical=effective_critical_count, effective_high=effective_high_count, effective_moderate=effective_moderate_count, effective_low=effective_low_count).save()
 
     def all(self):
+        """ Refresh Team, Repository and their associated vulnerability
+        information held in the application's database by pulling fresh
+        information out of Github.
+        """
+        # Retrieve info from Github and update the application's backing store
+        # (database) with fresh information.
         self.__repositories__()
         self.__set_skip_scan__()
         self.__teams__()
         self.__teamRepositories__()
         self.__vulnerabilities__()
+        # Based upon database updates performed in previous steps, update
+        # relevant metrics within the database.
         self.__update_vulnerability_age__()
         self.__update_effective_servity_()
         self.__update_slo_breach_status__()
