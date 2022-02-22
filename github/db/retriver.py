@@ -7,7 +7,6 @@ from github.models import TeamVulnerabilityCount
 
 
 class Retriver:
-
     def getRepos(self):
         return Repository.objects.all()
 
@@ -28,13 +27,17 @@ class Retriver:
         return (self.getTeams()).filter(name=team).first()
 
     def getVulnerableRepositories(self):
-        return RepositoryVulnerability.objects.values('repository').distinct()
+        return RepositoryVulnerability.objects.values("repository").distinct()
 
     def getVulnerableRepoReport(self, repository):
         return RepositoryVulnerabilityCount.objects.filter(repository=repository)
 
     def getSortedVunrableRepos(self, repositories):
-        return RepositoryVulnerabilityCount.objects.filter(repository__in=repositories).order_by('effective_slabreach', 'critical', 'high', 'moderate', 'low').reverse()
+        return (
+            RepositoryVulnerabilityCount.objects.filter(repository__in=repositories)
+            .order_by("effective_slabreach", "critical", "high", "moderate", "low")
+            .reverse()
+        )
 
     def getDetailsRepoVulnerabilities(self, repository):
         return RepositoryVulnerability.objects.filter(repository=repository)
@@ -49,10 +52,12 @@ class Retriver:
         return RepositorySLOBreachCount.objects.filter(repository__in=repositories)
 
     def getSortedTeamsVulnerabilitySummaryReport(self):
-        return TeamVulnerabilityCount.objects.order_by('critical', 'high', 'moderate', 'low').reverse()
+        return TeamVulnerabilityCount.objects.order_by(
+            "critical", "high", "moderate", "low"
+        ).reverse()
 
-    def getReposityVulnerabilities(self,repository):
+    def getReposityVulnerabilities(self, repository):
         return RepositoryVulnerability.objects.filter(repository=repository)
 
     def getRepositoriesVulnerabilities(self, repositories):
-        return   RepositoryVulnerability.objects.filter(repository__in=repositories)
+        return RepositoryVulnerability.objects.filter(repository__in=repositories)

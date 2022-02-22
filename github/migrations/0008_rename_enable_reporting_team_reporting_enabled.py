@@ -6,13 +6,13 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('github', '0007_auto_20220111_1857'),
+        ("github", "0007_auto_20220111_1857"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='team',
-            old_name='enable_reporting',
-            new_name='reporting_enabled',
+            model_name="team",
+            old_name="enable_reporting",
+            new_name="reporting_enabled",
         ),
     ]
