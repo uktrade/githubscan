@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models.deletion import CASCADE
 from django.utils import timezone
+
 # Create your models here.
 
 
@@ -9,7 +10,7 @@ class Repository(models.Model):
     skip_scan = models.BooleanField(default=False)
 
     def __str__(self):
-        return '{}'.format(self.name)
+        return "{}".format(self.name)
 
 
 class Team(models.Model):
@@ -17,21 +18,22 @@ class Team(models.Model):
     repositories = models.ManyToManyField(Repository)
     reporting_enabled = models.BooleanField(
         default=True,
-        help_text='Set True (checked / on) to enable reporting for this team.',
+        help_text="Set True (checked / on) to enable reporting for this team.",
     )
 
     def __str__(self):
-        return '{}'.format(self.name)
+        return "{}".format(self.name)
 
 
 class OrganisationNotificationTarget(models.Model):
-    """ Notification target details for the application instance's owning
+    """Notification target details for the application instance's owning
     organisation (held by the settings attribute ORG_NAME which is set from
     and env var of the same name).
     """
+
     email = models.EmailField(
         unique=True,
-        help_text='Target email address for organisation-level notifications.',
+        help_text="Target email address for organisation-level notifications.",
     )
 
     def __str__(self):
@@ -40,22 +42,21 @@ class OrganisationNotificationTarget(models.Model):
 
 class TeamNotificationTarget(models.Model):
     team = models.ForeignKey(
-        'Team',
+        "Team",
         on_delete=CASCADE,
     )
     email = models.EmailField(
-        help_text='Target email address for team-level notifications.',
+        help_text="Target email address for team-level notifications.",
     )
     red_alerts_only = models.BooleanField(
         default=False,
         help_text=(
-            'Set True (checked/on) to prevent green status notifications being '
-            'sent.'
+            "Set True (checked/on) to prevent green status notifications being " "sent."
         ),
     )
 
     class Meta:
-        unique_together = ('team', 'email')
+        unique_together = ("team", "email")
 
     def __str__(self):
         return f"{self.team}:{self.email}"
@@ -63,7 +64,7 @@ class TeamNotificationTarget(models.Model):
 
 class RepositoryVulnerability(models.Model):
     id = models.AutoField(primary_key=True)
-    repository = models.ForeignKey('Repository', on_delete=models.CASCADE)
+    repository = models.ForeignKey("Repository", on_delete=models.CASCADE)
     package_name = models.CharField(max_length=50)
     severity_level = models.CharField(max_length=20)
     effective_severity_level = models.CharField(max_length=20, blank=True)
@@ -78,9 +79,10 @@ class RepositoryVulnerability(models.Model):
     slo_breach = models.BooleanField(default=False)
     patched_version = models.CharField(max_length=20, blank=True)
 
+
 class RepositoryVulnerabilityCount(models.Model):
     id = models.AutoField(primary_key=True)
-    repository = models.ForeignKey('Repository', on_delete=models.CASCADE)
+    repository = models.ForeignKey("Repository", on_delete=models.CASCADE)
     critical = models.IntegerField()
     high = models.IntegerField()
     moderate = models.IntegerField()
@@ -94,7 +96,7 @@ class RepositoryVulnerabilityCount(models.Model):
 
 class RepositorySLOBreachCount(models.Model):
     id = models.AutoField(primary_key=True)
-    repository = models.ForeignKey('Repository', on_delete=models.CASCADE)
+    repository = models.ForeignKey("Repository", on_delete=models.CASCADE)
     critical = models.IntegerField()
     high = models.IntegerField()
     moderate = models.IntegerField()
@@ -103,7 +105,7 @@ class RepositorySLOBreachCount(models.Model):
 
 class TeamVulnerabilityCount(models.Model):
     id = models.AutoField(primary_key=True)
-    team = models.ForeignKey('Team', on_delete=models.CASCADE)
+    team = models.ForeignKey("Team", on_delete=models.CASCADE)
     critical = models.IntegerField()
     high = models.IntegerField()
     moderate = models.IntegerField()

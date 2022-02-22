@@ -21,18 +21,18 @@ from github.admin_views import admin_login_view
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls, name='admin'),
+    path("admin/", admin.site.urls, name="admin"),
 ]
 
 if not settings.SSO_DISABLED:
     urlpatterns = [
         path(
-            'admin/login/',
+            "admin/login/",
             admin_login_view,
-        ),    
+        ),
         path(
-            'auth/',
-            include('authbroker_client.urls', namespace='authbroker'),
+            "auth/",
+            include("authbroker_client.urls", namespace="authbroker"),
         ),
         *urlpatterns,
     ]

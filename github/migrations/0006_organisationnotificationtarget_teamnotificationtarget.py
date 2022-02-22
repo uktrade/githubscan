@@ -7,27 +7,67 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('github', '0005_repositoryvulnerability_patched_version'),
+        ("github", "0005_repositoryvulnerability_patched_version"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='OrganisationNotificationTarget',
+            name="OrganisationNotificationTarget",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('email', models.EmailField(help_text='Target email address for organisation-level notifications.', max_length=254, unique=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "email",
+                    models.EmailField(
+                        help_text="Target email address for organisation-level notifications.",
+                        max_length=254,
+                        unique=True,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='TeamNotificationTarget',
+            name="TeamNotificationTarget",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('email', models.EmailField(help_text='Target email address for team-level notifications.', max_length=254)),
-                ('red_alerts_only', models.BooleanField(default=False, help_text='Set to True/On/Yes to prevent email being sent for green status notifications.')),
-                ('team', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='github.team')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "email",
+                    models.EmailField(
+                        help_text="Target email address for team-level notifications.",
+                        max_length=254,
+                    ),
+                ),
+                (
+                    "red_alerts_only",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Set to True/On/Yes to prevent email being sent for green status notifications.",
+                    ),
+                ),
+                (
+                    "team",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="github.team"
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('team', 'email')},
+                "unique_together": {("team", "email")},
             },
         ),
     ]

@@ -1,4 +1,3 @@
-
 from github.report.gecko import GeskoReport
 import geckoboard as gb
 
@@ -12,7 +11,6 @@ import traceback
 
 
 class Command(BaseCommand):
-
     def handle(self, *args, **options):
         self.send_gecko_report()
 
@@ -33,16 +31,17 @@ class Command(BaseCommand):
     def __push_overview__(self, gbClient, report):
         self.__wait__()
 
-        dataset = gbClient.datasets.find_or_create('overview.github.vulnerability.alerts.by_name',
-                                                   {
-                                                       'teams': {'type': 'string', 'name': 'Teams'},
-                                                       'repository': {'type': 'string', 'name': 'Repository'},
-                                                       'critical': {'type': 'number', 'name': 'C'},
-                                                       'high': {'type': 'number', 'name': 'H'},
-                                                       'moderate': {'type': 'number', 'name': 'M'},
-                                                       'low': {'type': 'number', 'name': 'L'}
-                                                   },
-                                                   )
+        dataset = gbClient.datasets.find_or_create(
+            "overview.github.vulnerability.alerts.by_name",
+            {
+                "teams": {"type": "string", "name": "Teams"},
+                "repository": {"type": "string", "name": "Repository"},
+                "critical": {"type": "number", "name": "C"},
+                "high": {"type": "number", "name": "H"},
+                "moderate": {"type": "number", "name": "M"},
+                "low": {"type": "number", "name": "L"},
+            },
+        )
         dataset.put([])
         dataset.put(report.getReport())
 
@@ -53,17 +52,17 @@ class Command(BaseCommand):
 
         for report in report.getTeamReport():
             self.__wait__()
-            team = report['team']
-            report_data = report['team_report']
+            team = report["team"]
+            report_data = report["team_report"]
 
             dataset = gbClient.datasets.find_or_create(
-                team + '.github.vulnerability.alerts.by_name',
+                team + ".github.vulnerability.alerts.by_name",
                 {
-                    'repository': {'type': 'string', 'name': 'Repository'},
-                    'critical': {'type': 'number', 'name': 'C'},
-                    'high': {'type': 'number', 'name': 'H'},
-                    'moderate': {'type': 'number', 'name': 'M'},
-                    'low': {'type': 'number', 'name': 'L'}
+                    "repository": {"type": "string", "name": "Repository"},
+                    "critical": {"type": "number", "name": "C"},
+                    "high": {"type": "number", "name": "H"},
+                    "moderate": {"type": "number", "name": "M"},
+                    "low": {"type": "number", "name": "L"},
                 },
             )
 
