@@ -118,6 +118,7 @@ class Updater:
                     advisory_url = alert[4]
                     published_at = alert[5]
                     patched_version = alert[6]
+                    detection_date = alert[7]
                     active_repo_alerts.append(
                         [
                             repository,
@@ -128,6 +129,7 @@ class Updater:
                             advisory_url,
                             published_at,
                             patched_version,
+                            detection_date,
                         ]
                     )
 
@@ -143,7 +145,13 @@ class Updater:
                     Value('YYYY-MM-DD"T"HH24:MI:SS"Z"'),
                     function="to_char",
                     output_field=CharField(),
-                )
+                ),
+                detectedAt_as_string=Func(
+                    F("detection_date"),
+                    Value('YYYY-MM-DD"T"HH24:MI:SS"Z"'),
+                    function="to_char",
+                    output_field=CharField(),
+                ),
             )
 
             # if repo has active alert check if therre are new to add or have old to delete
@@ -159,6 +167,7 @@ class Updater:
                         "advisory_url",
                         "publishedAt_as_string",
                         "patched_version",
+                        "detectedAt_as_string",
                     )
                 )
 
@@ -188,6 +197,7 @@ class Updater:
                         advisory_url=record[5],
                         published_at=record[6],
                         patched_version=record[7],
+                        detection_date=record[8],
                     ).save()
             else:
                 # if repo does not have any active alerts , delete it from record too

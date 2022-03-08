@@ -63,6 +63,7 @@ class GitHubRepoVulnerabilitesAdmin(admin.ModelAdmin):
         "detection_date",
         "detection_age_in_days",
         "advisory_url",
+        "published_at",
     )
 
 

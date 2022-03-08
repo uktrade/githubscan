@@ -252,6 +252,7 @@ class GHClient:
                                     refrence_url = ref["url"]
                                     break
 
+                        created_at = node["createdAt"]
                         published_at = node["securityAdvisory"]["publishedAt"]
 
                         patched_version = "Not Known"
@@ -273,6 +274,7 @@ class GHClient:
                                 refrence_url,
                                 published_at,
                                 patched_version,
+                                created_at,
                             )
                         )
 
