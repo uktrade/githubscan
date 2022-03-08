@@ -72,7 +72,7 @@ class RepositoryVulnerability(models.Model):
     identifier_value = models.CharField(max_length=20)
     advisory_url = models.CharField(max_length=200, null=True)
     published_at = models.DateTimeField(default=timezone.now)
-    detection_date = models.DateTimeField(auto_now_add=True)
+    detection_date = models.DateTimeField(default=timezone.now)
     publish_age_in_days = models.IntegerField(default=0)
     detection_age_in_days = models.IntegerField(default=0)
     time_since_current_level = models.IntegerField(default=0)
