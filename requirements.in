@@ -1,0 +1,12 @@
+django
+django-environ
+requests
+schema
+django-log-formatter-ecs
+notifications-python-client
+dj-database-url
+psycopg2
+django-staff-sso-client
+sentry-sdk
+geckoboard.py
+ratelimit
