@@ -101,6 +101,7 @@ def refresh_database_teams(*args, **options):
     report_reader.load_data_from_file = settings.PROCESSED_DATA_FILE_PATH
 
     github_teams = list(report_reader.teams.keys())
+
     update_teams_in_db(github_teams=github_teams)
 
     report_reader.clear()

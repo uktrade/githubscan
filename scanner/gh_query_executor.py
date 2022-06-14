@@ -122,7 +122,8 @@ class GHQueryExecutor:
                 Github does not like team names with space and replaces it with a '-' behind the scene (as noted in team name URL)
                 if we do not substitute , we will get incorrect results
                 """
-                self._teams.append(info["name"].replace(" ", "-"))
+                team_name = info["name"].replace(" ", "-")
+                self._teams.append(team_name.lower())
 
             if not pageInfo["hasNextPage"]:
                 break
@@ -285,7 +286,7 @@ class GHQueryExecutor:
 
         for index, team in enumerate(self.teams):
             print(f"processing:{team}")
-            self._teams_repositories.insert(index, {team: []})
+            self._teams_repositories.insert(index, {team.lower(): []})
             self._team_repositories(team=team, index=index, payload=deepcopy(payload))
 
     def _team_repositories(self, team, index, payload):
@@ -331,7 +332,7 @@ class GHQueryExecutor:
         """
 
         while True:
-            payload["variables"].update({"team": team})
+            payload["variables"].update({"team": team.lower()})
             self.query_builder.make_gql_query_from_dict = payload
             self.query_builder.is_a_valid_input_query(
                 payload=payload, caller="teams_repositories"
@@ -359,7 +360,7 @@ class GHQueryExecutor:
                 }:
                     continue
 
-                self._teams_repositories[index][team].append(
+                self._teams_repositories[index][team.lower()].append(
                     repository_info["repository"]["name"]
                 )
 
