@@ -122,8 +122,9 @@ SEVERITY_ESCLATION_MATRIC = {
 }
 
 
+AUTHBROKER_URL = env("AUTHBROKER_URL", default="https://sso.trade.gov.uk")
+
 if ENABLE_SSO:
-    AUTHBROKER_URL = env("AUTHBROKER_URL", default="https://sso.trade.gov.uk")
     AUTHBROKER_CLIENT_ID = env("AUTHBROKER_CLIENT_ID")
     AUTHBROKER_CLIENT_SECRET = env("AUTHBROKER_CLIENT_SECRET")
 
