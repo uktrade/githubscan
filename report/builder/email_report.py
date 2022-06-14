@@ -74,7 +74,7 @@ class BuildEmailReport:
     def teams_summary(self, team, report_reader):
 
         if team not in report_reader.teams:
-            raise ValueError("Uknown Team:{tean}")
+            raise ValueError(f"Uknown Team:{team}")
 
         email_report = {}
 
