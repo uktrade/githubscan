@@ -1,0 +1,13 @@
+query($login: String!,$first: Int!,$after: String){
+    organization(login:$login){
+        teams(first:$first,after:$after){
+            pageInfo {
+                hasNextPage
+                endCursor
+            }
+            teams_info:nodes{
+                name
+            }
+        }
+    }
+}

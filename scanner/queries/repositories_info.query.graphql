@@ -1,0 +1,54 @@
+query(
+  $first: Int!,
+  $after: String,
+){
+  repositories:search(query: "user:{$user} archived:false",type: REPOSITORY, first:$first,after:$after){
+  	pageInfo {
+        hasNextPage
+        endCursor
+      }
+    	repositoryCount
+			repositories_info:nodes {
+       		... on Repository {
+                  name
+        repository_topics_info:repositoryTopics(first:$first){
+          pageInfo{
+            hasNextPage
+            endCursor
+          }
+          totalCount
+           topics: nodes{
+            topic{
+              name
+            }
+          }
+        }
+        repository_alerts_info:vulnerabilityAlerts(first:$first,states:OPEN){
+          pageInfo{
+                endCursor
+            hasNextPage
+          }
+          alerts:nodes{
+            createdAt
+            state
+            dismissedAt
+            severity:securityVulnerability{
+              level:severity
+              package {
+                name
+              }
+              patched_version:firstPatchedVersion{
+                identifier
+              }
+            }
+            advisory:securityAdvisory{
+              urls:references {
+                    url
+              }
+            }
+          }
+        }
+        }
+      }
+    }
+}
