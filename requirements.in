@@ -10,3 +10,4 @@ django-staff-sso-client
 sentry-sdk
 geckoboard.py
 ratelimit
+gunicorn

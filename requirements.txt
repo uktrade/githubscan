@@ -32,6 +32,8 @@ docopt==0.6.2
     # via notifications-python-client
 geckoboard-py==1.1.0
     # via -r requirements.in
+gunicorn==20.1.0
+    # via -r requirements.in
 idna==3.3
     # via requests
 kubi-ecs-logger==0.1.1
@@ -70,3 +72,6 @@ urllib3==1.26.9
     # via
     #   requests
     #   sentry-sdk
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools
