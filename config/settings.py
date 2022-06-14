@@ -17,6 +17,7 @@ import sys
 import os
 import json
 import dj_database_url
+import whitenoise
 
 from django_log_formatter_ecs import (
     ECSFormatter,
@@ -184,6 +185,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
