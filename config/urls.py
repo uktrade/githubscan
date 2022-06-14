@@ -20,7 +20,10 @@ from django.conf import settings
 
 from common.admin_views import admin_login_view
 
-urlpatterns = [path("admin/", admin.site.urls)]
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("report/", include(("report.urls", "report"), namespace="report")),
+]
 
 if settings.ENABLE_SSO:
     urlpatterns = [

@@ -21,7 +21,7 @@ class GeckoClient:
         self._gb_cleint = geckoboard.client(api_key)
 
     @sleep_and_retry
-    @limits(calls=1, period=5)
+    @limits(calls=1, period=8)
     def send_organization_report(self, organization_data):
         dataset = (
             "overview.github.vulnerability.alerts.by_name",
@@ -38,7 +38,7 @@ class GeckoClient:
         self._publish_to_geckoboard_(dataset=dataset, data=organization_data)
 
     @sleep_and_retry
-    @limits(calls=1, period=5)
+    @limits(calls=1, period=8)
     def send_team_report(self, team, team_data):
         dataset = (
             team.lower() + ".github.vulnerability.alerts.by_name",
