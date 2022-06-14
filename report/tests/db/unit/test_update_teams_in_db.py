@@ -22,7 +22,7 @@ def test_update_teams_in_db_with_data(db):
     assert teams == teams_in_db
 
 
-def test_update_teams_in_db_for_no_repeat(db):
+def test_update_teams_it_removes_missing_team(db):
     teams_1 = sorted(["test-t1", "test-t2", "test-t3"])
     update_teams_in_db(github_teams=teams_1)
 
@@ -32,8 +32,7 @@ def test_update_teams_in_db_for_no_repeat(db):
     """
     Get unique values from merged list just as epxected from db
     """
-    teams = sorted(list(set(teams_1 + teams_2)))
 
     teams_in_db = sorted(list(Team.objects.all().values_list("name", flat=True)))
 
-    assert teams == teams_in_db
+    assert teams_2 == teams_in_db

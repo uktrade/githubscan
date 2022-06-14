@@ -9,7 +9,7 @@ def update_teams_in_db(github_teams):
     """
     isinstance_of(github_teams, list, "github_teams")
 
-    teams_in_db = set(Team.objects.all())
+    teams_in_db = set(Team.objects.values_list("name", flat=True))
     teams_in_github = set(github_teams)
 
     add_records = teams_in_github.difference(teams_in_db)
