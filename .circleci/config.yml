@@ -1,0 +1,42 @@
+version: 2.1
+
+jobs:
+  run_test:
+    docker:
+      - image: cimg/python:3.10.4
+        environment:
+          DATABASE_URL: postgresql://localhost/githubdb
+          DEPLOYMENT_ENVIRONMENT: 'ci'
+          DJANGO_SECRET_KEY: "Nothing secret here"
+          GITHUB_LOGIN: "its_not_real"
+          GITHUB_AUTH_TOKEN: "unrealgithubtoken"
+          SLACK_URL: "https://slackpost.url"
+          SLACK_AUTH_TOKEN: "this-is-very-unreal-slack-token"
+          SLACK_CHANNEL: "#SlackingAllTheWay"
+          GECKO_BOARD_TOKEN: "myGreenGeckoToken"
+          GOV_NOTIFY_API_KEY: "GOVUK-Real-UnrealKey"
+          GOV_NOTIFY_FAKE_TEST_API_KEY: "yet-another-fake-key"
+          GOV_NOTIFY_REAL_TEST_API_KEY: "i-am-wann-be-real-key"
+          EMAIL_SIGNAURE: "ThisIsMySignature"
+          GOV_NOTIFY_DETAILED_REPORT_TEMPLATE_ID: "one-templateo-id"
+          GOV_NOTIFY_SUMMARY_REPORT_TEMPLATE_ID: "Another-template-id"
+          ENABLE_SSO: False
+
+      - image: cimg/postgres:12.10
+        environment:
+          POSTGRES_USER: circleci
+          POSTGRES_DB: githubdb
+
+    steps:
+      - checkout
+      - run: sudo apt-get update
+      - run: sudo apt-get install postgresql-client
+      - run: pip install -r requirements-dev.txt
+      - run: python manage.py migrate
+      - run: pytest --cov
+
+workflows:
+  version: 2
+  testing:
+    jobs:
+      - run_test

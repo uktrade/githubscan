@@ -1,0 +1,32 @@
+# -*- coding: utf-8 -*-
+from report.models import OrganizationNotificationTarget
+from report.db import get_organization_notification_targets
+
+
+def test_get_organization_notification_targets_with_default_enabled(db):
+    OrganizationNotificationTarget(email="test1@dummy.com").save()
+    OrganizationNotificationTarget(email="test2@dummy.com").save()
+
+    organization_targets = get_organization_notification_targets()
+
+    sorted_targets = sorted(list(organization_targets.values_list("email", flat=True)))
+
+    assert sorted_targets == ["test1@dummy.com", "test2@dummy.com"]
+
+
+def test_get_organization_notification_targets_with_disabled_reporting(db):
+    OrganizationNotificationTarget(
+        email="test1@dummy.com", reporting_enabled=True
+    ).save()
+    OrganizationNotificationTarget(
+        email="test2@dummy.com", reporting_enabled=False
+    ).save()
+
+    organization_targets = get_organization_notification_targets()
+
+    sorted_targets = sorted(list(organization_targets.values_list("email", flat=True)))
+
+    assert sorted_targets == ["test1@dummy.com", "test2@dummy.com"]
+
+    assert organization_targets.get(email="test1@dummy.com").reporting_enabled == True
+    assert organization_targets.get(email="test2@dummy.com").reporting_enabled == False

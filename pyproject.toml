@@ -1,0 +1,14 @@
+[project]
+name = "github_vulnerabilities_reporter"
+description = "Github Vulnerabilities Reporter"
+version = "2.0"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q -p no:warnings --reuse-db"
+DJANGO_SETTINGS_MODULE = "config.settings"
+testpaths = [
+    "common/tests",
+    "scanner/tests",
+    "report/tests"
+]
