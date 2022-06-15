@@ -87,7 +87,7 @@ def write_scanner_data(scanner_data, dest_file=settings.SCANNER_DATA_FILE_PATH):
         raise
 
 
-def refresh_scan(*args, **options):
+def refresh_scan():
     """
     Sends queries to github end point to collect data and
     write data to scanner file

@@ -90,6 +90,24 @@ $python manage.py dispatch_slack_report
 ---
 <br>
 
+### **Web End Points**
+In order to be able to execute commands using PaaS task runner one, need to have a web end points since,task runner container can not access application hosts file system, it would not have access to report files
+
+Please be aware endpoints listed below are disabled by default. To enable 'em you need to set
+
+```bash
+ENABLE_REPORT_ENDPOINT = True
+ALLOWED_REPORT_ENDPOINT_HOST = <your.internal.domain>
+```
+
+Please ensure your internal domain is as sequre as possible and could not be access by anything but just host running this app
+
+ - Update Vulnerability Information ```common/refresh_vulneranility_data```
+ - Push updates to Gecko Board ```common/dispatch_gecko_reports```
+ - Dispatch Email reports ```common/dispatch_email_reports```
+ - Dispatch Slack report ```common/dispatch_slack_report```
+
+
 ## Setup Dev environment (non-Cloud Foundry environments)
 ---
 #### **Pre-requisites**
@@ -236,7 +254,7 @@ These commands are here to simply help you test one featire at a time and, you c
 
 - Dispatch Slack report
     ```bash
-    $python manage.py dispatch_slack_report
+    $python manage.py dispatch_to_slack
     ```
 
 - Dispatch Gecko Organisation level report

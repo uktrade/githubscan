@@ -124,11 +124,11 @@ def command_runner(command_name):
     """
 
     def inner_command(handle):
-        def wrapper(self, *args, **options):
+        def wrapper(self, *args, **option):
             try:
                 start_time = time.time()
 
-                handle(self, *args, **options)
+                handle()
                 end_time = time.time()
 
                 logger.info(f"Time: {end_time - start_time}s Success: {command_name}")
@@ -146,6 +146,34 @@ def command_runner(command_name):
         return wrapper
 
     return inner_command
+
+
+def job_runner(command_name, function):
+    """
+    A  function which can be used with any function to time it and print useful logging informationa
+    However, it can be expanded to  add status page and more
+
+    command_name: this parameter makes it easy to identify which command is being executed
+    function: is the actual function to execute
+    """
+
+    try:
+        start_time = time.time()
+
+        function()
+        end_time = time.time()
+
+        logger.info(f"Time: {end_time - start_time}s Success: {command_name}")
+    except Exception as e:
+
+        end_time = time.time()
+        logger.info(
+            f"Time: {end_time - start_time}s {command_name.capitalize()} Error: {e}"
+        )
+        print(
+            f"Execustion Time: {end_time - start_time}s {command_name.capitalize()} Error:{format(e)}"
+        )
+        logger.info(f"Error Trace: {traceback.print_exc()}")
 
 
 def isinstance_of(variable, expected_type, variable_name):

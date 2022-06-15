@@ -89,7 +89,7 @@ def write_processed_data(processed_data, processed_data_file):
         raise
 
 
-def refresh_database_teams(*args, **options):
+def refresh_database_teams():
     """
     This function simply updates teams in database
     which is used for the dispatching email eventually
@@ -107,7 +107,7 @@ def refresh_database_teams(*args, **options):
     report_reader.clear()
 
 
-def refresh_processed_data(*args, **options):
+def refresh_processed_data():
     """
     Loads scanned data from file , process it and write to process data file
     which will than be used for building reports
@@ -123,7 +123,7 @@ def refresh_processed_data(*args, **options):
     processed_data.clear()
 
 
-def dispatch_slack(*args, **options):
+def dispatch_slack():
     """ """
     global report_reader
 
@@ -158,7 +158,7 @@ def dispatch_slack(*args, **options):
         logger.info("set ENABLE_SLACK_NOTIFY to true to use slack notification")
 
 
-def dispatch_organization_email(*args, **options):
+def dispatch_organization_email():
     """
     This function dispatches summary email
     """
@@ -186,7 +186,7 @@ def dispatch_organization_email(*args, **options):
     report_file.unlink()
 
 
-def dispatch_team_email(*args, **options):
+def dispatch_team_email():
     """
     This function sends detailed email to each team
     """
@@ -228,7 +228,7 @@ def dispatch_team_email(*args, **options):
     report_reader.clear()
 
 
-def dispatch_team_detailed_email(*args, **options):
+def dispatch_team_detailed_email():
     """
     This function dispatches detailed emails to team
     """
@@ -263,7 +263,7 @@ def dispatch_team_detailed_email(*args, **options):
     report_reader.clear()
 
 
-def dispatch_organization_gecko_report(*args, **options):
+def dispatch_organization_gecko_report():
     """
     This function dispatches organization report to gecko board
     """
@@ -285,7 +285,7 @@ def dispatch_organization_gecko_report(*args, **options):
     build_gecko_report.clear()
 
 
-def dispatch_teams_gecko_report(*args, **options):
+def dispatch_teams_gecko_report():
     """
     This function dispatches organization report to gecko board
     """

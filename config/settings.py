@@ -113,6 +113,13 @@ GECKO_BOARD_TOP_N_REPOSITORIES = env.int("GECKO_BOARD_TOP_N_REPOSITORIES", defau
 # SSO Config
 ENABLE_SSO = env.bool("ENABLE_SSO", default=True)
 
+ENABLE_REPORT_ENDPOINT = env.bool("ENABLE_REPORT_ENDPOINT", default=False)
+
+# Enable Report WEB End Point
+if ENABLE_REPORT_ENDPOINT:
+    ALLOWED_REPORT_ENDPOINT_HOST = env(
+        "ALLOWED_REPORT_ENDPOINT_HOST", default="localhost"
+    )
 
 SEVERITY_ESCLATION_MATRIC = {
     key: int(value)
