@@ -11,6 +11,6 @@ class Command(BaseCommand):
     command_name = Path(__file__).stem
 
     @command_runner(command_name)
-    def handle(*args, **options):
-        refresh_processed_data(*args, **options)
-        refresh_database_teams(*args, **options)
+    def handle():
+        refresh_processed_data()
+        refresh_database_teams()

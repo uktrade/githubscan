@@ -11,5 +11,5 @@ class Command(BaseCommand):
     command_name = Path(__file__).stem
 
     @command_runner(command_name)
-    def handle(self, *args, **options):
-        refresh_scan(*args, **options)
+    def handle():
+        refresh_scan()

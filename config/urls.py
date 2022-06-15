@@ -22,7 +22,6 @@ from common.admin_views import admin_login_view
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("report/", include(("report.urls", "report"), namespace="report")),
 ]
 
 if settings.ENABLE_SSO:
@@ -35,5 +34,11 @@ if settings.ENABLE_SSO:
             "auth/",
             include("authbroker_client.urls", namespace="authbroker"),
         ),
+        *urlpatterns,
+    ]
+
+if settings.ENABLE_REPORT_ENDPOINT:
+    urlpatterns = [
+        path("common/", include(("common.urls", "report"), namespace="common")),
         *urlpatterns,
     ]

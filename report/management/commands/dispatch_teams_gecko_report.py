@@ -11,5 +11,5 @@ class Command(BaseCommand):
     command_name = Path(__file__).stem
 
     @command_runner(command_name)
-    def handle(*args, **options):
-        dispatch_teams_gecko_report(*args, **options)
+    def handle():
+        dispatch_teams_gecko_report()
