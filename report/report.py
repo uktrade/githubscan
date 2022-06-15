@@ -249,7 +249,8 @@ def dispatch_team_detailed_email():
         """
         We send detailed emails only if there is something to send
         """
-        if report_data:
+        if report_data and report_data["content"]:
+
             for email_info in team_notification_targets:
 
                 if email_info.red_alerts_only:
