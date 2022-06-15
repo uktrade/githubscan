@@ -246,19 +246,24 @@ def dispatch_team_detailed_email():
             team=team.name, report_reader=report_reader
         )
 
-        for email_info in team_notification_targets:
-            if email_info.red_alerts_only:
-                if SEVERITY_STATUS.RED.name != report_data["severity_status"]:
-                    continue
+        """
+        We send detailed emails only if there is something to send
+        """
+        if report_data:
+            for email_info in team_notification_targets:
 
-            email_client.send_email(
-                receiver_email=email_info.email,
-                data=report_data,
-                notify_template_id=settings.GOV_NOTIFY_DETAILED_REPORT_TEMPLATE_ID,
-            )
+                if email_info.red_alerts_only:
+                    if SEVERITY_STATUS.RED.name != report_data["severity_status"]:
+                        continue
 
-            build_email_report.clear()
-            report_data.clear()
+                email_client.send_email(
+                    receiver_email=email_info.email,
+                    data=report_data,
+                    notify_template_id=settings.GOV_NOTIFY_DETAILED_REPORT_TEMPLATE_ID,
+                )
+
+        build_email_report.clear()
+        report_data.clear()
 
     report_reader.clear()
 
