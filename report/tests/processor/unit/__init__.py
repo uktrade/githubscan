@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from .test_add_enterprise_users import check_add_enterprise_users
+from .test_add_sso_notification_targets import check_sso_notification_targets
+from .test_add_sso_notification_targets import check_users_without_sso_email
+
 """
 Import alerts check
 """
@@ -94,7 +98,9 @@ Import vulnerable repositories
 """
 from .test_add_vulnurable_repositories import check_vulnerable_repositories
 
+
 __all__ = [
+    "check_add_enterprise_users",
     "check_effective_level_and_escalation_status",
     "check_add_repository_teams",
     "check_fix_by_date",
@@ -123,4 +129,6 @@ __all__ = [
     "check_teams_and_team_repositories",
     "check_token_has_no_access",
     "check_vulnerable_repositories",
+    "check_sso_notification_targets",
+    "check_users_without_sso_email",
 ]

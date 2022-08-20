@@ -5,10 +5,13 @@ from report.processor import ReportDataProcessor
 from report.reader import ReportReader
 from common.functions import write_json_file, load_json_file
 from report.db import (
+    update_enterprise_users_in_db,
     update_teams_in_db,
+    update_sso_notification_targets_in_db,
     get_repotable_organization_notification_targets,
     get_reportable_teams_from_db,
     get_team_notification_targets,
+    remove_duplicate_team_notification_targets,
 )
 
 from django.conf import settings
@@ -45,6 +48,9 @@ def create_processed_data(scanner_data):
     try:
         processor = ReportDataProcessor()
         processor.load_data_from_dict = scanner_data
+
+        processor.add_enterprise_users()
+        processor.add_sso_notification_targets()
 
         processor.add_repositories()
         processor.add_repository_teams()
@@ -89,11 +95,12 @@ def write_processed_data(processed_data, processed_data_file):
         raise
 
 
-def refresh_database_teams():
+def refresh_database():
     """
-    This function simply updates teams in database
+    This function simply updates data base with
+     - enterprise users and
+     - teams
     which is used for the dispatching email eventually
-
     Note: Not tested , needs integration testing
     """
 
@@ -103,6 +110,14 @@ def refresh_database_teams():
     github_teams = list(report_reader.teams.keys())
 
     update_teams_in_db(github_teams=github_teams)
+
+    update_enterprise_users_in_db(enterprise_users=report_reader.enterprise_users)
+
+    update_sso_notification_targets_in_db(
+        sso_notification_targets=report_reader.sso_notification_targets
+    )
+
+    remove_duplicate_team_notification_targets()
 
     report_reader.clear()
 
