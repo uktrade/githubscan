@@ -456,9 +456,42 @@ class MockTestData:
         try:
             for index, scene_info in self.SCENARIOS.items():
                 mock_data = {
+                    "enterprise_users": {
+                        "user1": {"email": "user1@test.com", "name": "User One"},
+                        "user2": {"email": "user2@test.com", "name": "User Two"},
+                        "user3": {"email": "user3@test.com", "name": "User Three"},
+                        "user4": {"email": "user4@test.com", "name": "User Four"},
+                        "user5": {"email": "user5@test.com", "name": "User Five"},
+                        "user6": {"email": "user6@test.com", "name": "User Six"},
+                    },
+                    "invalid_emails": [
+                        {
+                            "email": "invalid.email@",
+                            "login": "invalid1",
+                            "name": "Invalid One",
+                        },
+                        {
+                            "email": "another-inalid-email",
+                            "login": "invalid2",
+                            "name": "",
+                        },
+                    ],
+                    "orphan_sso_emails": ["some@email.com", "some.another@email.com"],
                     "repositories": [],
                     "teams": list(scene_info.keys()),
                     "team_repositories": [],
+                    "team_members": {
+                        "team1": ["user1", "user2"],
+                        "team2": [
+                            "user2",
+                            "user3",
+                            "user9",
+                        ],  # """ user 9 does not exists in enterprise user, that is not found in enterprise list """
+                        "team3": ["user4", "user5", "user6"],
+                        "team4": [
+                            "user7"
+                        ],  # """ user7 login was not found/fetched by enterprise user """
+                    },
                 }
 
                 for team, info in scene_info.items():

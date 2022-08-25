@@ -13,7 +13,13 @@ def create_scanner_data():
      - GHQueryExecutor
     """
     try:
-        scanner_data = {"repositories": [], "teams": [], "team_repositories": []}
+        scanner_data = {
+            "enterprise_users": {},
+            "repositories": [],
+            "teams": [],
+            "team_repositories": [],
+            "team_members": {},
+        }
 
         """ This function fetched data and write it to file """
         QUERY_VARIABLES = {
@@ -33,6 +39,17 @@ def create_scanner_data():
         query_executor.api_client = api_client
         query_executor.query_builder = query_builder
 
+        # Enterprise users
+        query_builder.make_gql_query_from_file = Path.joinpath(
+            query_executor.QUERY_DIRECTORY, "enterprise_users.query.graphql"
+        )
+
+        query_executor.enterprise_users = {
+            "query": query_builder.gql_query,
+            "variables": dict(QUERY_VARIABLES),
+        }
+
+        # Teams
         query_builder.make_gql_query_from_file = Path.joinpath(
             query_executor.QUERY_DIRECTORY, "teams.query.graphql"
         )
@@ -41,25 +58,43 @@ def create_scanner_data():
             "variables": dict(QUERY_VARIABLES),
         }
 
+        # Team members
+        query_builder.make_gql_query_from_file = Path.joinpath(
+            query_executor.QUERY_DIRECTORY, "team_members.query.graphql"
+        )
+
+        query_executor.team_members_query = {
+            "query": query_builder.gql_query,
+            "variables": dict(QUERY_VARIABLES),
+        }
+
+        # Repository info/alerts
         query_builder.make_gql_query_from_file = Path.joinpath(
             query_executor.QUERY_DIRECTORY, "repositories_info.query.graphql"
         )
+
         query_executor.repositories_and_alerts_query = {
             "query": query_builder.gql_query.replace("{$user}", settings.GITHUB_LOGIN),
             "variables": dict(QUERY_VARIABLES),
         }
 
+        # Team repositories
         query_builder.make_gql_query_from_file = Path.joinpath(
             query_executor.QUERY_DIRECTORY, "team_repositories.query.graphql"
         )
+
         query_executor.teams_repositories_query = {
             "query": query_builder.gql_query,
             "variables": dict(QUERY_VARIABLES),
         }
 
+        scanner_data["enterprise_users"] = query_executor.enterprise_users
+        scanner_data["orphan_sso_emails"] = query_executor.orphan_sso_emails
+        scanner_data["invalid_emails"] = query_executor.invalid_emails
         scanner_data["repositories"] = query_executor.repositories_and_alerts
         scanner_data["teams"] = query_executor.teams
         scanner_data["team_repositories"] = query_executor.teams_repositories
+        scanner_data["team_members"] = query_executor.team_members
 
         scanner_data_schema.validate(scanner_data)
 

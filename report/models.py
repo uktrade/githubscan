@@ -3,6 +3,12 @@ from django.db import models
 from django.db.models.deletion import CASCADE
 
 
+class EnterpriseUser(models.Model):
+    login = models.CharField(primary_key=True, max_length=100)
+    email = models.EmailField()
+    name = models.CharField(blank=True, max_length=100)
+
+
 class Team(models.Model):
     name = models.CharField(primary_key=True, max_length=100)
     reporting_enabled = models.BooleanField(
@@ -16,9 +22,37 @@ class TeamNotificationTarget(models.Model):
         "Team",
         on_delete=CASCADE,
     )
+    login = models.CharField(max_length=30, default="", blank=True)
     email = models.EmailField(
         help_text="Target email address for team-level notifications.",
     )
+    red_alerts_only = models.BooleanField(
+        default=False,
+        help_text=(
+            "Set True (checked/on) to prevent green status notifications being " "sent."
+        ),
+    )
+
+    class Meta:
+        unique_together = ("team", "email")
+
+    def __str__(self):
+        return f"{self.team}:{self.email}"
+
+
+class SAMLNotificationTarget(models.Model):
+    team = models.ForeignKey(
+        "Team",
+        on_delete=CASCADE,
+    )
+
+    login = models.CharField(max_length=30)
+
+    email = models.EmailField(
+        blank=True,
+        help_text="Target email address obtail from SAML for team-level notifications.",
+    )
+
     red_alerts_only = models.BooleanField(
         default=False,
         help_text=(

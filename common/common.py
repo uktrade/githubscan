@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from scanner.scanner import refresh_scan
-from report.report import refresh_processed_data, refresh_database_teams
+from report.report import refresh_processed_data, refresh_database
 from report.report import (
     dispatch_organization_email,
     dispatch_team_email,
@@ -16,7 +16,7 @@ from report.report import dispatch_slack
 def refresh_vulnerability_data():
     refresh_scan()
     refresh_processed_data()
-    refresh_database_teams()
+    refresh_database()
 
 
 def dispatch_email_reports():

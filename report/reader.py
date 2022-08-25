@@ -41,6 +41,18 @@ class ReportReader:
         self._processed_data_store = dict(data)
 
     @property
+    def enterprise_users(self):
+        return self.processed_data["enterprise_users"]
+
+    @property
+    def sso_notification_targets(self):
+        return self.processed_data["sso_notification_targets"]
+
+    @property
+    def users_without_sso_email(self):
+        self.processed_data["users_without_sso_email"]
+
+    @property
     def repositories(self):
         return self.processed_data["repositories"]
 
@@ -96,6 +108,14 @@ class ReportReader:
             for repositor_name, repository in self.repositories.items()
             if repositor_name in org_report_repositories_name
         ]
+
+    @property
+    def sso_notification_targets(self):
+        return self.processed_data["sso_notification_targets"]
+
+    @property
+    def users_without_sso_email(self):
+        return self.processed_data["users_without_sso_email"]
 
     def team_repositories_list(self, team):
 
