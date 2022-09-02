@@ -5,7 +5,7 @@ schema
 django-log-formatter-ecs
 notifications-python-client
 dj-database-url
-psycopg2
+psycopg2-binary
 django-staff-sso-client
 sentry-sdk
 geckoboard.py
