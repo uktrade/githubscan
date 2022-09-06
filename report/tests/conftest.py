@@ -25,6 +25,9 @@ import pytest
 from copy import deepcopy
 
 
+settings.GITHUB_TEAMS_ARE_NOT_A_SSO_TARGET = ["team1"]
+
+
 @singleton
 class MockScannerData:
     """

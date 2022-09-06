@@ -14,6 +14,7 @@ from config.severities import (
 
 from collections import Counter
 from copy import deepcopy
+from django.conf import settings
 
 
 class ReportDataProcessor:
@@ -196,6 +197,9 @@ class ReportDataProcessor:
                 self._processed_data_store["sso_notification_targets"].update(
                     {team: {}}
                 )
+
+            if team in settings.GITHUB_TEAMS_ARE_NOT_A_SSO_TARGET:
+                continue
 
             for member in members:
                 if member in known_users:

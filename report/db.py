@@ -127,9 +127,15 @@ def get_reportable_teams_from_db():
 
 
 def get_team_notification_targets(team):
-    return SAMLNotificationTarget.objects.filter(team=team).union(
-        TeamNotificationTarget.objects.filter(team=team)
-    )
+
+    saml_targets = SAMLNotificationTarget.objects.filter(team=team).exclude(email="")
+    team_targets = TeamNotificationTarget.objects.filter(team=team).exclude(email="")
+
+    return saml_targets.union(team_targets)
+
+    # return SAMLNotificationTarget.objects.filter(team=team).union(
+    #     TeamNotificationTarget.objects.filter(team=team)
+    # )
 
 
 def get_organization_notification_targets():
