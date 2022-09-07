@@ -64,15 +64,15 @@ def test_update_sso_notification_targets_in_db_with_delete_user(
     update_teams_in_db(github_teams=list(report_reader.teams.keys()))
     update_sso_notification_targets_in_db(sso_notification_targets=notification_targets)
 
-    logins = list(notification_targets["team1"].keys())
+    logins = list(notification_targets["team3"].keys())
 
     del_login = logins[0]
-    del notification_targets["team1"][del_login]
+    del notification_targets["team3"][del_login]
 
     update_sso_notification_targets_in_db(sso_notification_targets=notification_targets)
 
     logins_in_db = list(
-        SAMLNotificationTarget.objects.filter(team="team1").values_list(
+        SAMLNotificationTarget.objects.filter(team="team3").values_list(
             "login", flat=True
         )
     )

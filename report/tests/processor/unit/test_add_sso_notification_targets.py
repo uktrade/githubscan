@@ -16,8 +16,9 @@ def test_add_sso_notification_targets(processor, scene_index, scene_data):
 
 def check_sso_notification_targets(sso_notification_targets):
 
-    assert "user1" in sso_notification_targets["team1"]
-    assert "user2" in sso_notification_targets["team1"]
+    assert "user1" not in sso_notification_targets["team1"]
+    assert "user2" not in sso_notification_targets["team1"]
+    assert len(sso_notification_targets["team1"]) == 0
 
     assert "user2" in sso_notification_targets["team2"]
     assert "user3" in sso_notification_targets["team2"]

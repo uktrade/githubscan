@@ -15,7 +15,7 @@ def test_test_get_team_notification_target(db):
         Team(name=team_name).save()
 
     for team in get_teams_from_db():
-        TeamNotificationTarget(team=team).save()
+        TeamNotificationTarget(team=team, email=f"{team}@test.done").save()
 
     for team_name in teams:
         target_team = get_team_notification_targets(team=team_name)
