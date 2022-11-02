@@ -1,0 +1,22 @@
+query($login: String!,$first: Int!,$after: String,) {
+  organization(login:$login ) {
+    sso:samlIdentityProvider {
+      identities:externalIdentities(first:$first,after:$after) {
+        totalCount
+        pageInfo{
+          hasNextPage
+          endCursor
+        }
+        user_info:nodes {
+          email:samlIdentity {
+              address:nameId
+          }
+          user {
+              login
+              name
+            }
+          }
+        }
+    }
+  }
+}

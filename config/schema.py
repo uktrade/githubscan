@@ -42,6 +42,14 @@ scanner_alerts_schema = Schema(
 
 scanner_data_schema = Schema(
     {
+        "enterprise_users": {
+            And(str, len): {
+                "email": Or(str, And(str, len)),
+                "name": Or(str, And(str, len)),
+            }
+        },
+        "orphan_sso_emails": Or([], [str]),
+        "invalid_emails": Or([], [{"email": str, "login": str, "name": str}]),
         "repositories": [
             {
                 "name": And(str, len),
@@ -50,6 +58,7 @@ scanner_data_schema = Schema(
                 "alerts": scanner_alerts_schema,
             }
         ],
+        "team_members": {And(str, len): Or([], [str])},
         "team_repositories": [{str: Or([], [And(str, len)])}],
         "teams": [And(str, len)],
     }
@@ -149,6 +158,16 @@ report_severity_schema = Schema(
 
 processed_data_schema = Schema(
     {
+        "enterprise_users": {
+            And(str, len): {
+                "email": Or(str, And(str, len)),
+                "name": Or(str, And(str, len)),
+            }
+        },
+        "sso_notification_targets": Or(
+            {}, {And(str, len): Or({}, {And(str, len): And(str, len)})}
+        ),
+        "users_without_sso_email": Or([], [str]),
         "repositories": {
             And(str, len): {
                 "name": And(str, len),

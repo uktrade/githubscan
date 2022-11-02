@@ -164,7 +164,7 @@ if you are going to use the non-virtualised environment , you need following too
 
     GITHUB_LOGIN=<GitHubLogin>
     GITHUB_AUTH_TOKEN=<GithubAuthToken>
-
+    GITHUB_TEAMS_ARE_NOT_A_SSO_TARGET=<list of teams not part of sso target i.e. users of those team will not receive an automatic vulnerability report>
     SLACK_URL=<Slack Post Message Url>
     SLACK_AUTH_TOKEN=<Slack Test Auth Token>
     SLACK_CHANNEL=<Slack Test Channel Code>

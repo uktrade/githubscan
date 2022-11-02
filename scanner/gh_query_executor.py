@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+from curses.ascii import NUL
+from functools import cache
 from scanner import GHAPIClient, GHQueryBuilder
 import re
 from pathlib import Path
 import logging
 from copy import deepcopy
-from common.functions import isinstance_of
+from common.functions import isinstance_of, is_valid_email
 
 logger = logging.getLogger(__name__)
 
@@ -34,9 +36,12 @@ class GHQueryExecutor:
         ----------
         self._gh_api_client: GHAPIClient() init Github API Client
         self._query_text: str. GraphQL query string ( normally loaded from a file )
+        self._enterprise_users: [{}] , list of dictionary with , userlogin,user name and, enterprise email
         self._teams: list
         self._repositories_and_alerts = [{}] , list of dict for details refer to schema
         self._teams_repositories = [] , list of repositories on which team has ADMIN | MAINTAINER | WRITE permision
+        self._orphan_sso_emails = [] , list of emails which are not associated with any github user name but are in SAML
+        self._invalid_emails = {} , dict on invalid emails associated to particular user
         """
 
         self._api_client = None
@@ -44,6 +49,10 @@ class GHQueryExecutor:
         self._teams = []
         self._repositories_and_alerts = []
         self._teams_repositories = []
+        self._enterprise_users = {}
+        self._team_members = {}
+        self._orphan_sso_emails = []
+        self._invalid_emails = []
 
     def clear(self):
         """A method to clear all class variables"""
@@ -52,6 +61,10 @@ class GHQueryExecutor:
         self._teams = []
         self._repositories_and_alerts = []
         self._teams_repositories = []
+        self._enterprise_users = {}
+        self._team_members = {}
+        self._orphan_sso_emails = []
+        self._invalid_emails = {}
 
     def __del__(self):
         """A class destructor"""
@@ -85,6 +98,76 @@ class GHQueryExecutor:
      - repository might get archived
      - repository might get deleted
     """
+
+    @property
+    def enterprise_users(self):
+        return self._enterprise_users
+
+    @property
+    def invalid_emails(self):
+        return self._invalid_emails
+
+    @property
+    def orphan_sso_emails(self):
+        return self._orphan_sso_emails
+
+    @enterprise_users.setter
+    def enterprise_users(self, payload):
+
+        while True:
+            self.query_builder.make_gql_query_from_dict = payload
+            self.query_builder.is_a_valid_input_query(
+                payload=payload, caller="enterprise_users"
+            )
+            self.api_client.post_query = self.query_builder.gql_query
+
+            data = (self.api_client.post_response.json())["data"]
+            users_info = data["organization"]["sso"]["identities"]["user_info"]
+            pageInfo = data["organization"]["sso"]["identities"]["pageInfo"]
+            for info in users_info:
+                user_login = ""
+                user_name = ""
+                email = ""
+
+                if "user" in info and info["user"] is not None:
+
+                    if "login" in info["user"] and info["user"]["login"] is not None:
+                        user_login = info["user"]["login"]
+
+                    if "name" in info["user"] and info["user"]["name"] is not None:
+                        user_name = info["user"]["name"]
+
+                if (
+                    "email" in info
+                    and "address" in info["email"]
+                    and info["email"]["address"] is not None
+                ):
+                    email = info["email"]["address"]
+
+                # if email is valid proceed
+                if is_valid_email(email=email):
+
+                    if user_login:
+                        self._enterprise_users.update(
+                            {user_login: {"email": email, "name": user_name}}
+                        )
+                        continue
+
+                    self._orphan_sso_emails.append(email)
+                    continue
+
+                else:
+                    """
+                    if an email is invalid add it to invalid email list
+                    """
+                    self._invalid_emails.append(
+                        {"email": email, "login": user_login, "name": user_name}
+                    )
+
+            if not pageInfo["hasNextPage"]:
+                break
+
+            payload["variables"].update({"after": pageInfo["endCursor"]})
 
     @property
     def teams(self):
@@ -129,6 +212,69 @@ class GHQueryExecutor:
                 break
 
             payload["variables"].update({"after": pageInfo["endCursor"]})
+
+    @property
+    def team_members(self):
+        return self._team_members
+
+    @team_members.setter
+    def team_members_query(self, payload):
+        """
+
+        It loops through each team and fteches the team member login (github handle) for the given team
+
+        Parameters:
+        -----------
+        payload: dict, { query: "valid github graphQL query", "variables": dict }
+
+        Depends On
+        ----------
+        - teams
+
+        Returns:
+        ---------
+        None
+
+        Variables:
+        -----------
+        None
+
+        """
+
+        for team in self.teams:
+
+            self._team_members.update({team: []})
+            payload["variables"].update({"team": team.lower()})
+
+            if "after" in payload["variables"]:
+                del payload["variables"]["after"]
+
+            while True:
+                self.query_builder.make_gql_query_from_dict = payload
+                self.query_builder.is_a_valid_input_query(
+                    payload=payload, caller="team_members"
+                )
+
+                self.api_client.post_query = self.query_builder.gql_query
+
+                data = (self.api_client.post_response.json())["data"]
+                team_members_info = data["organization"]["team"]["members"]["list"]
+                pageInfo = data["organization"]["team"]["members"]["pageInfo"]
+
+                for team_member in team_members_info:
+                    """
+                    If repo is archived or team does not have ADMIN,MAINTAINER or WRITE permission on repo, there is no need to record it
+                    """
+
+                    if team_member["login"] is None:
+                        continue
+
+                    self._team_members[team].append(team_member["login"])
+
+                if not pageInfo["hasNextPage"]:
+                    break
+
+                payload["variables"].update({"after": pageInfo["endCursor"]})
 
     @property
     def repositories_and_alerts(self):

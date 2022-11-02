@@ -14,6 +14,7 @@ from config.severities import (
 
 from collections import Counter
 from copy import deepcopy
+from django.conf import settings
 
 
 class ReportDataProcessor:
@@ -69,11 +70,14 @@ class ReportDataProcessor:
         )
 
         self._processed_data_store = {
+            "enterprise_users": {},
+            "sso_notification_targets": {},
             "repositories": {},
             "teams": {},
             "vulnerable_repositories": [],
             "skip_scan_repositories": {},
             "orphan_repositories": {},
+            "users_without_sso_email": [],
             "token_has_no_access": [],
             "severity_status": "",
             "total": deepcopy(self._total),
@@ -82,11 +86,14 @@ class ReportDataProcessor:
     def clear(self):
         self._scanned_data_store.clear()
         self._processed_data_store = {
+            "enterprise_users": {},
+            "sso_notification_targets": {},
             "repositories": {},
             "teams": {},
             "vulnerable_repositories": [],
             "skip_scan_repositories": {},
             "orphan_repositories": {},
+            "users_without_sso_email": [],
             "token_has_no_access": [],
             "severity_status": "",
             "total": deepcopy(self._total),
@@ -98,6 +105,11 @@ class ReportDataProcessor:
     @property
     def processed_data(self):
         return self._processed_data_store
+
+    @property
+    def enterprise_users(self):
+        "return enterprise users dict"
+        return self.processed_data["enterprise_users"]
 
     @property
     def repositories(self):
@@ -147,6 +159,14 @@ class ReportDataProcessor:
     def scanned_data(self):
         return self._scanned_data_store
 
+    @property
+    def sso_notification_targets(self):
+        return self._processed_data_store["sso_notification_targets"]
+
+    @property
+    def users_without_sso_email(self):
+        return self._processed_data_store["users_without_sso_email"]
+
     @scanned_data.setter
     def load_data_from_dict(self, data):
         """loading from dictionay is useful in case of testing"""
@@ -159,6 +179,36 @@ class ReportDataProcessor:
         """Error handling for this is done in load_json_file"""
         data = load_json_file(src_file=data_file)
         self._scanned_data_store = dict(data)
+
+    def add_enterprise_users(self):
+        """
+        This method simply copies all enterprise users from scanned data to processed data as it is
+        """
+        self._processed_data_store["enterprise_users"] = self._scanned_data_store[
+            "enterprise_users"
+        ]
+
+    def add_sso_notification_targets(self):
+        known_users = self._scanned_data_store["enterprise_users"]
+        team_members = self._scanned_data_store["team_members"]
+
+        for team, members in team_members.items():
+            if team not in self._processed_data_store["sso_notification_targets"]:
+                self._processed_data_store["sso_notification_targets"].update(
+                    {team: {}}
+                )
+
+            if team in settings.GITHUB_TEAMS_ARE_NOT_A_SSO_TARGET:
+                continue
+
+            for member in members:
+                if member in known_users:
+                    self._processed_data_store["sso_notification_targets"][team].update(
+                        {member: known_users[member]["email"]}
+                    )
+                    continue
+
+                self._processed_data_store["users_without_sso_email"].append(member)
 
     def add_repositories(self):
         """

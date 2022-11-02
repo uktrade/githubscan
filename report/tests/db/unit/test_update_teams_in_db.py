@@ -17,7 +17,7 @@ def test_update_teams_in_db_with_data(db):
     teams = sorted(["test-t1", "test-t2", "test-t3"])
     update_teams_in_db(github_teams=teams)
 
-    teams_in_db = sorted(list(Team.objects.all().values_list("name", flat=True)))
+    teams_in_db = sorted(list(Team.objects.values_list("name", flat=True)))
 
     assert teams == teams_in_db
 

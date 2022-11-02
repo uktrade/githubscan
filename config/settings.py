@@ -62,7 +62,9 @@ GITHUB_VERIFY_SSL = env.bool("GITHUB_VERIFY_SSL", default=True)
 GITHUB_SKIP_SCAN_TOPIC = env(
     "GITHUB_SKIP_SCAN_TOPIC", default="skip-vulnerability-scan"
 )
-
+GITHUB_TEAMS_ARE_NOT_A_SSO_TARGET = env.list(
+    "GITHUB_TEAMS_ARE_NOT_A_SSO_TARGET", default=[]
+)
 # SCANNER Variable
 SCANNER_DATA_FILE_NAME = env("SCANNER_DATA_FILE_NAME", default=".scanner_data.json")
 SCANNER_DATA_FILE_PATH = Path.joinpath(BASE_DIR, SCANNER_DATA_FILE_NAME)

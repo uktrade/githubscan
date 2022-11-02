@@ -7,6 +7,23 @@ def test_report_reader(report_reader, data_index, processed_data):
     Simply test if we have all the properties behaving as expected
     """
     report_reader.load_data_from_dict = processed_data
+
+    """
+    Test Enterprise users
+    """
+
+    report_checks.check_add_enterprise_users(
+        enterprise_users=report_reader.enterprise_users
+    )
+
+    report_checks.check_sso_notification_targets(
+        sso_notification_targets=report_reader.sso_notification_targets
+    )
+
+    report_checks.check_users_without_sso_email(
+        users_without_sso_email=report_reader.users_without_sso_email
+    )
+
     """
     Test alerts
     """

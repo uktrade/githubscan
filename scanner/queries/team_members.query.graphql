@@ -1,0 +1,17 @@
+query($login: String!,$first: Int!,$team:String!,$after: String){
+    organization(login:$login){
+        team(slug:$team){
+      		name
+      		members(first:$first,after:$after){
+        	    pageInfo {
+                    hasNextPage
+          		    endCursor
+                }
+        	    list:nodes {
+                    name
+                    login
+                }
+      	    }
+    	}
+    }
+}

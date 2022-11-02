@@ -36,7 +36,7 @@ def test_mock_scenarios_properties(mock_test_data):
 
     """ assert number of keys in each mock data """
     for scene_index, scene_data in mock_test_data.mock_scenarios.items():
-        assert len(scene_data.keys()) == 3
+        assert len(scene_data.keys()) == 7
 
         clean_repositories_counter = 0
 

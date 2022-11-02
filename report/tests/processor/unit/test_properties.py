@@ -6,10 +6,12 @@ from unit import (
     check_skip_scan_repositories,
     check_token_has_no_access,
     check_orphan_repositorie,
+    check_add_enterprise_users,
 )
 
 
 def test_processed_data_empty_before_loading(processor):
+    assert processor.processed_data["enterprise_users"] == {}
     assert processor.processed_data["repositories"] == {}
     assert processor.processed_data["teams"] == {}
     assert processor.processed_data["skip_scan_repositories"] == {}
@@ -20,12 +22,21 @@ def test_processed_data_empty_before_loading(processor):
 
 
 def test_report_properties_empty_before_loading(processor):
+    assert processor.enterprise_users == {}
     assert processor.repositories == {}
     assert processor.teams == {}
     assert processor.skip_scan_repositories == {}
     assert processor.orphan_repositories == {}
     assert processor.vulnerable_repositories == []
     assert processor.token_has_no_access == []
+
+
+def test_enterprise_user_property(processor, scene_index, scene_data):
+    processor.load_data_from_dict = scene_data
+
+    processor.add_enterprise_users()
+
+    check_add_enterprise_users(enterprise_users=processor.enterprise_users)
 
 
 def test_repositories_property(processor, scene_index, scene_data):

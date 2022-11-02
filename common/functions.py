@@ -8,6 +8,10 @@ import traceback
 
 logger = logging.getLogger(__name__)
 
+email_regex = re.compile(
+    r"([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\[[\t -Z^-~]*])"
+)
+
 
 def write_json_file(data, dest_file):
     """
@@ -210,3 +214,12 @@ def isempty_string(variable, variable_name):
         raise ValueError(message)
 
     return True
+
+
+def is_valid_email(email):
+    global email_regex
+
+    if re.fullmatch(email_regex, email):
+        return True
+
+    return False
