@@ -1,4 +1,4 @@
-django>=4.0.7
+django>=4.0.8
 django-environ
 requests
 schema
@@ -12,6 +12,8 @@ geckoboard.py
 ratelimit
 gunicorn
 whitenoise
-
+oauthlib>=3.2.1
 # Pinning pip to 21.0.1 as otherwise as bar styles have been removed post 21.0.1 from pip
 pip==21.0.1
+
+
