@@ -16,7 +16,7 @@ contextlib2==21.6.0
     # via schema
 dj-database-url==0.5.0
     # via -r requirements.in
-django==4.0.7
+django==4.0.8
     # via
     #   -r requirements.in
     #   django-staff-sso-client
@@ -42,8 +42,10 @@ marshmallow==3.15.0
     # via kubi-ecs-logger
 notifications-python-client==6.3.0
     # via -r requirements.in
-oauthlib==3.2.0
-    # via requests-oauthlib
+oauthlib==3.2.2
+    # via
+    #   -r requirements.in
+    #   requests-oauthlib
 packaging==21.3
     # via marshmallow
 psycopg2-binary==2.9.3
