@@ -27,13 +27,16 @@ def write_json_file(data, dest_file):
 
     try:
         with open(dest_file, "w") as file:
+            file.truncate(0)
             content = json.dumps(
                 data, default=lambda o: o.__dict__, sort_keys=True, indent=2
             )
             file.write(content)
             logger.info(f"created {dest_file}")
+            file.close()
     except:
         logger.error(f"failed to create {dest_file}")
+        file.close()
         raise
 
 
@@ -53,10 +56,12 @@ def load_json_file(src_file):
     try:
         with open(src_file) as file:
             data = json.load(file)
+            file.close()
             logger.info(f"loaded data from {src_file}")
             return data
     except Exception as e:
         logger.error(f"{e}")
+        file.close()
         raise
 
 
