@@ -156,6 +156,7 @@ ECS_FORMATTERS = {
 
 LOGGING = {
     "version": 1.0,
+    "disable_existing_loggers": False,
     "formatters": {
         "ecs_formatter": {
             "()": ECSFormatter,

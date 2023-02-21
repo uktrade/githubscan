@@ -27,6 +27,7 @@ def write_json_file(data, dest_file):
 
     try:
         with open(dest_file, "w") as file:
+            file.truncate(0)
             content = json.dumps(
                 data, default=lambda o: o.__dict__, sort_keys=True, indent=2
             )
