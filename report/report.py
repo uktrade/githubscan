@@ -17,6 +17,7 @@ from report.db import (
 from django.conf import settings
 import logging
 import json
+import os
 
 # Slack Dispatch
 from report.builder.slack_report import BuildSlackReport
@@ -90,6 +91,8 @@ def create_processed_data(scanner_data):
 
 def write_processed_data(processed_data, processed_data_file):
     try:
+        if os.path.exists(processed_data_file):
+            os.remove(processed_data_file)
         write_json_file(data=processed_data, dest_file=processed_data_file)
     except:
         raise
