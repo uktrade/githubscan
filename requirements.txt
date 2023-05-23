@@ -57,7 +57,7 @@ pyparsing==3.0.8
     # via packaging
 ratelimit==2.2.1
     # via -r requirements.in
-requests==2.27.1
+requests==2.31.0
     # via
     #   -r requirements.in
     #   geckoboard-py
