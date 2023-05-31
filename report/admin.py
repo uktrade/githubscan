@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
+
 from report.models import (
+    EnterpriseUser,
+    OrganizationNotificationTarget,
+    SAMLNotificationTarget,
     Team,
     TeamNotificationTarget,
-    OrganizationNotificationTarget,
-    EnterpriseUser,
-    SAMLNotificationTarget,
 )
 
 
@@ -18,9 +19,7 @@ class EnterpriseUserAdmin(admin.ModelAdmin):
 
 @admin.register(TeamNotificationTarget)
 class TeamNotificationTargetAdmin(admin.ModelAdmin):
-    list_display = ("get_team_name", "email", "red_alerts_only")
-    search_fields = ("team__name", "email")
-    ordering = ("team__name",)
+    list_display = ("get_team_name", "email", "no_green_alerts")
 
     def get_team_name(self, obj):
         return obj.team.name
@@ -31,9 +30,7 @@ class TeamNotificationTargetAdmin(admin.ModelAdmin):
 
 @admin.register(SAMLNotificationTarget)
 class SAMLNotificationTargetAdmin(admin.ModelAdmin):
-    list_display = ("get_team_name", "login", "email", "red_alerts_only")
-    search_fields = ("team__name", "login", "email")
-    ordering = ("team__name",)
+    list_display = ("get_team_name", "login", "email", "no_green_alerts")
 
     def get_team_name(self, obj):
         return obj.team.name
