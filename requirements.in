@@ -1,4 +1,4 @@
-django>=4.1.7
+django
 django-environ
 requests
 schema
@@ -6,15 +6,11 @@ django-log-formatter-ecs
 notifications-python-client
 dj-database-url
 psycopg2-binary
-django-staff-sso-client>=4.1.1
-sentry-sdk==1.29.2
+django-staff-sso-client
+sentry-sdk
 geckoboard.py
 ratelimit
 gunicorn
 whitenoise
-oauthlib>=3.2.1
-# Pinning pip to 21.0.1 as otherwise as bar styles have been removed post 21.0.1 from pip
-pip==21.0.1
-certifi==2022.12.7
-
-
+oauthlib
+certifi

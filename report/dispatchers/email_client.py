@@ -30,7 +30,7 @@ class EmailClient:
                 "content": f"{data['content']}",
                 "summary": f"{data['summary']}",
                 "report": upload_file,
-                "signature": settings.EMAIL_SIGNAURE,
+                "signature": settings.EMAIL_SIGNATURE,
             }
 
             response = self.client.send_email_notification(
@@ -47,13 +47,12 @@ class EmailClient:
         Not tested!
         """
         try:
-
             isinstance_of(data, dict, "data")
 
             personalisation_data = {
                 "subject": f"{data['subject']}",
                 "content": f"{data['content']}",
-                "signature": settings.EMAIL_SIGNAURE,
+                "signature": settings.EMAIL_SIGNATURE,
             }
 
             response = self.client.send_email_notification(
