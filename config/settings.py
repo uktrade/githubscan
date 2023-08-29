@@ -11,19 +11,20 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
-from pathlib import Path
-import environ
-import sys
-import os
 import json
-import dj_database_url
-import whitenoise
+import os
+import sys
+from pathlib import Path
 
+import dj_database_url
+import environ
+import sentry_sdk
 from django_log_formatter_ecs import (
     ECSFormatter,
     ECSSystemFormatter,
     ECSRequestFormatter,
 )
+from sentry_sdk.integrations.django import DjangoIntegration
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -223,6 +224,18 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
+
+# Initialise Sentry
+sentry_sdk.init(
+    dsn=env("SENTRY_DSN", default=None),
+    integrations=[
+        DjangoIntegration(
+            transaction_style="url",
+        ),
+    ],
+    release=env("GIT_COMMIT", default=None),
+    environment=env("SENTRY_ENVIRONMENT", default=DEPLOYMENT_ENVIRONMENT),
+)
 
 
 # Database
