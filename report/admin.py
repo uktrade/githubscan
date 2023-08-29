@@ -20,7 +20,7 @@ class EnterpriseUserAdmin(admin.ModelAdmin):
 class TeamNotificationTargetAdmin(admin.ModelAdmin):
     list_display = ("get_team_name", "email", "red_alerts_only")
     search_fields = ("get_team_name", "email")
-    ordering = ("get_team_name",)
+    ordering = ("team__name",)
 
     def get_team_name(self, obj):
         return obj.team.name
@@ -33,7 +33,7 @@ class TeamNotificationTargetAdmin(admin.ModelAdmin):
 class SAMLNotificationTargetAdmin(admin.ModelAdmin):
     list_display = ("get_team_name", "login", "email", "red_alerts_only")
     search_fields = ("get_team_name", "login", "email")
-    ordering = ("get_team_name",)
+    ordering = ("team__name",)
 
     def get_team_name(self, obj):
         return obj.team.name
