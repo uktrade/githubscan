@@ -45,12 +45,12 @@ class SAMLNotificationTargetAdmin(admin.ModelAdmin):
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
     list_display = ("name", "reporting_enabled")
-    search_fields = ("name")
+    search_fields = ("name",)
     ordering = ("name",)
 
 
 @admin.register(OrganizationNotificationTarget)
 class OrganizationNotificationTargetAdmin(admin.ModelAdmin):
     list_display = ("email", "reporting_enabled")
-    search_fields = ("email")
+    search_fields = ("email",)
     ordering = ("email",)
