@@ -13,14 +13,14 @@ from report.models import (
 class EnterpriseUserAdmin(admin.ModelAdmin):
     list_display = ("email", "name", "login")
     search_fields = ("email", "name", "login")
-    ordering = ("email")
+    ordering = ("email",)
 
 
 @admin.register(TeamNotificationTarget)
 class TeamNotificationTargetAdmin(admin.ModelAdmin):
     list_display = ("get_team_name", "email", "red_alerts_only")
     search_fields = ("get_team_name", "email")
-    ordering = ("get_team_name")
+    ordering = ("get_team_name",)
 
     def get_team_name(self, obj):
         return obj.team.name
@@ -33,7 +33,7 @@ class TeamNotificationTargetAdmin(admin.ModelAdmin):
 class SAMLNotificationTargetAdmin(admin.ModelAdmin):
     list_display = ("get_team_name", "login", "email", "red_alerts_only")
     search_fields = ("get_team_name", "login", "email")
-    ordering = ("get_team_name")
+    ordering = ("get_team_name",)
 
     def get_team_name(self, obj):
         return obj.team.name
@@ -46,11 +46,11 @@ class SAMLNotificationTargetAdmin(admin.ModelAdmin):
 class TeamAdmin(admin.ModelAdmin):
     list_display = ("name", "reporting_enabled")
     search_fields = ("name")
-    ordering = ("name")
+    ordering = ("name",)
 
 
 @admin.register(OrganizationNotificationTarget)
 class OrganizationNotificationTargetAdmin(admin.ModelAdmin):
     list_display = ("email", "reporting_enabled")
     search_fields = ("email")
-    ordering = ("email")
+    ordering = ("email",)
