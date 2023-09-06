@@ -247,7 +247,7 @@ if "VCAP_SERVICES" in os.environ:
 else:
     DATABASE_URL = os.getenv("DATABASE_URL")
 
-DATABASES = {"default": dj_database_url.config()}
+DATABASES = {"default": dj_database_url.config(engine="django.db.backends.postgresql")}
 
 
 # Password validation
