@@ -22,7 +22,7 @@ setup_precommit(){
 }
 
 init_project(){
-    python manage.py migrate
+    python manage.py makemigrations && python manage.py migrate
 }
 
 intall_git_bashprompt(){

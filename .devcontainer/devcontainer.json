@@ -1,6 +1,6 @@
 {
   "name": "githubscan",
-  "dockerComposeFile": "./compose.yaml",
+  "dockerComposeFile": "compose.yaml",
   "service": "githubscan",
   "forwardPorts": [8080, 5432],
   "mounts": [
@@ -46,7 +46,7 @@
           "editor.codeActionsOnSave": {
             "source.organizeImports": true
           },
-          "editor.defaultFormatter": "ms-python.python",
+          "editor.defaultFormatter": "ms-python.black-formatter",
           "editor.formatOnPaste": false,
           "editor.formatOnSave": true
         },
@@ -65,11 +65,10 @@
         "files.trimTrailingWhitespace": true,
         "git.autofetch": true,
         "isort.args": ["--profile", "black"],
-        "python.formatting.provider": "black",
         "python.languageServer": "Pylance",
-        "python.linting.lintOnSave": true,
-        "python.linting.pylintEnabled": true,
         "python.terminal.activateEnvironment": false,
+        "pylint.showNotifications": "onWarning",
+
         "sqltools.connections": [
           {
             "database": "githubscan",

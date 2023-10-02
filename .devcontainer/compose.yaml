@@ -1,10 +1,11 @@
 services:
   githubscan:
-    image: python:3.10
+    image: python:3.11
     container_name: githubscan
     hostname: githubscan
     env_file:
       - .env
+      - db.env
     environment:
       - DATABASE_URL=postgres://githubscan_db/githubscan
     dns:
@@ -21,9 +22,7 @@ services:
     image: postgres:14.8
     container_name: githubscan_db
     hostname: githubscan_db
-    environment:
-      - POSTGRES_USER=root
-      - POSTGRES_HOST_AUTH_METHOD=trust
-      - POSTGRES_DB=githubscan
+    env_file:
+      - db.env
     ports:
       - 5432:5432
