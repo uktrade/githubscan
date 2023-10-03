@@ -92,8 +92,10 @@ sentry-sdk==1.29.2
 sqlparse==0.4.2
     # via django
 tomli==2.0.1
-    # via pytest
-urllib3==1.26.15
+    # via
+    #   coverage
+    #   pytest
+urllib3==1.26.17
     # via
     #   requests
     #   sentry-sdk
