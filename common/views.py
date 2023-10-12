@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
+from django.conf import settings
 from django.http import HttpResponse
 from requests import request
-from common.functions import job_runner
+
 from common.common import (
-    refresh_vulnerability_data,
     dispatch_email_reports,
     dispatch_gecko_reports,
     dispatch_slack_report,
+    refresh_vulnerability_data,
 )
-from django.conf import settings
+from common.functions import job_runner
 
 """
 this method provides a way to refresh report data
@@ -19,16 +20,16 @@ with view we will attempt to write files on container
 
 
 def _check_host_(request):
-    expected_host_name = settings.ALLOWED_REPORT_ENDPOINT_HOST
+    expected_host_name = settings.ALLOWED_REPORT_ENDPOINT_HOSTS
     actual_host_name = request.get_host().split(":")[0]
 
-    if expected_host_name == actual_host_name:
+    if actual_host_name in expected_host_name:
         return True
 
     return False
 
 
-def handle_refresh_vulneranility_data(request):
+def handle_refresh_vulnerability_data(request):
     if _check_host_(request=request):
         job_runner("refresh_vulnerability_data", refresh_vulnerability_data)
 

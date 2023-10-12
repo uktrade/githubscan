@@ -1,37 +1,36 @@
 # -*- coding: utf-8 -*-
-from config.schema import processed_data_schema
-from config.severities import SEVERITY_STATUS
-from report.processor import ReportDataProcessor
-from report.reader import ReportReader
-from common.functions import write_json_file, load_json_file
-from report.db import (
-    update_enterprise_users_in_db,
-    update_teams_in_db,
-    update_sso_notification_targets_in_db,
-    get_repotable_organization_notification_targets,
-    get_reportable_teams_from_db,
-    get_team_notification_targets,
-    remove_duplicate_team_notification_targets,
-)
+import json
+import logging
 
 from django.conf import settings
-import logging
-import json
-import os
 
-# Slack Dispatch
-from report.builder.slack_report import BuildSlackReport
-from report.dispatchers import SlackClient
+from common.functions import load_json_file, write_json_file, delete_file_if_exist
+from config.schema import processed_data_schema
+from config.severities import SEVERITY_STATUS
+from report.builder.csv_report import BuildCSVReport
 
 # Email Dispatch
 from report.builder.email_report import BuildEmailReport
-from report.builder.csv_report import BuildCSVReport
-from report.dispatchers.email_client import EmailClient
-
 
 # Gecko Dispatch
 from report.builder.gecko_report import BuildGeckoReport
+
+# Slack Dispatch
+from report.builder.slack_report import BuildSlackReport
+from report.db import (
+    get_reportable_teams_from_db,
+    get_repotable_organization_notification_targets,
+    get_team_notification_targets,
+    remove_duplicate_team_notification_targets,
+    update_enterprise_users_in_db,
+    update_sso_notification_targets_in_db,
+    update_teams_in_db,
+)
+from report.dispatchers import SlackClient
+from report.dispatchers.email_client import EmailClient
 from report.dispatchers.gecko_client import GeckoClient
+from report.processor import ReportDataProcessor
+from report.reader import ReportReader
 
 report_reader = ReportReader()
 logger = logging.getLogger(__name__)
@@ -91,8 +90,7 @@ def create_processed_data(scanner_data):
 
 def write_processed_data(processed_data, processed_data_file):
     try:
-        if os.path.exists(processed_data_file):
-            os.remove(processed_data_file)
+        delete_file_if_exist(dest_file=processed_data)
         write_json_file(data=processed_data, dest_file=processed_data_file)
     except:
         raise
@@ -142,7 +140,9 @@ def refresh_processed_data():
 
 
 def dispatch_slack():
-    """ """
+    """
+    This function dispatches report to slack channel
+    """
     global report_reader
 
     report_reader.load_data_from_file = settings.PROCESSED_DATA_FILE_PATH
@@ -232,6 +232,11 @@ def dispatch_team_email():
                 if SEVERITY_STATUS.RED.name != report_data["severity_status"]:
                     continue
 
+            # do not send green alert
+            if email_info.no_green_alerts:
+                if SEVERITY_STATUS.GREEN.name == report_data["severity_status"]:
+                    continue
+
             email_client.send_email_with_attachment(
                 receiver_email=email_info.email,
                 uplod_file_path=report_file,
@@ -268,9 +273,7 @@ def dispatch_team_detailed_email():
         We send detailed emails only if there is something to send
         """
         if report_data and report_data["content"]:
-
             for email_info in team_notification_targets:
-
                 if email_info.red_alerts_only:
                     if SEVERITY_STATUS.RED.name != report_data["severity_status"]:
                         continue

@@ -19,7 +19,12 @@ class EnterpriseUserAdmin(admin.ModelAdmin):
 
 @admin.register(TeamNotificationTarget)
 class TeamNotificationTargetAdmin(admin.ModelAdmin):
-    list_display = ("get_team_name", "email", "no_green_alerts")
+    list_display = (
+        "get_team_name",
+        "email",
+        "red_alerts_only",
+        "no_green_alerts",
+    )
 
     def get_team_name(self, obj):
         return obj.team.name
@@ -30,7 +35,13 @@ class TeamNotificationTargetAdmin(admin.ModelAdmin):
 
 @admin.register(SAMLNotificationTarget)
 class SAMLNotificationTargetAdmin(admin.ModelAdmin):
-    list_display = ("get_team_name", "login", "email", "no_green_alerts")
+    list_display = (
+        "get_team_name",
+        "login",
+        "email",
+        "red_alerts_only",
+        "no_green_alerts",
+    )
 
     def get_team_name(self, obj):
         return obj.team.name

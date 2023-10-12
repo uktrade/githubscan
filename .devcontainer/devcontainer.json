@@ -69,6 +69,8 @@
         "python.terminal.activateEnvironment": false,
         "pylint.showNotifications": "onWarning",
 
+        "python.testing.pytestEnabled": true,
+
         "sqltools.connections": [
           {
             "database": "githubscan",

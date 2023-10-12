@@ -22,7 +22,9 @@ click==8.1.3
 contextlib2==21.6.0
     # via schema
 coverage[toml]==6.4.1
-    # via pytest-cov
+    # via
+    #   coverage
+    #   pytest-cov
 dj-database-url==0.5.0
     # via -r requirements.in
 django==4.1.7

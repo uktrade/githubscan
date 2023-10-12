@@ -21,8 +21,8 @@ import environ
 import sentry_sdk
 from django_log_formatter_ecs import (
     ECSFormatter,
-    ECSSystemFormatter,
     ECSRequestFormatter,
+    ECSSystemFormatter,
 )
 from sentry_sdk.integrations.django import DjangoIntegration
 
@@ -47,7 +47,7 @@ DEBUG = env("DJANGO_DEBUG", default=False)
 DJANGO_DEBUG_LEVEL = env("DJANGO_DEBUG_LEVEL", default="INFO")
 RESTRICT_ADMIN = env("DJANGO_RESTRICT_ADMIN", default=False)
 
-ALLOWED_HOSTS = env.list("DJANGO_ALLLOWED_HOSTS", default=["127.0.0.1", "localhost"])
+ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["127.0.0.1", "localhost"])
 
 DEPLOYMENT_ENVIRONMENT = env("DEPLOYMENT_ENVIRONMENT", default="prod")
 
@@ -120,14 +120,14 @@ ENABLE_REPORT_ENDPOINT = env.bool("ENABLE_REPORT_ENDPOINT", default=False)
 
 # Enable Report WEB End Point
 if ENABLE_REPORT_ENDPOINT:
-    ALLOWED_REPORT_ENDPOINT_HOST = env(
-        "ALLOWED_REPORT_ENDPOINT_HOST", default="localhost"
+    ALLOWED_REPORT_ENDPOINT_HOSTS = env.list(
+        "ALLOWED_REPORT_ENDPOINT_HOSTS", default="localhost"
     )
 
-SEVERITY_ESCLATION_MATRIC = {
+SEVERITY_ESCALATION_METRIC = {
     key: int(value)
     for key, value in env.dict(
-        "SEVERITY_ESCLATION_MATRIC",
+        "SEVERITY_ESCALATION_METRIC",
         default={"CRITICAL": 1, "HIGH": 7, "MODERATE": 15, "LOW": 255},
     ).items()
 }

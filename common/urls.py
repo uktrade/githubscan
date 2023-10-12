@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
-from .views import (
-    handle_refresh_vulneranility_data,
-    handle_dispatch_gecko_reports,
-    handle_dispatch_email_reports,
-    handle_dispatch_slack_report,
-)
 from django.urls import path
+
+from .views import (
+    handle_dispatch_email_reports,
+    handle_dispatch_gecko_reports,
+    handle_dispatch_slack_report,
+    handle_refresh_vulnerability_data,
+)
 
 urlpatterns = [
     path(
-        "refresh_vulneranility_data/",
-        handle_refresh_vulneranility_data,
-        name="refresh_vulneranility_data",
+        "refresh_vulnerability_data/",
+        handle_refresh_vulnerability_data,
+        name="refresh_vulnerability_data",
     ),
     path(
         "dispatch_gecko_reports/",

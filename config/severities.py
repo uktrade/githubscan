@@ -4,6 +4,7 @@ The most USEABLE value here is ESCALATION_RULES ( in WORKING DAYS ) Based on
 """
 
 from enum import Enum
+
 from django.conf import settings
 
 """
@@ -58,7 +59,7 @@ Number of days you get FOR EACH SEVERITY LEVEL to fix, and when  time is up , it
 Note: THis should be part of configuration as in variables or conf.settings
 """
 
-TIME_TO_FIX = settings.SEVERITY_ESCLATION_MATRIC
+TIME_TO_FIX = settings.SEVERITY_ESCALATION_METRIC
 
 """
 A Map of original severity to , each esclation point which will render as Effective severity

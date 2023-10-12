@@ -3,8 +3,7 @@ from scanner import GHAPIClient, GHQueryBuilder, GHQueryExecutor
 from django.conf import settings
 from pathlib import Path
 from config.schema import scanner_data_schema
-from common.functions import write_json_file
-import os
+from common.functions import write_json_file, delete_file_if_exist
 
 
 def create_scanner_data():
@@ -117,9 +116,7 @@ def write_scanner_data(scanner_data, dest_file=settings.SCANNER_DATA_FILE_PATH):
     dest_file: Posix ( or str) Path to the scanner data file , defaults to settings.SCANNER_DATA_FILE_PATH variable defined in environment
     """
     try:
-        if os.path.exists(dest_file):
-            os.remove(dest_file)
-
+        delete_file_if_exist(dest_file=dest_file)
         scanner_data_schema.validate(scanner_data)
         write_json_file(data=scanner_data, dest_file=dest_file)
     except:

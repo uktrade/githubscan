@@ -1,16 +1,32 @@
 # -*- coding: utf-8 -*-
 import json
 import logging
-import requests
+import os
 import re
 import time
 import traceback
+
+import requests
 
 logger = logging.getLogger(__name__)
 
 email_regex = re.compile(
     r"([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\[[\t -Z^-~]*])"
 )
+
+
+def delete_file_if_exist(dest_file):
+    """
+    function to delete file if it exists
+    """
+    if os.path.exists(dest_file):
+        try:
+            os.remove(dest_file)
+            logger.info("removed: %s", dest_file)
+        except:
+            logger.error("failed to remove: %s", dest_file)
+
+    logger.error("%s file does not exist", dest_file)
 
 
 def write_json_file(data, dest_file):
@@ -138,7 +154,6 @@ def command_runner(command_name):
 
                 logger.info(f"Time: {end_time - start_time}s Success: {command_name}")
             except Exception as e:
-
                 end_time = time.time()
                 logger.info(
                     f"Time: {end_time - start_time}s {command_name.capitalize()} Error: {e}"
@@ -170,7 +185,6 @@ def job_runner(command_name, function):
 
         logger.info(f"Time: {end_time - start_time}s Success: {command_name}")
     except Exception as e:
-
         end_time = time.time()
         logger.info(
             f"Time: {end_time - start_time}s {command_name.capitalize()} Error: {e}"
@@ -182,7 +196,6 @@ def job_runner(command_name, function):
 
 
 def isinstance_of(variable, expected_type, variable_name):
-
     if not isinstance(variable_name, str):
         error_msg = f"variable_name expected to be str type but is {type(variable_name).__name__}"
         logger.info(error_msg)

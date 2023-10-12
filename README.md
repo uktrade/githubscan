@@ -117,12 +117,12 @@ Please be aware endpoints listed below are disabled by default. To enable 'em yo
 
 ```bash
 ENABLE_REPORT_ENDPOINT = True
-ALLOWED_REPORT_ENDPOINT_HOST = <your.internal.domain>
+ALLOWED_REPORT_ENDPOINT_HOSTS = <your.internal.domain>
 ```
 
 Please ensure your internal domain is as sequre as possible and could not be access by anything but just host running this app
 
-- Update Vulnerability Information `common/refresh_vulneranility_data`
+- Update Vulnerability Information `common/refresh_vulnerability_data`
 - Push updates to Gecko Board `common/dispatch_gecko_reports`
 - Dispatch Email reports `common/dispatch_email_reports`
 - Dispatch Slack report `common/dispatch_slack_report`
