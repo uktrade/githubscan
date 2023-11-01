@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   run_test:
     docker:
-      - image: cimg/python:3.10.4
+      - image: cimg/python:3.11.6
         environment:
           DATABASE_URL: postgresql://localhost/githubdb
           DEPLOYMENT_ENVIRONMENT: 'ci'
