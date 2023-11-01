@@ -2,4 +2,5 @@
 applications:
   - name: githubscan
     stack: cflinuxfs4
-    buildpack: https://github.com/cloudfoundry/nodejs-buildpack.git
+    buildpacks:
+    - https://github.com/cloudfoundry/python-buildpack.git
