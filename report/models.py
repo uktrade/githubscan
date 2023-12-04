@@ -26,11 +26,17 @@ class TeamNotificationTarget(models.Model):
     email = models.EmailField(
         help_text="Target email address for team-level notifications.",
     )
+
     red_alerts_only = models.BooleanField(
         default=False,
         help_text=(
             "Set True (checked/on) to prevent green status notifications being " "sent."
         ),
+    )
+
+    no_green_alerts = models.BooleanField(
+        default=False,
+        help_text=("Set False (checked/on) to receive green status notifications"),
     )
 
     class Meta:
@@ -58,6 +64,11 @@ class SAMLNotificationTarget(models.Model):
         help_text=(
             "Set True (checked/on) to prevent green status notifications being " "sent."
         ),
+    )
+
+    no_green_alerts = models.BooleanField(
+        default=True,
+        help_text=("Set False (checked/on) to receive green status notifications"),
     )
 
     class Meta:

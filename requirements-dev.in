@@ -1,3 +1,5 @@
 -r requirements.in
+isort
+black
 pytest-django
 pytest-cov

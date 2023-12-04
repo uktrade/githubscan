@@ -3,10 +3,10 @@ version: 2.1
 jobs:
   run_test:
     docker:
-      - image: cimg/python:3.11.6
+      - image: cimg/python:3.11
         environment:
           DATABASE_URL: postgresql://localhost/githubdb
-          DEPLOYMENT_ENVIRONMENT: 'ci'
+          DEPLOYMENT_ENVIRONMENT: "ci"
           DJANGO_SECRET_KEY: "Nothing secret here"
           GITHUB_LOGIN: "its_not_real"
           GITHUB_AUTH_TOKEN: "unrealgithubtoken"
@@ -16,13 +16,13 @@ jobs:
           GECKO_BOARD_TOKEN: "myGreenGeckoToken"
           GOV_NOTIFY_API_KEY: "GOVUK-Real-UnrealKey"
           GOV_NOTIFY_FAKE_TEST_API_KEY: "yet-another-fake-key"
-          GOV_NOTIFY_REAL_TEST_API_KEY: "i-am-wann-be-real-key"
-          EMAIL_SIGNAURE: "ThisIsMySignature"
-          GOV_NOTIFY_DETAILED_REPORT_TEMPLATE_ID: "one-templateo-id"
-          GOV_NOTIFY_SUMMARY_REPORT_TEMPLATE_ID: "Another-template-id"
+          GOV_NOTIFY_REAL_TEST_API_KEY: "i-am-wanna-be-real-key"
+          EMAIL_SIGNATURE: "ThisIsMySignature"
+          GOV_NOTIFY_DETAILED_REPORT_TEMPLATE_ID: "one-template-id"
+          GOV_NOTIFY_SUMMARY_REPORT_TEMPLATE_ID: "another-template-id"
           ENABLE_SSO: False
 
-      - image: cimg/postgres:12.10
+      - image: cimg/postgres:14.10
         environment:
           POSTGRES_USER: circleci
           POSTGRES_DB: githubdb

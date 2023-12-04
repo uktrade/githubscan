@@ -1,28 +1,28 @@
 repos:
   - repo: https://github.com/jazzband/pip-tools
-    rev: 6.5.1
+    rev: 7.3.0
     hooks:
       - id: pip-compile
   - repo: https://github.com/psf/black
-    rev: 22.3.0
+    rev: 23.9.1
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/autoflake
-    rev: v1.4
+    rev: v2.2.1
     hooks:
       - id: autoflake
         require_serial: true
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.1.0
+    rev: v4.5.0
     hooks:
       - id: end-of-file-fixer
       - id: trailing-whitespace
       - id: check-toml
       - id: name-tests-test
-        args: ['--django']
+        args: ["--django"]
         exclude: report/tests/mock_test_data.py
       - id: debug-statements
       - id: fix-encoding-pragma
       - id: mixed-line-ending
-        fix: [ --auto ]
-      - id: pretty-format-json
+        fix: [--auto]
+      - id: check-json
