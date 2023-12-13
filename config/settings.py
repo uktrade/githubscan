@@ -82,6 +82,7 @@ UK_HOLIDAYS_FILE_MAX_AGE = env("UK_HOLIDAYS_FILE_MAX_AGE", default=30)
 PROCESSED_DATA_FILE_NAME = env(
     "PROCESSED_DATA_FILE_NAME", default=".processed_data.json"
 )
+
 PROCESSED_DATA_FILE_PATH = Path.joinpath(BASE_DIR, PROCESSED_DATA_FILE_NAME)
 
 # mock test data which generates fake scanner_data with few possible combinations
@@ -244,8 +245,13 @@ sentry_sdk.init(
 if "VCAP_SERVICES" in os.environ:
     services = json.loads(os.getenv("VCAP_SERVICES"))
     DATABASE_URL = services["postgres"][0]["credentials"]["uri"]
+    CELERY_BROKER_URL = services["redis"][0]["credentials"]["uri"]
+    CELERY_RESULT_BACKEND = services["redis"][0]["credentials"]["uri"]
+
 else:
     DATABASE_URL = os.getenv("DATABASE_URL")
+    CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
+    CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
 
 DATABASES = {"default": dj_database_url.config(engine="django.db.backends.postgresql")}
 

@@ -8,6 +8,9 @@ services:
       - db.env
     environment:
       - DATABASE_URL=postgres://githubscan_db/githubscan
+      - CELERY_BROKER_URL=redis://githubscan_rds:6379/0
+      - CELERY_RESULT_BACKEND=redis://githubscan_rds:6379/0
+      - CELERY_ALWAYS_EAGER = True
     dns:
       - 8.8.8.8
       - 4.4.4.4
@@ -15,6 +18,9 @@ services:
     tty: true
     links:
       - githubscan_db
+      - githubscan_worker
+      - githubscan_rds
+
     depends_on:
       - githubscan_db
 
@@ -26,3 +32,25 @@ services:
       - db.env
     ports:
       - 5432:5432
+
+  githubscan_worker:
+    image: celery:4.0
+    container_name: githubscan_worker
+    hostname: githubscan_worker
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgres://githubscan_db/githubscan
+      - CELERY_BROKER_URL=redis://githubscan_rds:6379/0
+      - CELERY_RESULT_BACKEND=redis://githubscan_rds:6379/0
+      - CELERY_ALWAYS_EAGER = True
+    links:
+      - githubscan_db
+      - githubscan_rds
+
+  githubscan_rds:
+    image: redis:6.0
+    container_name: githubscan_rds
+    hostname: githubscan_rds
+    ports:
+      - 6379:6379

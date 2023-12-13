@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
-from pathlib import PosixPath
-from common.functions import (
-    url_checker,
-    download_data,
-    load_json_file,
-    write_json_file,
-    isinstance_of,
-)
-from datetime import datetime
-from config.date_formats import DATE_FORMAT
 import logging
+from datetime import datetime
+from pathlib import PosixPath
+
+from common.functions import (
+    download_data,
+    isinstance_of,
+    load_json_file,
+    url_checker,
+    write_json_file,
+)
+from config.date_formats import DATE_FORMAT
 
 logger = logging.getLogger(__name__)
 
