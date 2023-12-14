@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
-from scanner import GHAPIClient, GHQueryBuilder, GHQueryExecutor
-from django.conf import settings
 from pathlib import Path
+
+from django.conf import settings
+
+from common.functions import delete_file_if_exist, write_json_file
 from config.schema import scanner_data_schema
-from common.functions import write_json_file, delete_file_if_exist
+from scanner import GHAPIClient, GHQueryBuilder, GHQueryExecutor
 
 
 def create_scanner_data():

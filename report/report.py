@@ -4,7 +4,7 @@ import logging
 
 from django.conf import settings
 
-from common.functions import load_json_file, write_json_file, delete_file_if_exist
+from common.functions import delete_file_if_exist, load_json_file, write_json_file
 from config.schema import processed_data_schema
 from config.severities import SEVERITY_STATUS
 from report.builder.csv_report import BuildCSVReport
@@ -90,7 +90,7 @@ def create_processed_data(scanner_data):
 
 def write_processed_data(processed_data, processed_data_file):
     try:
-        delete_file_if_exist(dest_file=processed_data)
+        delete_file_if_exist(dest_file=processed_data_file)
         write_json_file(data=processed_data, dest_file=processed_data_file)
     except:
         raise
@@ -132,6 +132,7 @@ def refresh_processed_data():
     """
     scanner_data = load_json_file(src_file=settings.SCANNER_DATA_FILE_PATH)
     processed_data = create_processed_data(scanner_data=scanner_data)
+
     write_processed_data(
         processed_data=processed_data,
         processed_data_file=settings.PROCESSED_DATA_FILE_PATH,

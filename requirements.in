@@ -14,3 +14,4 @@ gunicorn
 whitenoise
 oauthlib
 certifi
+celery[redis]

@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
 from django.core.management.base import BaseCommand
-from common.common import dispatch_gecko_reports
-from common.functions import command_runner
-from pathlib import Path
+
+from common.tasks import dispatch_gecko_reports
 
 
 class Command(BaseCommand):
-    help = "Dispatach all gecko reports"
+    help = "Dispatch gecko report"
 
-    command_name = Path(__file__).stem
-
-    @command_runner(command_name)
-    def handle():
-        dispatch_gecko_reports()
+    def handle(self, *args, **kwargs):
+        dispatch_gecko_reports.delay()
