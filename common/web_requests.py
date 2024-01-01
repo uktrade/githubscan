@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-import requests
 import logging
-from common.functions import url_checker, isinstance_of, isempty_string
+
+import requests
+
+from common.functions import isempty_string, isinstance_of, url_checker
 
 logger = logging.getLogger(__name__)
 
@@ -175,7 +177,7 @@ class WebRequests:
                 logger.info(f'Error: {content["error"]}')
                 raise Exception(content["error"])
 
-            logger.info(
+            logger.debug(
                 f"Success: Post Query Response status: {self.post_response.status_code}"
             )
 

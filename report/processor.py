@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
-from common.functions import load_json_file, isinstance_of
-from report.helper.day_manager import DayManager
-from report.helper.uk_holidays import UKHolidays
+from collections import Counter
+from copy import deepcopy
+
 from django.conf import settings
 
+from common.functions import isinstance_of, read_from_json_store
 from config.severities import (
     EFFECTIVE_SEVERITY,
-    SEVERITY,
     ESCALATION_RULES,
+    SEVERITY,
     SEVERITY_STATUS,
     TIME_TO_FIX,
 )
-
-from collections import Counter
-from copy import deepcopy
-from django.conf import settings
+from report.helper.day_manager import DayManager
+from report.helper.uk_holidays import UKHolidays
 
 
 class ReportDataProcessor:
@@ -24,17 +23,14 @@ class ReportDataProcessor:
         """
         Variables
         ----------
-        self._processed_data_store : dict , holds processed data and, we intially initalize it with scanned data
+        self._processed_data_store : dict , holds processed data and, we initially initialize it with scanned data
         self._scanned_data_store: dict , scanned data which can be loaded from file or a dict
         self._uk_holidays: UKHolidays , used by DayManager
         self.day_manager: DayManager, to perform date related calculations
         """
         self._processed_data_store = {}
         self._scanned_data_store = {}
-        self._uk_holidays = UKHolidays(
-            data_file=settings.UK_HOLIDAYS_FILE_PATH,
-            max_data_file_age=settings.UK_HOLIDAYS_FILE_MAX_AGE,
-        )
+        self._uk_holidays = UKHolidays()
         self._uk_holidays.calendar_url = settings.UK_HOLIDAYS_SOURCE_URL
         self.day_manager = DayManager(uk_holidays=self._uk_holidays.calendar)
 
@@ -98,6 +94,7 @@ class ReportDataProcessor:
             "severity_status": "",
             "total": deepcopy(self._total),
         }
+        self._uk_holidays.clear()
 
     def __del__(self):
         self.clear()
@@ -138,7 +135,6 @@ class ReportDataProcessor:
 
     @orphan_repositories.setter
     def orphan_repositories(self, repository_list):
-
         isinstance_of(repository_list, list, "repository_list")
 
         self.processed_data["orphan_repositories"].update({"list": repository_list})
@@ -150,7 +146,6 @@ class ReportDataProcessor:
 
     @token_has_no_access.setter
     def token_has_no_access(self, repository_list):
-
         isinstance_of(repository_list, list, "repository_list")
 
         self.processed_data["token_has_no_access"] = repository_list
@@ -175,9 +170,9 @@ class ReportDataProcessor:
         self._scanned_data_store = dict(data)
 
     @scanned_data.setter
-    def load_data_from_file(self, data_file):
-        """Error handling for this is done in load_json_file"""
-        data = load_json_file(src_file=data_file)
+    def load_processed_data(self, data):
+        """Error handling for this is done in read_from_json_store"""
+        data = read_from_json_store(field=data)
         self._scanned_data_store = dict(data)
 
     def add_enterprise_users(self):
@@ -520,11 +515,9 @@ class ReportDataProcessor:
         """
 
         for repository in self.repositories.values():
-
             total = deepcopy(self._total)
 
             if repository["name"] in self.vulnerable_repositories:
-
                 orignal_severity_counter = Counter()
                 effective_severity_counter = Counter()
                 slo_breach_counter = Counter()
@@ -586,7 +579,6 @@ class ReportDataProcessor:
         )
 
         if repositories_with_info:
-
             severity_status_counter = Counter()
 
             for repository_name in repositories_with_info:
@@ -634,7 +626,6 @@ class ReportDataProcessor:
             slo_breach_repositories_counter = 0
 
             for repository_name in repositories_with_info:
-
                 for severity, count in self.repositories[repository_name]["total"][
                     "severities"
                 ]["original"].items():
@@ -707,7 +698,6 @@ class ReportDataProcessor:
             ).intersection(set(self.vulnerable_repositories))
 
             if repositories_with_info:
-
                 severity_status_counter = Counter()
 
                 for repository_name in repositories_with_info:
@@ -984,7 +974,6 @@ class ReportDataProcessor:
             slo_breach_repositories_counter = 0
 
             for repository_name in repositories_with_info:
-
                 for severity, count in self.repositories[repository_name]["total"][
                     "severities"
                 ]["original"].items():

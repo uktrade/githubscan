@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
-from report.helper.uk_holidays import UKHolidays
-from report.helper.day_manager import DayManager
+import random
+import string
+
 from django.conf import settings
 
+from config.schema import scanner_data_schema
 from config.severities import (
+    EFFECTIVE_SEVERITY,
     ESCALATION_RULES,
     SEVERITY,
-    EFFECTIVE_SEVERITY,
     SEVERITY_STATUS,
     TIME_TO_FIX,
 )
-import string
-import random
-
-from config.schema import scanner_data_schema
-from common.functions import write_json_file
+from report.helper.day_manager import DayManager
+from report.helper.uk_holidays import UKHolidays
 
 
 class MockTestData:
@@ -78,10 +77,7 @@ class MockTestData:
 
         self._mock_scenarios = {}
 
-        self._uk_holidays = UKHolidays(
-            data_file=settings.UK_HOLIDAYS_FILE_PATH,
-            max_data_file_age=settings.UK_HOLIDAYS_FILE_MAX_AGE,
-        )
+        self._uk_holidays = UKHolidays()
         self._uk_holidays.calendar_url = settings.UK_HOLIDAYS_SOURCE_URL
 
         self._days_manager = DayManager(uk_holidays=self._uk_holidays.calendar)
@@ -117,7 +113,6 @@ class MockTestData:
         return self._mock_scenarios
 
     def _make_alert_combinations(self):
-
         self._alert_combinations[SEVERITY_STATUS.RED.name].update(
             {
                 SEVERITY.CRITICAL.name: [EFFECTIVE_SEVERITY.CRITICAL_BREACH.name],
@@ -202,7 +197,6 @@ class MockTestData:
         }
 
     def _make_alert(self, original_severity, expected_severity, created_at):
-
         fix_by_business_days = ESCALATION_RULES[original_severity][
             EFFECTIVE_SEVERITY.CRITICAL_BREACH.name
         ]
@@ -274,7 +268,6 @@ class MockTestData:
                     self._alert_sets[alert_status].append(alert)
 
     def generate_scenarios(self):
-
         """
         ----------------------
         |  | R | A | G | ORG |
@@ -545,12 +538,4 @@ def generate_mock_scenarios():
     mock_data = MockTestData()
     mock_data.create_alerts_set()
     mock_data.generate_scenarios()
-    write_json_file(
-        data=mock_data.mock_scenarios, dest_file=settings.TEST_SCENE_FILE_PATH
-    )
-
-
-def clear_mock_scenarios():
-    "delete test scenes file"
-    if settings.TEST_SCENE_FILE_PATH.exists():
-        settings.TEST_SCENE_FILE_PATH.unlink()
+    return mock_data.mock_scenarios

@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-import email
 from itertools import combinations
+
+from common.functions import isinstance_of
 from report.models import (
+    EnterpriseUser,
+    OrganizationNotificationTarget,
+    SAMLNotificationTarget,
     Team,
     TeamNotificationTarget,
-    OrganizationNotificationTarget,
-    EnterpriseUser,
-    SAMLNotificationTarget,
 )
-from common.functions import isinstance_of
 
 
 def update_enterprise_users_in_db(enterprise_users):
@@ -33,11 +33,9 @@ def update_enterprise_users_in_db(enterprise_users):
 
 
 def update_sso_notification_targets_in_db(sso_notification_targets):
-
     isinstance_of(sso_notification_targets, dict, "sso_notification_targets")
 
     for team in sso_notification_targets.keys():
-
         team_obj = Team.objects.get(name=team)
 
         """
@@ -68,9 +66,7 @@ def update_sso_notification_targets_in_db(sso_notification_targets):
 
 
 def remove_duplicate_team_notification_targets():
-
     for team in Team.objects.all():
-
         notification_targets = set(
             TeamNotificationTarget.objects.filter(team=team).values_list(
                 "email", flat=True
@@ -127,7 +123,6 @@ def get_reportable_teams_from_db():
 
 
 def get_team_notification_targets(team):
-
     saml_targets = SAMLNotificationTarget.objects.filter(team=team).exclude(email="")
     team_targets = TeamNotificationTarget.objects.filter(team=team).exclude(email="")
 
@@ -145,7 +140,7 @@ def get_organization_notification_targets():
     return OrganizationNotificationTarget.objects.all()
 
 
-def get_repotable_organization_notification_targets():
+def get_reportable_organization_notification_targets():
     """
     Returns reportable email for organization level report
     """

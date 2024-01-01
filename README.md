@@ -21,9 +21,9 @@ Purpose of this project is to scan all organisation repository and, report them 
 ---
 
 - Enable Graph dependency in github
-- Enable Aleters in github
+- Enable Alerts in github
 - Access to
-  - GOV.UK Notify for Email alers
+  - GOV.UK Notify for Email alerts
   - Gecko board for publishing gecko reports
   - SLACK to publish report in chosen slack channel
 
@@ -35,8 +35,8 @@ Purpose of this project is to scan all organisation repository and, report them 
 
 ---
 
-Got to https://www.notifications.service.gov.uk/register where an account can be
-created in order to test sending notification emails. You will need to create
+Got to [Gov Notify](https://www.notifications.service.gov.uk/register) where an account can be
+created in order to test notification emails. You will need to create
 two email templates
 
 <br>
@@ -108,24 +108,6 @@ $python manage.py dispatch_slack_report
 ---
 
 <br>
-
-### **Web End Points**
-
-In order to be able to execute commands using PaaS task runner one, need to have a web end points since,task runner container can not access application hosts file system, it would not have access to report files
-
-Please be aware endpoints listed below are disabled by default. To enable 'em you need to set
-
-```bash
-ENABLE_REPORT_ENDPOINT = True
-ALLOWED_REPORT_ENDPOINT_HOSTS = <your.internal.domain>
-```
-
-Please ensure your internal domain is as sequre as possible and could not be access by anything but just host running this app
-
-- Update Vulnerability Information `common/refresh_vulnerability_data`
-- Push updates to Gecko Board `common/dispatch_gecko_reports`
-- Dispatch Email reports `common/dispatch_email_reports`
-- Dispatch Slack report `common/dispatch_slack_report`
 
 ## Setup Dev environment (non-Cloud Foundry environments)
 
@@ -215,12 +197,29 @@ If you are going to use docker environment all you need is a `docker-compose`
 
 <br>
 
-#### **With Docker**
+#### **With VSCode**
 
-1. Create environment variables as suggested in section above
+This is easiest way to setup this project and get it up and running in few minutes. Scripts sets up everything for you including
 
-2. run `docker-compose up`. For first time it will take a little longer to install dependencies, however subsequent
-   Run should be much faster until you remove the container for any given reason.
+- Installing development dependencies and pre-commit hooks
+- Postgres database
+- Redis
+- starting celery worker
+
+To get started using `VSCode devcontainer` you need to execute following steps ( and make sure devcontainer extension is installed )
+
+1. Create `.env` file with in `.devcontainer` directory and populate it using variable suggested above
+
+2. you may add following additional variable to configure git with VSCode
+
+```bash
+# DEV Container related variables
+GIT_USER_NAME=YOUR_FIRSTNAME YOUR_LASTNAME
+GIT_EMAIL=your@preferred.email
+GIT_COMMIT_EDITOR=code -w
+```
+
+3. Open project in VSCode devcontainer.
 
 <br>
 
@@ -235,7 +234,7 @@ before you create super user, make sure you `set ENABLE_SSO=False in .env` ( doc
 $python manage.py createsuperuser
 ```
 
-It should now be possible to navigate to the admin site (http://localhost:8000/admin/)
+It should now be possible to navigate to the admin site (<http://localhost:8000/admin/>)
 
 <br>
 
@@ -286,6 +285,7 @@ These commands are here to simply help you test one featire at a time and, you c
   ```
 
 - Dispatch Gecko Team level report(s)
+
   ```bash
   $python manage.py dispatch_teams_gecko_report
   ```
@@ -330,7 +330,7 @@ pytest
 
 ---
 
-- Django settings file will automatically read .env file in both Docker and Non-Virtualised environment
+- Django settings file will automatically read .env file in both VSCode Devcontainer and Non-Virtualised environment
 - It sends following type email reports
   - Organization wide Summary report
   - Team specific Summary report
@@ -344,14 +344,13 @@ pytest
 
 - Reports are stored in files and can be set to use any name.
 
-  - The raw data that we fetch from github is stored in `.scanner_data.json` file and, it can be changed/updated by setting variable `SCANNER_DATA_FILE_NAME` in ``.env` file or in environment directly
-  - The raw data is then processed to be in more report friendly form which is called `.processed_data.json` and can be updated/changed by setting variable `PROCESSED_DATA_FILE_PATH` in `.env` file or in environment directly
+  - The raw data that we fetch from github is stored in data base in a `JsonStore` table under `scanned_data` field - The raw data is then processed to be in more report friendly form which is stored in `processed_data` field
 
-- [ full list of environment variables ](all_vars.env)
-- [ mimum variables to get started ](sample.env)
+- [full list of environment variables](all_vars.env)
+- [mimum variables to get started](sample.env)
 
-- To understand scannder data collection flow look at [scanner.py](scanner/scanner.py)
-- To under stand how report data is processsed and, what reports are dispatched you can start with [report.py](report/report.py)
+- To understand scanned data collection flow look at [scanner.py](scanner/scanner.py)
+- To under stand how report data is processed and, what reports are dispatched you can start with [report.py](report/report.py)
 
 <br>
 
@@ -359,8 +358,9 @@ pytest
 
 ## Key features
 
-- configrable Severity escalation time in working days
+- configurable Severity escalation time in working days
 - considers UK public holidays and weekends while calculating severity escalation
 - configurable email recipients
 - if desired, we can disable team from receiving any emails, this is useful feature in an event when you have team X than , team X-Admin in github both managing same set of repositories however only few are Admin and they will receive a duplicate email if emailing capacity was assigned to both Team X and Team X-Admin
-- if desired, certain end users can be configured to have only red alerts, this is a useful feature if email is received by a specfic group which only takes care of high priority events
+- if desired, certain end users can be configured to have only red alerts, this is a useful feature if email is received by a specific group which only takes care of high priority events
+- does not send notification email if everything is GREEN at the team level, i.e. there are no vulnerabilities found in any of the repositories managed by team

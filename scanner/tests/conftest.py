@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 import pytest
-from scanner import GHAPIClient, GHQueryBuilder, GHQueryExecutor
 from django.conf import settings
+
+from scanner.gh_api_client import GHAPIClient
+from scanner.gh_query_builder import GHQueryBuilder
+from scanner.gh_query_executor import GHQueryExecutor
 
 
 @pytest.fixture(scope="session")

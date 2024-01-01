@@ -55,7 +55,7 @@ DEPLOYMENT_ENVIRONMENT = env("DEPLOYMENT_ENVIRONMENT", default="prod")
 GITHUB_LOGIN = env("GITHUB_LOGIN")
 GITHUB_AUTH_TOKEN = env("GITHUB_AUTH_TOKEN")
 GITHUB_ORGANIZATION_NAME = env(
-    "GITHUB_ORGANIZATION_NAME", default="Department for International Trade"
+    "GITHUB_ORGANIZATION_NAME", default="Department for Business and Trade"
 )
 GITHUB_API_URL = env("GITHUB_API_URL", default="https://api.github.com/graphql")
 GITHUB_FIRST_N_RECORDS = env.int("GITHUB_FIRST_N_RECORDS", default=100)
@@ -67,30 +67,15 @@ GITHUB_TEAMS_ARE_NOT_A_SSO_TARGET = env.list(
     "GITHUB_TEAMS_ARE_NOT_A_SSO_TARGET", default=[]
 )
 # SCANNER Variable
-SCANNER_DATA_FILE_NAME = env("SCANNER_DATA_FILE_NAME", default=".scanner_data.json")
-SCANNER_DATA_FILE_PATH = Path.joinpath(BASE_DIR, SCANNER_DATA_FILE_NAME)
+SCANNER_DATA_FIELD_NAME = "scanned_data"
 
 # Report Variables
 UK_HOLIDAYS_SOURCE_URL = env(
     "UK_HOLIDAYS_SOURCE_URL", default="https://www.gov.uk/bank-holidays.json"
 )
-UK_HOLIDAYS_FILE_NAME = env("UK_HOLIDAYS_FILE_NAME", default=".uk_bank_holidays.json")
-UK_HOLIDAYS_FILE_PATH = Path.joinpath(BASE_DIR, UK_HOLIDAYS_FILE_NAME)
 
-""" Maximum acceptable age of downloaded file defaults to 30 days"""
-UK_HOLIDAYS_FILE_MAX_AGE = env("UK_HOLIDAYS_FILE_MAX_AGE", default=30)
-PROCESSED_DATA_FILE_NAME = env(
-    "PROCESSED_DATA_FILE_NAME", default=".processed_data.json"
-)
 
-PROCESSED_DATA_FILE_PATH = Path.joinpath(BASE_DIR, PROCESSED_DATA_FILE_NAME)
-
-# mock test data which generates fake scanner_data with few possible combinations
-if DEPLOYMENT_ENVIRONMENT != "prod":
-    TEST_SCENES_FILE_NAME = env(
-        "TEST_SCENES_FILE_NAME", default=".test_scenes_data.json"
-    )
-    TEST_SCENE_FILE_PATH = Path.joinpath(BASE_DIR, TEST_SCENES_FILE_NAME)
+PROCESSED_DATA_FIELD = "processed_data"
 
 # Email config
 ENABLE_GOV_NOTIFY = env.bool("ENABLE_GOV_NOTIFY", default=True)
@@ -116,14 +101,6 @@ GECKO_BOARD_TOP_N_REPOSITORIES = env.int("GECKO_BOARD_TOP_N_REPOSITORIES", defau
 
 # SSO Config
 ENABLE_SSO = env.bool("ENABLE_SSO", default=True)
-
-ENABLE_REPORT_ENDPOINT = env.bool("ENABLE_REPORT_ENDPOINT", default=False)
-
-# Enable Report WEB End Point
-if ENABLE_REPORT_ENDPOINT:
-    ALLOWED_REPORT_ENDPOINT_HOSTS = env.list(
-        "ALLOWED_REPORT_ENDPOINT_HOSTS", default="localhost"
-    )
 
 SEVERITY_ESCALATION_METRIC = {
     key: int(value)
@@ -191,8 +168,8 @@ INSTALLED_APPS = [
     "authbroker_client",
     "user",
     "common",
-    "scanner",
     "report",
+    "scanner",
 ]
 
 MIDDLEWARE = [
@@ -226,17 +203,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-# Initialise Sentry
-sentry_sdk.init(
-    dsn=env("SENTRY_DSN", default=None),
-    integrations=[
-        DjangoIntegration(
-            transaction_style="url",
-        ),
-    ],
-    release=env("GIT_COMMIT", default=None),
-    environment=env("SENTRY_ENVIRONMENT", default=DEPLOYMENT_ENVIRONMENT),
-)
+if DEPLOYMENT_ENVIRONMENT != "local":
+    # Initialise Sentry
+    sentry_sdk.init(
+        dsn=env("SENTRY_DSN", default=None),
+        integrations=[
+            DjangoIntegration(
+                transaction_style="url",
+            ),
+        ],
+        release=env("GIT_COMMIT", default=None),
+        environment=env("SENTRY_ENVIRONMENT", default=DEPLOYMENT_ENVIRONMENT),
+    )
 
 
 # Database

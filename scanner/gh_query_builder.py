@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import logging
+
 from common.functions import isinstance_of
 
 logger = logging.getLogger(__name__)

@@ -8,6 +8,9 @@ class EnterpriseUser(models.Model):
     email = models.EmailField()
     name = models.CharField(blank=True, max_length=100)
 
+    class Meta:
+        app_label = "report"
+
 
 class Team(models.Model):
     name = models.CharField(primary_key=True, max_length=100)
@@ -15,6 +18,9 @@ class Team(models.Model):
         default=True,
         help_text="Set True (checked / on) to enable reporting for this team.",
     )
+
+    class Meta:
+        app_label = "report"
 
 
 class TeamNotificationTarget(models.Model):
@@ -41,6 +47,7 @@ class TeamNotificationTarget(models.Model):
 
     class Meta:
         unique_together = ("team", "email")
+        app_label = "report"
 
     def __str__(self):
         return f"{self.team}:{self.email}"
@@ -73,6 +80,7 @@ class SAMLNotificationTarget(models.Model):
 
     class Meta:
         unique_together = ("team", "email")
+        app_label = "report"
 
     def __str__(self):
         return f"{self.team}:{self.email}"
@@ -86,3 +94,6 @@ class OrganizationNotificationTarget(models.Model):
         default=True,
         help_text="Set it to False (unchecked/off) to disable email notifications",
     )
+
+    class Meta:
+        app_label = "report"

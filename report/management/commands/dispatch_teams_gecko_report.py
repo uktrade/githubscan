@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
-from django.core.management.base import BaseCommand
-from report.report import dispatch_teams_gecko_report
-from common.functions import command_runner
 from pathlib import Path
+from typing import Any
+
+from django.core.management.base import BaseCommand
+
+from report.operators import dispatch_teams_gecko_report
 
 
 class Command(BaseCommand):
@@ -10,6 +12,5 @@ class Command(BaseCommand):
 
     command_name = Path(__file__).stem
 
-    @command_runner(command_name)
-    def handle():
+    def handle(self, *args: Any, **options: Any):
         dispatch_teams_gecko_report()

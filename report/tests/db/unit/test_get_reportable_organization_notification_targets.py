@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
+from report.db import get_reportable_organization_notification_targets
 from report.models import OrganizationNotificationTarget
-from report.db import get_repotable_organization_notification_targets
 
 
 def test_get_reportable_organization_notification_targets_with_default_enabled(db):
     OrganizationNotificationTarget(email="test1@dummy.com").save()
     OrganizationNotificationTarget(email="test2@dummy.com").save()
 
-    organization_targets = get_repotable_organization_notification_targets()
+    organization_targets = get_reportable_organization_notification_targets()
 
     sorted_targets = sorted(list(organization_targets.values_list("email", flat=True)))
 
@@ -22,7 +22,7 @@ def test_get_reportable_organization_notification_targets_with_disabled_reportin
         email="test2@dummy.com", reporting_enabled=False
     ).save()
 
-    organization_targets = get_repotable_organization_notification_targets()
+    organization_targets = get_reportable_organization_notification_targets()
 
     sorted_targets = sorted(list(organization_targets.values_list("email", flat=True)))
 

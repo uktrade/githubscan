@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from celery import shared_task
 
-from report.report import (
+from report.operators import (
     dispatch_organization_email,
     dispatch_organization_gecko_report,
     dispatch_slack,
@@ -11,7 +11,7 @@ from report.report import (
     refresh_database,
     refresh_processed_data,
 )
-from scanner.scanner import refresh_scan
+from scanner.operators import refresh_scan
 
 
 @shared_task

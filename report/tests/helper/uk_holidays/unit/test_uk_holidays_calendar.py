@@ -22,6 +22,5 @@ def test_exception_in_calendar(uk_holidays):
         assert len(uk_holidays.calendar) >= 1
         assert True
         uk_holidays.clear()
-        uk_holidays.uk_holidays_file.unlink()
     except:
         assert False
