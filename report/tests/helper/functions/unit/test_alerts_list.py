@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from report.helper.functions import sort_alerts_list
 from config.severities import EFFECTIVE_SEVERITY
+from report.helper.functions import sort_alerts_list
 
 
 def test_sort_alerts_list(data_index, processed_data):
-
     alerts_list = []
     for value in processed_data["repositories"].values():
         for alert in value["alerts"]:

@@ -5,7 +5,6 @@ import re
 def test_orphan_repositories_list(
     build_slack_report, report_reader, data_index, processed_data
 ):
-
     report_reader.load_data_from_dict = processed_data
 
     build_slack_report.orphan_repositories_list(report_reader=report_reader)

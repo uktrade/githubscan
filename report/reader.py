@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from common.functions import load_json_file, isinstance_of
-
 from django.conf import settings
+
+from common.functions import isinstance_of, read_from_json_store
 
 
 class ReportReader:
@@ -35,9 +35,9 @@ class ReportReader:
         self._processed_data_store = dict(data)
 
     @processed_data.setter
-    def load_data_from_file(self, data_file=settings.PROCESSED_DATA_FILE_PATH):
-        """Error handling for this is done in load_json_file"""
-        data = load_json_file(src_file=data_file)
+    def load_processed_data(self, data_field=settings.PROCESSED_DATA_FIELD):
+        """Error handling for this is done in read_from_json_store"""
+        data = read_from_json_store(field=data_field)
         self._processed_data_store = dict(data)
 
     @property
@@ -98,7 +98,6 @@ class ReportReader:
 
     @property
     def reportable_organization_repositories_list(self):
-
         org_report_repositories_name = set(self.vulnerable_repositories).difference(
             set(self.skip_scan_repositories["list"])
         )
@@ -118,7 +117,6 @@ class ReportReader:
         return self.processed_data["users_without_sso_email"]
 
     def team_repositories_list(self, team):
-
         team_repositories_name = set(self.teams[team]["repositories"]).difference(
             set(self.skip_scan_repositories["list"])
         )
@@ -130,7 +128,6 @@ class ReportReader:
         ]
 
     def reportable_team_repositories_list(self, team):
-
         team_repositories_name = (
             set(self.teams[team]["repositories"])
             .intersection(self.vulnerable_repositories)

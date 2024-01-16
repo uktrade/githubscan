@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 import json
 import logging
-import os
 import re
-import time
-import traceback
 
 import requests
+
+from common.models import JsonStore
 
 logger = logging.getLogger(__name__)
 
@@ -15,66 +14,72 @@ email_regex = re.compile(
 )
 
 
-def delete_file_if_exist(dest_file):
+def write_to_json_store(data, field):
     """
-    function to delete file if it exists
-    """
-    if os.path.exists(dest_file):
-        try:
-            os.remove(dest_file)
-            logger.info("removed: %s", dest_file)
-        except:
-            logger.error("failed to remove: %s", dest_file)
-
-    logger.error("%s file does not exist", dest_file)
-
-
-def write_json_file(data, dest_file):
-    """
-    Function to create/over-write Json file
+    Function to Write data to given text field in JsonStore
 
     Parameters:
     -----------
     data = Dict
-    dest_file = PosixPath
+    field = name of the field
     """
 
     isinstance_of(variable=data, expected_type=dict, variable_name="data")
 
-    try:
-        with open(dest_file, "w") as file:
-            file.truncate(0)
-            content = json.dumps(
-                data, default=lambda o: o.__dict__, sort_keys=True, indent=2
-            )
-            file.write(content)
-            logger.info(f"created {dest_file}")
-    except:
-        logger.error(f"failed to create {dest_file}")
-        raise
+    table_fields = [table_field.name for table_field in JsonStore()._meta.get_fields()]
 
-
-def load_json_file(src_file):
-    """
-    Function to load json file and return python dict
-
-    Parameter:
-    ----------
-    src_file: PosixPath
-
-    Returns:
-    --------
-    python dict object
-    """
+    if field not in table_fields:
+        message = f"{field} does not exist in JsonStore"
+        logger.error(message)
+        raise KeyError(message)
 
     try:
-        with open(src_file) as file:
-            data = json.load(file)
-            logger.info(f"loaded data from {src_file}")
-            return data
-    except Exception as e:
-        logger.error(f"{e}")
+        data_store = JsonStore.objects.get(id=1)
+    except JsonStore.DoesNotExist:
+        JsonStore(id=1).save()
+
+    data_store = JsonStore.objects.get(id=1)
+
+    setattr(
+        data_store,
+        field,
+        json.dumps(data, default=lambda o: o.__dict__, sort_keys=True),
+    )
+
+    data_store.save()
+    logger.info(f"added data to field {field}")
+
+
+def read_from_json_store(field):
+    """
+    Function to read data to given text field in JsonStore
+
+    Parameters:
+    -----------
+    data = Dict
+    field = name of the field
+    """
+
+    table_fields = [table_field.name for table_field in JsonStore()._meta.get_fields()]
+
+    if field not in table_fields:
+        message = f"{field} does not exist in JsonStore"
+        logger.error(message)
+        raise KeyError(message)
+
+    try:
+        data_store = JsonStore.objects.get(id=1)
+
+    except JsonStore.DoesNotExist:
+        message = "No data in the table JsonStore"
+        logger.error(message)
         raise
+
+    content = json.loads(getattr(data_store, field))
+
+    logger.info(f"fetched data from field {field}")
+
+    return content
 
 
 def download_data(url, verify_ssl=True):
@@ -133,66 +138,6 @@ def singleton(cls):
         return instances[cls]
 
     return getinstance
-
-
-def command_runner(command_name):
-    """
-    A decorator function which can be used with Django command handle function
-    It will time it and print useful logging informationa s of now
-    However, it can be expanded to  add status page and more
-
-    command_name: this parameter makes it easy to identify which command is being executed
-    """
-
-    def inner_command(handle):
-        def wrapper(self, *args, **option):
-            try:
-                start_time = time.time()
-
-                handle()
-                end_time = time.time()
-
-                logger.info(f"Time: {end_time - start_time}s Success: {command_name}")
-            except Exception as e:
-                end_time = time.time()
-                logger.info(
-                    f"Time: {end_time - start_time}s {command_name.capitalize()} Error: {e}"
-                )
-                print(
-                    f"Execustion Time: {end_time - start_time}s {command_name.capitalize()} Error:{format(e)}"
-                )
-                logger.info(f"Error Trace: {traceback.print_exc()}")
-
-        return wrapper
-
-    return inner_command
-
-
-def job_runner(command_name, function):
-    """
-    A  function which can be used with any function to time it and print useful logging informationa
-    However, it can be expanded to  add status page and more
-
-    command_name: this parameter makes it easy to identify which command is being executed
-    function: is the actual function to execute
-    """
-
-    try:
-        start_time = time.time()
-
-        function()
-        end_time = time.time()
-
-        logger.info(f"Time: {end_time - start_time}s Success: {command_name}")
-    except Exception as e:
-        end_time = time.time()
-        logger.info(
-            f"Time: {end_time - start_time}s {command_name.capitalize()} Error: {e}"
-        )
-        print(
-            f"Execustion Time: {end_time - start_time}s {command_name.capitalize()} Error:{format(e)}"
-        )
-        logger.info(f"Error Trace: {traceback.print_exc()}")
 
 
 def isinstance_of(variable, expected_type, variable_name):

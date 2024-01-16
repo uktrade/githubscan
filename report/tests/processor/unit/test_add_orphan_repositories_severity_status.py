@@ -24,7 +24,6 @@ def test_add_orphan_repositories_severity_status(processor, scene_index, scene_d
 
 
 def check_orphan_repositories_severity_status(scene_index, severity_status):
-
     if scene_index == 1 or scene_index == 2 or scene_index == 3 or scene_index == 4:
         assert severity_status == SEVERITY_STATUS.RED.name
 

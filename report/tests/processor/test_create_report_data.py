@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-from report.report import create_processed_data
 import report.tests.processor.unit as report_checks
 from config.schema import processed_data_schema
+from report.operators import create_processed_data
 
 
 def test_create_report(db, scene_index, scene_data):
-
     processed_data = create_processed_data(scanner_data=scene_data)
 
     assert processed_data_schema.is_valid(processed_data)
@@ -18,7 +17,7 @@ def test_create_report(db, scene_index, scene_data):
 
     teams = processed_data["teams"]
 
-    orhpan_repositories = processed_data["orphan_repositories"]
+    orphan_repositories = processed_data["orphan_repositories"]
     skip_scan_repositories = processed_data["skip_scan_repositories"]
 
     """
@@ -55,22 +54,22 @@ def test_create_report(db, scene_index, scene_data):
     """
     report_checks.check_orphan_totals_vulnerable_repositoriest(
         scene_index=scene_index,
-        vulnerable_repositories_count=orhpan_repositories["total"]["repositories"],
+        vulnerable_repositories_count=orphan_repositories["total"]["repositories"],
     )
     report_checks.check_orphan_repositories_totals_severities(
         scene_index=scene_index,
-        severities=orhpan_repositories["total"]["severities"],
+        severities=orphan_repositories["total"]["severities"],
     )
     report_checks.check_orphan_repositories_totals_slo_breaches(
         scene_index=scene_index,
-        slo_breach=orhpan_repositories["total"]["slo_breach"],
+        slo_breach=orphan_repositories["total"]["slo_breach"],
     )
     report_checks.check_orphan_repositories_severity_status(
         scene_index=scene_index,
-        severity_status=orhpan_repositories["severity_status"],
+        severity_status=orphan_repositories["severity_status"],
     )
     report_checks.check_orphan_repositorie(
-        orphan_repositories_list=orhpan_repositories["list"]
+        orphan_repositories_list=orphan_repositories["list"]
     )
 
     """

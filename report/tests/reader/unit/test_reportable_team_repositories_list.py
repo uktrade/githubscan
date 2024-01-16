@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-def test_reportable_team_repositories_list(report_reader, data_index, processed_data):
-
+def test_reportable_team_repositories_list(
+    report_reader, data_index, processed_data, db
+):
     report_reader.load_data_from_dict = processed_data
 
     team1_repositories_list = report_reader.reportable_team_repositories_list(

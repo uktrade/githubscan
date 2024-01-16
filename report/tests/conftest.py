@@ -1,29 +1,21 @@
 # -*- coding: utf-8 -*-
-from report.tests.mock_test_data import generate_mock_scenarios, clear_mock_scenarios
-from common.functions import load_json_file, singleton
-
-from report.helper.uk_holidays import UKHolidays
-from report.helper.day_manager import DayManager
-
-from report.processor import ReportDataProcessor
-from report.reader import ReportReader
-from report.report import create_processed_data
-
-from report.builder.email_report import BuildEmailReport
-from report.builder.slack_report import BuildSlackReport
-from report.builder.csv_report import BuildCSVReport
-from report.builder.gecko_report import BuildGeckoReport
-
-from report.dispatchers import EmailClient, SlackClient
-
-from report.tests.mock_test_data import MockTestData
-
-
-from django.conf import settings
-from pathlib import Path
-import pytest
 from copy import deepcopy
 
+import pytest
+from django.conf import settings
+
+from common.functions import singleton
+from report.builder.csv_report import BuildCSVReport
+from report.builder.email_report import BuildEmailReport
+from report.builder.gecko_report import BuildGeckoReport
+from report.builder.slack_report import BuildSlackReport
+from report.dispatchers import EmailClient, SlackClient
+from report.helper.day_manager import DayManager
+from report.helper.uk_holidays import UKHolidays
+from report.operators import create_processed_data
+from report.processor import ReportDataProcessor
+from report.reader import ReportReader
+from report.tests.mock_test_data import MockTestData, generate_mock_scenarios
 
 settings.GITHUB_TEAMS_ARE_NOT_A_SSO_TARGET = ["team1"]
 
@@ -36,16 +28,7 @@ class MockScannerData:
 
     def __init__(self):
         self.data = {}
-        generate_mock_scenarios()
-        self.data.update(
-            {
-                int(k): v
-                for k, v in load_json_file(
-                    src_file=settings.TEST_SCENE_FILE_PATH
-                ).items()
-            }
-        )
-        clear_mock_scenarios()
+        self.data = generate_mock_scenarios()
 
     @property
     def get(self):
@@ -105,27 +88,12 @@ def set_processed_mock_data(parameters, metafunc):
 
 @pytest.fixture(scope="session")
 def uk_holidays():
-
-    uk_holidays_file = Path.joinpath(
-        Path(__file__).parent, settings.UK_HOLIDAYS_FILE_NAME
-    )
-    uk_holidays_file_max_age = 10
-
-    uk_holidays = UKHolidays(
-        data_file=uk_holidays_file,
-        max_data_file_age=uk_holidays_file_max_age,
-        verify_ssl=False,
-    )
-
+    uk_holidays = UKHolidays(verify_ssl=False)
     yield uk_holidays
-
-    if uk_holidays_file.exists():
-        uk_holidays_file.unlink()
 
 
 @pytest.fixture(scope="session")
 def day_manager(uk_holidays):
-
     uk_holidays.calendar_url = settings.UK_HOLIDAYS_SOURCE_URL
     day_manager = DayManager(uk_holidays=uk_holidays.calendar)
 

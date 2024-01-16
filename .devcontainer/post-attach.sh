@@ -13,3 +13,7 @@ printf "${BLUE}Github Scan Devcontainer:${COLOUR_END}\n"
 printf "${GREY}Python:${COLOUER_END} ${WHITE}$PYTHON_VERSION${COLOUR_END}\n"
 printf "${GREY}Postgres:${COLOUER_END} ${WHITE}$POSTGRES_VERSION${COLOUR_END}\n"
 printf "${GREY}Pre-commit:${COLOUER_END} ${WHITE}$PRECOMMIT_VERSION${COLOUR_END}\n"
+
+printf "${GREY}Starting Celery:${COLOUER_END}"
+
+celery -A config worker -l debug

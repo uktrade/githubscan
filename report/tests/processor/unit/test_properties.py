@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from unit import (
+    check_add_enterprise_users,
+    check_orphan_repositorie,
     check_repositores,
-    check_vulnerable_repositories,
     check_skip_scan_repositories,
     check_token_has_no_access,
-    check_orphan_repositorie,
-    check_add_enterprise_users,
+    check_vulnerable_repositories,
 )
 
 

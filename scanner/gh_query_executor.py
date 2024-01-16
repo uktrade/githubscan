@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-from curses.ascii import NUL
-from functools import cache
-from scanner import GHAPIClient, GHQueryBuilder
-import re
-from pathlib import Path
 import logging
+import re
 from copy import deepcopy
-from common.functions import isinstance_of, is_valid_email
+from pathlib import Path
+
+from common.functions import is_valid_email, isinstance_of
+from scanner.gh_api_client import GHAPIClient
+from scanner.gh_query_builder import GHQueryBuilder
 
 logger = logging.getLogger(__name__)
 
@@ -113,7 +113,6 @@ class GHQueryExecutor:
 
     @enterprise_users.setter
     def enterprise_users(self, payload):
-
         while True:
             self.query_builder.make_gql_query_from_dict = payload
             self.query_builder.is_a_valid_input_query(
@@ -130,7 +129,6 @@ class GHQueryExecutor:
                 email = ""
 
                 if "user" in info and info["user"] is not None:
-
                     if "login" in info["user"] and info["user"]["login"] is not None:
                         user_login = info["user"]["login"]
 
@@ -146,7 +144,6 @@ class GHQueryExecutor:
 
                 # if email is valid proceed
                 if is_valid_email(email=email):
-
                     if user_login:
                         self._enterprise_users.update(
                             {user_login: {"email": email, "name": user_name}}
@@ -242,7 +239,6 @@ class GHQueryExecutor:
         """
 
         for team in self.teams:
-
             self._team_members.update({team: []})
             payload["variables"].update({"team": team.lower()})
 
@@ -354,7 +350,6 @@ class GHQueryExecutor:
                         patched_version = "unknown"
 
                         if alert["severity"]["patched_version"]:
-
                             patched_version = alert["severity"]["patched_version"][
                                 "identifier"
                             ]

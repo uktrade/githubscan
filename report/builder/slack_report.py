@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from report.helper.functions import sort_list_by_total
-from config.severities import EFFECTIVE_SEVERITY, SEVERITY
 from django.conf import settings
+
 from common.functions import isinstance_of
+from config.severities import EFFECTIVE_SEVERITY, SEVERITY
+from report.helper.functions import sort_list_by_total
 
 
 class BuildSlackReport:
@@ -66,7 +67,6 @@ class BuildSlackReport:
 
     @property
     def slack_message(self):
-
         return self._slack_message
 
     @slack_message.setter
@@ -159,7 +159,7 @@ class BuildSlackReport:
 
         self.slack_message = {"header": HEADER_TEXT, "section": SECTION_TEXT_LIST}
 
-    def orhpan_repositories(self, report_reader):
+    def orphan_repositories(self, report_reader):
         """
         Get skip scan repository report
         """
@@ -204,7 +204,6 @@ class BuildSlackReport:
         self.slack_message = {"header": HEADER_TEXT, "section": SECTION_TEXT_LIST}
 
     def teams(self, report_reader):
-
         reportable_teams = []
         for team in report_reader.processed_data["teams"].values():
             """
@@ -247,7 +246,6 @@ class BuildSlackReport:
         self.slack_message = {"header": HEADER_TEXT, "section": SECTION_TEXT_LIST}
 
     def orphan_repositories_list(self, report_reader):
-
         orphan_repositories_list = report_reader.orphan_repositories["list"]
 
         HEADER_TEXT = "Github Organization Orphan Repositories list"

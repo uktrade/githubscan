@@ -4,7 +4,7 @@ import logging
 
 from django.conf import settings
 
-from common.functions import delete_file_if_exist, load_json_file, write_json_file
+from common.functions import read_from_json_store, write_to_json_store
 from config.schema import processed_data_schema
 from config.severities import SEVERITY_STATUS
 from report.builder.csv_report import BuildCSVReport
@@ -18,8 +18,8 @@ from report.builder.gecko_report import BuildGeckoReport
 # Slack Dispatch
 from report.builder.slack_report import BuildSlackReport
 from report.db import (
+    get_reportable_organization_notification_targets,
     get_reportable_teams_from_db,
-    get_repotable_organization_notification_targets,
     get_team_notification_targets,
     remove_duplicate_team_notification_targets,
     update_enterprise_users_in_db,
@@ -45,55 +45,49 @@ def create_processed_data(scanner_data):
     scanner_data: input data file , meaning we need to run refresh scan before we run report generation
     processed_data: this is output file, where we will dump the content of report
     """
-    try:
-        processor = ReportDataProcessor()
-        processor.load_data_from_dict = scanner_data
 
-        processor.add_enterprise_users()
-        processor.add_sso_notification_targets()
-
-        processor.add_repositories()
-        processor.add_repository_teams()
-        processor.add_vulnerable_repositories()
-        processor.add_severity_age_in_days()
-        processor.add_effective_level_and_escalation_status()
-        processor.add_fix_by_date()
-        processor.add_hash()
-        processor.add_repository_severity_status()
-        processor.add_repository_totals()
-
-        processor.add_skip_scan_repositories()
-        processor.add_skip_scan_repositories_severity_status()
-        processor.add_skip_scan_repositories_totals()
-
-        processor.add_teams_and_team_repositories()
-        processor.enforce_exclusive_team_repositories()
-        processor.add_team_severity_status()
-        processor.add_team_totals()
-
-        processor.add_token_has_no_access()
-
-        processor.add_organization_severity_status()
-        processor.add_organization_totals()
-
-        processor.add_orphan_repositories()
-        processor.add_orphan_repositories_severity_status()
-        processor.add_orphan_repositories_totals()
-
-        processed_data_schema.validate(processor.processed_data)
-
-        return processor.processed_data
-
-    except:
-        raise
+    processor = ReportDataProcessor()
+    processor.load_data_from_dict = scanner_data
+    processor.add_enterprise_users()
+    processor.add_sso_notification_targets()
+    processor.add_repositories()
+    processor.add_repository_teams()
+    processor.add_vulnerable_repositories()
+    processor.add_severity_age_in_days()
+    processor.add_effective_level_and_escalation_status()
+    processor.add_fix_by_date()
+    processor.add_hash()
+    processor.add_repository_severity_status()
+    processor.add_repository_totals()
+    processor.add_skip_scan_repositories()
+    processor.add_skip_scan_repositories_severity_status()
+    processor.add_skip_scan_repositories_totals()
+    processor.add_teams_and_team_repositories()
+    processor.enforce_exclusive_team_repositories()
+    processor.add_team_severity_status()
+    processor.add_team_totals()
+    processor.add_token_has_no_access()
+    processor.add_organization_severity_status()
+    processor.add_organization_totals()
+    processor.add_orphan_repositories()
+    processor.add_orphan_repositories_severity_status()
+    processor.add_orphan_repositories_totals()
+    processed_data_schema.validate(processor.processed_data)
+    data = processor.processed_data
+    processor.clear()
+    return data
 
 
-def write_processed_data(processed_data, processed_data_file):
-    try:
-        delete_file_if_exist(dest_file=processed_data_file)
-        write_json_file(data=processed_data, dest_file=processed_data_file)
-    except:
-        raise
+def write_processed_data(
+    processed_data, processed_data_field=settings.PROCESSED_DATA_FIELD
+):
+    """write processed data to json field"""
+    write_to_json_store(data=processed_data, field=processed_data_field)
+
+
+def clear_processed_data(processed_data_field=settings.PROCESSED_DATA_FIELD):
+    """clear the data base field"""
+    write_to_json_store(data={}, field=processed_data_field)
 
 
 def refresh_database():
@@ -106,7 +100,7 @@ def refresh_database():
     """
 
     global report_reader
-    report_reader.load_data_from_file = settings.PROCESSED_DATA_FILE_PATH
+    report_reader.load_processed_data = settings.PROCESSED_DATA_FIELD
 
     github_teams = list(report_reader.teams.keys())
 
@@ -130,12 +124,13 @@ def refresh_processed_data():
 
     Note: Not tested , needs integration testing
     """
-    scanner_data = load_json_file(src_file=settings.SCANNER_DATA_FILE_PATH)
+    scanner_data = read_from_json_store(field=settings.SCANNER_DATA_FIELD_NAME)
     processed_data = create_processed_data(scanner_data=scanner_data)
 
+    clear_processed_data()
     write_processed_data(
         processed_data=processed_data,
-        processed_data_file=settings.PROCESSED_DATA_FILE_PATH,
+        processed_data_field=settings.PROCESSED_DATA_FIELD,
     )
     processed_data.clear()
 
@@ -146,13 +141,13 @@ def dispatch_slack():
     """
     global report_reader
 
-    report_reader.load_data_from_file = settings.PROCESSED_DATA_FILE_PATH
+    report_reader.load_processed_data = settings.PROCESSED_DATA_FIELD
     if settings.ENABLE_SLACK_NOTIFY:
         slack_report = BuildSlackReport()
         slack_report.organization(report_reader=report_reader)
         slack_report.organization_slo_breach(report_reader=report_reader)
         slack_report.teams(report_reader=report_reader)
-        slack_report.orhpan_repositories(report_reader=report_reader)
+        slack_report.orphan_repositories(report_reader=report_reader)
         slack_report.orphan_repositories_list(report_reader=report_reader)
         slack_report.unmonitored_repositories(report_reader=report_reader)
         slack_report.unmonitored_repositories_list(report_reader=report_reader)
@@ -181,7 +176,7 @@ def dispatch_organization_email():
     """
     This function dispatches summary email
     """
-    report_reader.load_data_from_file = settings.PROCESSED_DATA_FILE_PATH
+    report_reader.load_processed_data = settings.PROCESSED_DATA_FIELD
 
     build_email_report = BuildEmailReport()
     build_csv_report = BuildCSVReport()
@@ -191,7 +186,7 @@ def dispatch_organization_email():
     report_file = build_csv_report.organization_report(report_reader=report_reader)
 
     email_client = EmailClient()
-    for receiver in get_repotable_organization_notification_targets():
+    for receiver in get_reportable_organization_notification_targets():
         email_client.send_email_with_attachment(
             receiver_email=receiver.email,
             uplod_file_path=report_file,
@@ -211,7 +206,7 @@ def dispatch_team_email():
     """
     global report_reader
 
-    report_reader.load_data_from_file = settings.PROCESSED_DATA_FILE_PATH
+    report_reader.load_processed_data = settings.PROCESSED_DATA_FIELD
 
     build_email_report = BuildEmailReport()
     build_csv_report = BuildCSVReport()
@@ -258,7 +253,7 @@ def dispatch_team_detailed_email():
     """
     global report_reader
 
-    report_reader.load_data_from_file = settings.PROCESSED_DATA_FILE_PATH
+    report_reader.load_processed_data = settings.PROCESSED_DATA_FIELD
 
     build_email_report = BuildEmailReport()
 
@@ -297,7 +292,7 @@ def dispatch_organization_gecko_report():
     """
     global report_reader
 
-    report_reader.load_data_from_file = settings.PROCESSED_DATA_FILE_PATH
+    report_reader.load_processed_data = settings.PROCESSED_DATA_FIELD
 
     build_gecko_report = BuildGeckoReport()
 
@@ -319,7 +314,7 @@ def dispatch_teams_gecko_report():
     """
     global report_reader
 
-    report_reader.load_data_from_file = settings.PROCESSED_DATA_FILE_PATH
+    report_reader.load_processed_data = settings.PROCESSED_DATA_FIELD
 
     build_gecko_report = BuildGeckoReport()
 

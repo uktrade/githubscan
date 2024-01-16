@@ -3,3 +3,5 @@ isort
 black
 pytest-django
 pytest-cov
+pylint
+pylint-django

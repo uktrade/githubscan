@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-def test_data_is_not_a_dic(processor):
+def test_data_is_not_a_dic(processor, db):
     try:
         processor.load_data_from_dict = "string data"
         assert False
@@ -9,7 +9,7 @@ def test_data_is_not_a_dic(processor):
         assert True
 
 
-def test_data_is_a_dict(processor):
+def test_data_is_a_dict(processor, db):
     data_dict = {"key": "value"}
     processor.load_data_from_dict = data_dict
 

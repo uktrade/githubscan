@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from schema import And, Optional, Or, Schema, Use
-from config.severities import SEVERITY_STATUS, EFFECTIVE_SEVERITY, SEVERITY
 
+from config.severities import EFFECTIVE_SEVERITY, SEVERITY, SEVERITY_STATUS
 
 alert_test_data_schema = Schema(
     {
