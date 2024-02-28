@@ -2,6 +2,8 @@
 import json
 import logging
 import re
+import traceback
+from datetime import datetime
 
 import requests
 
@@ -34,20 +36,26 @@ def write_to_json_store(data, field):
         raise KeyError(message)
 
     try:
-        data_store = JsonStore.objects.get(id=1)
-    except JsonStore.DoesNotExist:
-        JsonStore(id=1).save()
+        if field == "scanned_data":
+            # Delete data
+            JsonStore.objects.all().delete()
+            store = JsonStore(
+                id=1, scanned_data=json.dumps(data), scanned_data_time=datetime.now()
+            )
+            store.save()
 
-    data_store = JsonStore.objects.get(id=1)
+        if field == "processed_data":
+            store = JsonStore.objects.get(id=1)
+            store.processed_data = json.dumps(data)
+            store.processed_data_time = datetime.now()
+            store.save()
 
-    setattr(
-        data_store,
-        field,
-        json.dumps(data, default=lambda o: o.__dict__, sort_keys=True),
-    )
+    except Exception:
+        logger.error(
+            "Failed: Can not write %s data, Error: %s", field, traceback.format_exc()
+        )
 
-    data_store.save()
-    logger.info(f"added data to field {field}")
+    logger.info("added data to field %s", field)
 
 
 def read_from_json_store(field):
@@ -75,11 +83,19 @@ def read_from_json_store(field):
         logger.error(message)
         raise
 
-    content = json.loads(getattr(data_store, field))
+    try:
+        if field == "scanned_data":
+            content = data_store.scanned_data
+        if field == "processed_data":
+            content = data_store.processed_data
+    except Exception:
+        logger.error(
+            "Failed: Can not write %s data, Error: %s", field, traceback.format_exc()
+        )
 
     logger.info(f"fetched data from field {field}")
 
-    return content
+    return json.loads(content)
 
 
 def download_data(url, verify_ssl=True):

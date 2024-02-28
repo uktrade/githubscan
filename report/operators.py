@@ -73,9 +73,7 @@ def create_processed_data(scanner_data):
     processor.add_orphan_repositories_severity_status()
     processor.add_orphan_repositories_totals()
     processed_data_schema.validate(processor.processed_data)
-    data = processor.processed_data
-    processor.clear()
-    return data
+    return processor.processed_data
 
 
 def write_processed_data(
@@ -83,11 +81,6 @@ def write_processed_data(
 ):
     """write processed data to json field"""
     write_to_json_store(data=processed_data, field=processed_data_field)
-
-
-def clear_processed_data(processed_data_field=settings.PROCESSED_DATA_FIELD):
-    """clear the data base field"""
-    write_to_json_store(data={}, field=processed_data_field)
 
 
 def refresh_database():
@@ -127,7 +120,6 @@ def refresh_processed_data():
     scanner_data = read_from_json_store(field=settings.SCANNER_DATA_FIELD_NAME)
     processed_data = create_processed_data(scanner_data=scanner_data)
 
-    clear_processed_data()
     write_processed_data(
         processed_data=processed_data,
         processed_data_field=settings.PROCESSED_DATA_FIELD,

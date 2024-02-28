@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 
 
 class UKHolidays:
-
     """
     As name suggest it gets uk holidays data
     It also downloads those data to a file and, uses it until max threshold is passed
@@ -35,7 +34,7 @@ class UKHolidays:
         self._holidays = []
         self._verify_ssl = verify_ssl
 
-        logger.debug(f"Initialized {self.__class__.__name__}")
+        logger.debug("Initialized %s", self.__class__.__name__)
 
     def clear(self):
         self._holidays = []
@@ -46,7 +45,7 @@ class UKHolidays:
     @property
     def calendar(self):
         if not self._holidays:
-            logger.debug(f"there are no data in holidays, have you set the setter?")
+            logger.debug("there are no data in holidays, have you set the setter?")
         return self._holidays
 
     @calendar.setter

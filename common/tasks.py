@@ -1,43 +1,25 @@
 # -*- coding: utf-8 -*-
+import logging
+
 from celery import shared_task
 
-from report.operators import (
-    dispatch_organization_email,
-    dispatch_organization_gecko_report,
-    dispatch_slack,
-    dispatch_team_detailed_email,
-    dispatch_team_email,
-    dispatch_teams_gecko_report,
-    refresh_database,
-    refresh_processed_data,
-)
+from report.operators import refresh_database, refresh_processed_data
 from scanner.operators import refresh_scan
 
+logger = logging.getLogger(__name__)
+
 
 @shared_task
-def generate_scan_data():
-    """refresh vulnerability data"""
+def refresh_scan_data():
+    """refresh scanner data"""
+    logger.info("Starting to run scanner")
     refresh_scan()
+    return "Done: Refreshing Scanned Data"
+
+
+@shared_task
+def refresh_report_data():
+    """refresh report data"""
     refresh_processed_data()
     refresh_database()
-
-
-@shared_task
-def dispatch_email_reports():
-    """dispatch emails"""
-    dispatch_organization_email()
-    dispatch_team_email()
-    dispatch_team_detailed_email()
-
-
-@shared_task
-def dispatch_gecko_reports():
-    """dispatch gecko board report"""
-    dispatch_organization_gecko_report()
-    dispatch_teams_gecko_report()
-
-
-@shared_task
-def dispatch_slack_report():
-    """dispatch slack report"""
-    dispatch_slack()
+    return "Done: Refreshing Processed Data"
