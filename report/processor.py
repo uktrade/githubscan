@@ -587,19 +587,19 @@ class ReportDataProcessor:
                 ] += 1
 
             if severity_status_counter[SEVERITY_STATUS.RED.name] > 0:
-                self.skip_scan_repositories[
-                    "severity_status"
-                ] = SEVERITY_STATUS.RED.name
+                self.skip_scan_repositories["severity_status"] = (
+                    SEVERITY_STATUS.RED.name
+                )
 
             elif severity_status_counter[SEVERITY_STATUS.AMBER.name] > 0:
-                self.skip_scan_repositories[
-                    "severity_status"
-                ] = SEVERITY_STATUS.AMBER.name
+                self.skip_scan_repositories["severity_status"] = (
+                    SEVERITY_STATUS.AMBER.name
+                )
 
             elif severity_status_counter[SEVERITY_STATUS.GREEN.name] > 0:
-                self.skip_scan_repositories[
-                    "severity_status"
-                ] = SEVERITY_STATUS.GREEN.name
+                self.skip_scan_repositories["severity_status"] = (
+                    SEVERITY_STATUS.GREEN.name
+                )
 
     def add_skip_scan_repositories_totals(self):
         """
@@ -816,14 +816,14 @@ class ReportDataProcessor:
                 self._processed_data_store["severity_status"] = SEVERITY_STATUS.RED.name
 
             elif SEVERITY_STATUS.AMBER.name in severity_status_list:
-                self._processed_data_store[
-                    "severity_status"
-                ] = SEVERITY_STATUS.AMBER.name
+                self._processed_data_store["severity_status"] = (
+                    SEVERITY_STATUS.AMBER.name
+                )
 
             elif SEVERITY_STATUS.GREEN.name in severity_status_list:
-                self._processed_data_store[
-                    "severity_status"
-                ] = SEVERITY_STATUS.GREEN.name
+                self._processed_data_store["severity_status"] = (
+                    SEVERITY_STATUS.GREEN.name
+                )
 
     def add_organization_totals(self):
         """

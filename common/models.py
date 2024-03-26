@@ -12,7 +12,9 @@ class JsonStore(models.Model):
     """
 
     scanned_data = models.TextField(blank=True)
+    scanned_data_time = models.DateTimeField(blank=True, null=True)
     processed_data = models.TextField(blank=True)
+    processed_data_time = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         app_label = "common"

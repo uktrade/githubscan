@@ -84,8 +84,10 @@ AUTHBROKER_CLIENT_SECRET=<OAuth Client Secret>
 Update vulnerabilities information
 
 ```bash
-$python manage.py refresh_vulnerability_data
+$python manage.py refresh_report_data
 ```
+
+**Note:** collect_scan_data uses celery worker and will exit instantly
 
 Push updates to Gecko board
 

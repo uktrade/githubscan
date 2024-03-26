@@ -5,3 +5,4 @@ pytest-django
 pytest-cov
 pylint
 pylint-django
+celery

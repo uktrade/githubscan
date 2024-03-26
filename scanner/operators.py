@@ -118,18 +118,6 @@ def read_scanner_data(dest_field=settings.SCANNER_DATA_FIELD_NAME):
     return scanner_data
 
 
-def clear_scanner_data(dest_field=settings.SCANNER_DATA_FIELD_NAME):
-    """
-    clear scanner data
-
-    Parameters:
-    -----------
-    dest_file: Posix ( or str) Path to the scanner data file , defaults to settings.SCANNER_DATA_FIELD_NAME variable defined in environment
-
-    """
-    write_to_json_store(data={}, field=dest_field)
-
-
 def refresh_scan():
     """
     Sends queries to github end point to collect data and
@@ -137,6 +125,5 @@ def refresh_scan():
 
     Note: Not tested , needs integration testing ?
     """
-    clear_scanner_data()
     scanner_data = create_scanner_data()
     write_scanner_data(scanner_data=scanner_data)
