@@ -73,7 +73,7 @@ frozenlist==1.4.0
     #   aiosignal
 geckoboard-py==1.1.0
     # via -r requirements.in
-gunicorn==21.2.0
+gunicorn==22.0.0
     # via -r requirements.in
 idna==3.6
     # via
