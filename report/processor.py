@@ -272,7 +272,10 @@ class ReportDataProcessor:
                 team_repo_set = set(team_info["repositories"])
                 team_relavent_set = team_repo_set.difference(exclusive_repositories)
                 if team_relavent_set:
-                    self.teams[team]["repositories"] = list(team_relavent_set)
+                    team_info["repositories"] = list(team_relavent_set)
+
+                if not team_relavent_set:
+                    team_info["repositories"] = []
 
             """
             Code below removes other teams from exclusive_repositories
