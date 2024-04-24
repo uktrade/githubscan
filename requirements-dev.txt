@@ -40,7 +40,7 @@ click-repl==0.3.0
     # via celery
 contextlib2==21.6.0
     # via schema
-coverage[toml]==7.4.4
+coverage[toml]==7.5.0
     # via pytest-cov
 dill==0.3.8
     # via pylint
@@ -97,7 +97,7 @@ packaging==24.0
     #   pytest
 pathspec==0.12.1
     # via black
-platformdirs==4.2.0
+platformdirs==4.2.1
     # via
     #   black
     #   pylint
@@ -130,7 +130,7 @@ python-dateutil==2.9.0.post0
     # via celery
 ratelimit==2.2.1
     # via -r requirements.in
-redis==5.0.3
+redis==5.0.4
     # via celery
 requests==2.31.0
     # via
