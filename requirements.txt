@@ -82,7 +82,7 @@ python-dateutil==2.9.0.post0
     # via celery
 ratelimit==2.2.1
     # via -r requirements.in
-redis==5.0.3
+redis==5.0.4
     # via celery
 requests==2.31.0
     # via
