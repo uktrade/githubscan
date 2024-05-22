@@ -184,8 +184,12 @@ class ReportDataProcessor:
         ]
 
     def add_sso_notification_targets(self):
+        """
+        This method adds notification targets and filter out users who does not have an email visible to app
+        """
         known_users = self._scanned_data_store["enterprise_users"]
         team_members = self._scanned_data_store["team_members"]
+        users_without_email = []
 
         for team, members in team_members.items():
             if team not in self._processed_data_store["sso_notification_targets"]:
@@ -203,7 +207,11 @@ class ReportDataProcessor:
                     )
                     continue
 
-                self._processed_data_store["users_without_sso_email"].append(member)
+                users_without_email.append(member)
+
+        self._processed_data_store["users_without_sso_email"] = list(
+            set(users_without_email)
+        )
 
     def add_repositories(self):
         """
@@ -232,7 +240,7 @@ class ReportDataProcessor:
                         ].append(team)
 
     def add_teams_and_team_repositories(self):
-        """simply addeds teams and repositories data to report data"""
+        """simply adds teams and repositories data to report data"""
         for team in self.scanned_data["teams"]:
             self.teams.update({team: {"repositories": []}})
             self.teams.update({team: {"name": team}})
@@ -274,7 +282,7 @@ class ReportDataProcessor:
                 if team_relavent_set:
                     team_info["repositories"] = list(team_relavent_set)
 
-                if not team_relavent_set:
+                if not team_relavent_set and team != exclusive_team:
                     team_info["repositories"] = []
 
             """
