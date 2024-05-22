@@ -143,7 +143,10 @@ class BuildSlackReport:
 
         HEADER_TEXT = "Github Organization Severity Report Summary"
 
-        SECTION_TEXT_LIST = self._section_text(total=total)
+        if total:
+            SECTION_TEXT_LIST = self._section_text(total=total)
+        else:
+            SECTION_TEXT_LIST = ["all is well"]
 
         self.slack_message = {"header": HEADER_TEXT, "section": SECTION_TEXT_LIST}
 
@@ -155,7 +158,10 @@ class BuildSlackReport:
 
         HEADER_TEXT = "Github Unmonitored Repositories severity summary"
 
-        SECTION_TEXT_LIST = self._section_text(total=total)
+        if total["repositories"] >= 1:
+            SECTION_TEXT_LIST = self._section_text(total=total)
+        else:
+            SECTION_TEXT_LIST = ["all is well"]
 
         self.slack_message = {"header": HEADER_TEXT, "section": SECTION_TEXT_LIST}
 
@@ -167,7 +173,10 @@ class BuildSlackReport:
 
         HEADER_TEXT = "Github Orphan Repositories severity summary"
 
-        SECTION_TEXT_LIST = self._section_text(total=total)
+        if total:
+            SECTION_TEXT_LIST = self._section_text(total=total)
+        else:
+            SECTION_TEXT_LIST = ["all is well"]
 
         self.slack_message = {"header": HEADER_TEXT, "section": SECTION_TEXT_LIST}
 
@@ -201,6 +210,9 @@ class BuildSlackReport:
             f'{"Total Low:":22s}{slo_breach_severities[SEVERITY.LOW.name]:3d}'
         )
 
+        if not SECTION_TEXT_LIST:
+            SECTION_TEXT_LIST = ["all is well"]
+
         self.slack_message = {"header": HEADER_TEXT, "section": SECTION_TEXT_LIST}
 
     def teams(self, report_reader):
@@ -218,30 +230,34 @@ class BuildSlackReport:
 
         SECTION_TEXT_LIST = []
 
-        SECTION_TEXT_LIST.append(f'{"Total Teams:":14s}{len(sorted_teams):3d}')
+        if sorted_teams:
+            SECTION_TEXT_LIST.append(f'{"Total Teams:":14s}{len(sorted_teams):3d}')
 
-        for team in sorted_teams:
-            original_severities = team["total"]["severities"]["original"]
-            effective_severities = team["total"]["severities"]["effective"]
+            for team in sorted_teams:
+                original_severities = team["total"]["severities"]["original"]
+                effective_severities = team["total"]["severities"]["effective"]
 
-            team_name = f'{team["name"]}:'
+                team_name = f'{team["name"]}:'
 
-            o_critical = original_severities[SEVERITY.CRITICAL.name]
-            o_high = original_severities[SEVERITY.HIGH.name]
-            o_moderate = original_severities[SEVERITY.MODERATE.name]
-            o_low = original_severities[SEVERITY.LOW.name]
+                o_critical = original_severities[SEVERITY.CRITICAL.name]
+                o_high = original_severities[SEVERITY.HIGH.name]
+                o_moderate = original_severities[SEVERITY.MODERATE.name]
+                o_low = original_severities[SEVERITY.LOW.name]
 
-            e_critical_breach = effective_severities[
-                EFFECTIVE_SEVERITY.CRITICAL_BREACH.name
-            ]
-            e_critical = effective_severities[EFFECTIVE_SEVERITY.CRITICAL.name]
-            e_high = effective_severities[EFFECTIVE_SEVERITY.HIGH.name]
-            e_moderate = effective_severities[EFFECTIVE_SEVERITY.MODERATE.name]
-            e_low = effective_severities[EFFECTIVE_SEVERITY.LOW.name]
+                e_critical_breach = effective_severities[
+                    EFFECTIVE_SEVERITY.CRITICAL_BREACH.name
+                ]
+                e_critical = effective_severities[EFFECTIVE_SEVERITY.CRITICAL.name]
+                e_high = effective_severities[EFFECTIVE_SEVERITY.HIGH.name]
+                e_moderate = effective_severities[EFFECTIVE_SEVERITY.MODERATE.name]
+                e_low = effective_severities[EFFECTIVE_SEVERITY.LOW.name]
 
-            team_text = f"{team_name:42s}[{o_critical:2d},{o_high:2d},{o_moderate:2d},{o_low:2d}] --> [{e_critical_breach:2d},{e_critical:2d},{e_high:2d},{e_moderate:2d},{e_low:2d}]"
-            SECTION_TEXT_LIST.append(team_text)
-            team_text = ""
+                team_text = f"{team_name:42s}[{o_critical:2d},{o_high:2d},{o_moderate:2d},{o_low:2d}] --> [{e_critical_breach:2d},{e_critical:2d},{e_high:2d},{e_moderate:2d},{e_low:2d}]"
+                SECTION_TEXT_LIST.append(team_text)
+                team_text = ""
+
+        else:
+            SECTION_TEXT_LIST.append("all is well")
 
         self.slack_message = {"header": HEADER_TEXT, "section": SECTION_TEXT_LIST}
 
@@ -252,15 +268,17 @@ class BuildSlackReport:
 
         SECTION_TEXT_LIST = []
 
-        SECTION_TEXT_LIST.append(
-            f'{"Total Repositories:":20s}{len(orphan_repositories_list):3d}'
-        )
-
-        for repoistory_name in orphan_repositories_list:
+        if orphan_repositories_list:
             SECTION_TEXT_LIST.append(
-                f"* <https://github.com/uktrade/{repoistory_name}/settings/access | {repoistory_name}>"
+                f'{"Total Repositories:":20s}{len(orphan_repositories_list):3d}'
             )
 
+            for repoistory_name in orphan_repositories_list:
+                SECTION_TEXT_LIST.append(
+                    f"* <https://github.com/uktrade/{repoistory_name}/settings/access | {repoistory_name}>"
+                )
+        else:
+            SECTION_TEXT_LIST.append("all is well")
         self.slack_message = {"header": HEADER_TEXT, "section": SECTION_TEXT_LIST}
 
     def unmonitored_repositories_list(self, report_reader):
@@ -273,13 +291,15 @@ class BuildSlackReport:
 
         SECTION_TEXT_LIST = []
 
-        SECTION_TEXT_LIST.append(
-            f'{"Total Repositories:":20s}{len(skip_scan_repositories_list):3d}'
-        )
-
-        for repoistory_name in skip_scan_repositories_list:
+        if skip_scan_repositories_list:
             SECTION_TEXT_LIST.append(
-                f"* <https://github.com/uktrade/{repoistory_name}/settings/access | {repoistory_name}>"
+                f'{"Total Repositories:":20s}{len(skip_scan_repositories_list):3d}'
             )
+            for repoistory_name in skip_scan_repositories_list:
+                SECTION_TEXT_LIST.append(
+                    f"* <https://github.com/uktrade/{repoistory_name}/settings/access | {repoistory_name}>"
+                )
+        else:
+            SECTION_TEXT_LIST.append("all is well")
 
         self.slack_message = {"header": HEADER_TEXT, "section": SECTION_TEXT_LIST}

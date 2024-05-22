@@ -35,9 +35,8 @@ def test_teams(build_slack_report, report_reader, data_index, processed_data):
 
     if data_index == 8:
         assert re.search(
-            f"{TEAM_TOAL_TEXT}{0:3d}",
+            "all is well",
             build_slack_report.slack_message[1]["text"]["text"],
         )
-
     build_slack_report.clear()
     report_reader.clear()

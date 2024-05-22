@@ -31,11 +31,9 @@ click-plugins==1.1.1
     # via celery
 click-repl==0.3.0
     # via celery
-contextlib2==21.6.0
-    # via schema
 dj-database-url==2.1.0
     # via -r requirements.in
-django==4.2.11
+django==4.2.13
     # via
     #   -r requirements.in
     #   dj-database-url
@@ -62,7 +60,7 @@ kubi-ecs-logger==0.1.2
     # via django-log-formatter-ecs
 marshmallow==3.19.0
     # via kubi-ecs-logger
-notifications-python-client==9.0.0
+notifications-python-client==9.1.0
     # via -r requirements.in
 oauthlib==3.2.2
     # via
@@ -84,7 +82,7 @@ ratelimit==2.2.1
     # via -r requirements.in
 redis==5.0.4
     # via celery
-requests==2.31.0
+requests==2.32.2
     # via
     #   -r requirements.in
     #   geckoboard-py
@@ -92,9 +90,9 @@ requests==2.31.0
     #   requests-oauthlib
 requests-oauthlib==2.0.0
     # via django-staff-sso-client
-schema==0.7.5
+schema==0.7.7
     # via -r requirements.in
-sentry-sdk==1.45.0
+sentry-sdk==2.2.1
     # via -r requirements.in
 six==1.16.0
     # via python-dateutil

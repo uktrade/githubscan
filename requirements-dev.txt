@@ -8,11 +8,11 @@ amqp==5.2.0
     # via kombu
 asgiref==3.8.1
     # via django
-astroid==3.1.0
+astroid==3.2.2
     # via pylint
 billiard==4.2.0
     # via celery
-black==24.4.0
+black==24.4.2
     # via -r requirements-dev.in
 celery[redis]==5.4.0
     # via
@@ -38,15 +38,15 @@ click-plugins==1.1.1
     # via celery
 click-repl==0.3.0
     # via celery
+coverage[toml]==7.5.1
 contextlib2==21.6.0
     # via schema
-coverage[toml]==7.5.0
     # via pytest-cov
 dill==0.3.8
     # via pylint
 dj-database-url==2.1.0
     # via -r requirements.in
-django==4.2.11
+django==4.2.13
     # via
     #   -r requirements.in
     #   dj-database-url
@@ -83,7 +83,7 @@ mccabe==0.7.0
     # via pylint
 mypy-extensions==1.0.0
     # via black
-notifications-python-client==9.0.0
+notifications-python-client==9.1.0
     # via -r requirements.in
 oauthlib==3.2.2
     # via
@@ -97,7 +97,7 @@ packaging==24.0
     #   pytest
 pathspec==0.12.1
     # via black
-platformdirs==4.2.1
+platformdirs==4.2.2
     # via
     #   black
     #   pylint
@@ -109,7 +109,7 @@ psycopg2-binary==2.9.9
     # via -r requirements.in
 pyjwt==2.8.0
     # via notifications-python-client
-pylint==3.1.0
+pylint==3.2.2
     # via
     #   -r requirements-dev.in
     #   pylint-django
@@ -118,7 +118,7 @@ pylint-django==2.5.5
     # via -r requirements-dev.in
 pylint-plugin-utils==0.8.2
     # via pylint-django
-pytest==8.1.1
+pytest==8.2.1
     # via
     #   pytest-cov
     #   pytest-django
@@ -132,7 +132,7 @@ ratelimit==2.2.1
     # via -r requirements.in
 redis==5.0.4
     # via celery
-requests==2.31.0
+requests==2.32.2
     # via
     #   -r requirements.in
     #   geckoboard-py
@@ -140,15 +140,15 @@ requests==2.31.0
     #   requests-oauthlib
 requests-oauthlib==2.0.0
     # via django-staff-sso-client
-schema==0.7.5
+schema==0.7.7
     # via -r requirements.in
-sentry-sdk==1.45.0
+sentry-sdk==2.2.1
     # via -r requirements.in
 six==1.16.0
     # via python-dateutil
 sqlparse==0.5.0
     # via django
-tomlkit==0.12.4
+tomlkit==0.12.5
     # via pylint
 typing-extensions==4.11.0
     # via dj-database-url
