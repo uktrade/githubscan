@@ -18,7 +18,7 @@ celery[redis]==5.4.0
     # via
     #   -r requirements-dev.in
     #   -r requirements.in
-certifi==2024.2.2
+certifi==2024.7.4
     # via
     #   -r requirements.in
     #   requests
@@ -39,8 +39,6 @@ click-plugins==1.1.1
 click-repl==0.3.0
     # via celery
 coverage[toml]==7.5.1
-contextlib2==21.6.0
-    # via schema
     # via pytest-cov
 dill==0.3.8
     # via pylint
