@@ -39,14 +39,12 @@ click-plugins==1.1.1
 click-repl==0.3.0
     # via celery
 coverage[toml]==7.5.1
-contextlib2==21.6.0
-    # via schema
     # via pytest-cov
 dill==0.3.8
     # via pylint
 dj-database-url==2.1.0
     # via -r requirements.in
-django==4.2.13
+django==4.2.14
     # via
     #   -r requirements.in
     #   dj-database-url
