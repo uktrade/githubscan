@@ -1,7 +1,11 @@
-[project]
-name = "github_vulnerabilities_reporter"
+[tool.poetry]
+name = "github_scanner"
+version = "2.0.1"
 description = "Github Vulnerabilities Reporter"
-version = "2.0"
+authors = ["Dhavalkumar Vadgama <dhavalkumar.vadgama@digital.trade.gov.uk>"]
+license = "MIT"
+readme = "README.md"
+package-mode = false
 
 [tool.pytest.ini_options]
 minversion = "7.0"
@@ -12,3 +16,39 @@ testpaths = [
     "scanner/tests",
     "report/tests"
 ]
+
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^5.1"
+django-environ = "^0.11.2"
+requests = "^2.32.3"
+schema = "^0.7.7"
+django-log-formatter-ecs = "^0.0.5"
+notifications-python-client = "^10.0.0"
+dj-database-url = "^2.2.0"
+psycopg2-binary = "^2.9.9"
+django-staff-sso-client = "^4.3.0"
+sentry-sdk = "^2.13.0"
+geckoboard-py = "^1.1.0"
+ratelimit = "^2.2.1"
+gunicorn = "^23.0.0"
+whitenoise = "^6.7.0"
+oauthlib = "^3.2.2"
+certifi = "^2024.7.4"
+celery = {extras = ["redis"], version = "^5.4.0"}
+
+
+[tool.poetry.group.dev.dependencies]
+isort = "^5.13.2"
+black = "^24.8.0"
+pytest-django = "^4.8.0"
+pytest-cov = "^5.0.0"
+pylint = "^3.2.6"
+pylint-django = "^2.5.5"
+celery = "^5.4.0"
+pre-commit = "^3.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

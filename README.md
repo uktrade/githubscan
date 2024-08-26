@@ -119,11 +119,10 @@ $python manage.py dispatch_slack_report
 
 if you are going to use the non-virtualised environment , you need following tools installed
 
-- `pip install pip-tools pre-commit`
-- `pre-commit install`
+- `pip install poetry`
 - postgres database
 
-If you are going to use docker environment all you need is a `docker-compose`
+If you are going to use VSCode with DevContainer,nothing needs doing
 
 <br>
 
@@ -132,13 +131,13 @@ If you are going to use docker environment all you need is a `docker-compose`
 1. install dev dependencies
 
    ```bash
-   $pip install -r requirements-dev.txt
+   $poetry lock
    ```
 
-2. _if you were to add your own dependencies do not forget to compile it with_
+2. if you were to add your own dependencies
 
    ```bash
-   $pip-compile requirements-dev.in
+   $poetry add --group=dev <package>
    ```
 
 3. Create a database instance and user:
