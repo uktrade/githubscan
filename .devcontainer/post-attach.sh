@@ -1,3 +1,4 @@
+source ${HOME}/.bashrc
 clear
 
 BLUE='\033[0;34m'

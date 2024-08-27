@@ -37,14 +37,14 @@
       "settings": {
         "[markdown]": {
           "editor.codeActionsOnSave": {
-            "source.fixAll.markdownlint": true
+            "source.fixAll.markdownlint": "always"
           },
           "editor.formatOnPaste": true,
           "editor.formatOnSave": true
         },
         "[python]": {
           "editor.codeActionsOnSave": {
-            "source.organizeImports": true
+            "source.organizeImports": "always"
           },
           "editor.defaultFormatter": "ms-python.black-formatter",
           "editor.formatOnPaste": false,
