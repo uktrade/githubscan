@@ -181,7 +181,7 @@ def dispatch_organization_email():
     for receiver in get_reportable_organization_notification_targets():
         email_client.send_email_with_attachment(
             receiver_email=receiver.email,
-            uplod_file_path=report_file,
+            upload_file_path=report_file,
             data=report_data,
             notify_template_id=settings.GOV_NOTIFY_SUMMARY_REPORT_TEMPLATE_ID,
         )
@@ -227,7 +227,7 @@ def dispatch_team_email():
 
             email_client.send_email_with_attachment(
                 receiver_email=email_info.email,
-                uplod_file_path=report_file,
+                upload_file_path=report_file,
                 data=report_data,
                 notify_template_id=settings.GOV_NOTIFY_SUMMARY_REPORT_TEMPLATE_ID,
             )
