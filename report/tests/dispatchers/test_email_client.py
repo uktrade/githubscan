@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings
 from pathlib import Path
+
+from django.conf import settings
 
 CSV_FILE_PATH = Path.joinpath(Path(__file__).parent, "fixtures", "test.csv")
 
@@ -24,7 +25,7 @@ def test_success_dispatcher(real_fast_test, fake_test_email_dispatcher):
     try:
         fake_test_email_dispatcher.send_email_with_attachment(
             receiver_email=receiver_email,
-            uplod_file_path=CSV_FILE_PATH,
+            upload_file_path=CSV_FILE_PATH,
             data=data,
             notify_template_id=temaplate_id,
         )
@@ -42,7 +43,7 @@ def test_fail_dispatcher(real_fast_test, fake_test_email_dispatcher, caplog):
     try:
         fake_test_email_dispatcher.send_email_with_attachment(
             receiver_email=receiver_email,
-            uplod_file_path=CSV_FILE_PATH,
+            upload_file_path=CSV_FILE_PATH,
             data=data,
             notify_template_id=temaplate_id,
         )
